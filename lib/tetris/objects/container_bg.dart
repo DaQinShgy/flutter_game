@@ -5,6 +5,7 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_game/tetris/constants/colors_value.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
+import 'package:flutter_game/tetris/objects/area_data.dart';
 import 'package:flutter_game/tetris/objects/area_game.dart';
 import 'package:flutter_game/tetris/objects/black_block.dart';
 import 'package:flutter_game/tetris/objects/block_unit.dart';
@@ -13,7 +14,7 @@ class ContainerBg extends CustomPainterComponent {
   ContainerBg({super.size});
 
   @override
-  FutureOr<void> onLoad() {
+  FutureOr<void> onLoad() async {
     painter = ContainerBgPainter();
 
     const borderLeft =
@@ -104,83 +105,6 @@ class ContainerBg extends CustomPainterComponent {
         }
       }
     }
-    // for (int i = 0; i < 6; i++) {
-    //   BlockUnit blockUnit = BlockUnit(
-    //     type: i == 0
-    //         ? BlockUnitType.Z
-    //         : i == 1
-    //             ? BlockUnitType.T
-    //             : i == 2
-    //                 ? BlockUnitType.O
-    //                 : i == 3
-    //                     ? BlockUnitType.T
-    //                     : i == 4
-    //                         ? BlockUnitType.J
-    //                         : BlockUnitType.I,
-    //     position: Vector2(
-    //       (borderLeft - Dimension.blackBlockSize * 2) / 2 +
-    //           Dimension.blackBlockSize,
-    //       Dimension.screenMaginTop -
-    //           Dimension.screenBorderMargin +
-    //           Dimension.blackBlockSize +
-    //           (i == 0
-    //                   ? Dimension.blackBlockSize * 1.5
-    //                   : i == 1
-    //                       ? Dimension.blackBlockSize * 4.5
-    //                       : i == 2
-    //                           ? Dimension.blackBlockSize * 8
-    //                           : i == 3
-    //                               ? Dimension.blackBlockSize * 11
-    //                               : i == 4
-    //                                   ? Dimension.blackBlockSize * 15
-    //                                   : Dimension.blackBlockSize * 19) *
-    //               1.07,
-    //     ),
-    //   );
-    //   leftBlocks.add(blockUnit);
-    // }
-    // // right blocks
-    // List<BlockUnit> rightBlocks = [];
-    // for (int i = 0; i < 6; i++) {
-    //   BlockUnit blockUnit = BlockUnit(
-    //     type: i == 0
-    //         ? BlockUnitType.S
-    //         : i == 1
-    //             ? BlockUnitType.T
-    //             : i == 2
-    //                 ? BlockUnitType.O
-    //                 : i == 3
-    //                     ? BlockUnitType.T
-    //                     : i == 4
-    //                         ? BlockUnitType.J
-    //                         : BlockUnitType.I,
-    //     position: Vector2(
-    //       borderLeft +
-    //           Dimension.screenBorderMargin * 2 +
-    //           Dimension.screenMaxWidth +
-    //           (borderLeft - Dimension.blackBlockSize * 2) / 2 +
-    //           (i == 5 ? Dimension.blackBlockSize : 0),
-    //       Dimension.screenMaginTop -
-    //           Dimension.screenBorderMargin +
-    //           Dimension.blackBlockSize +
-    //           (i == 0
-    //                   ? 0
-    //                   : i == 1
-    //                       ? Dimension.blackBlockSize * 4
-    //                       : i == 2
-    //                           ? Dimension.blackBlockSize * 8
-    //                           : i == 3
-    //                               ? Dimension.blackBlockSize * 11
-    //                               : i == 4
-    //                                   ? Dimension.blackBlockSize * 15
-    //                                   : Dimension.blackBlockSize * 19) *
-    //               1.07,
-    //     ),
-    //     angle: 0,
-    //     anchor: Anchor.center,
-    //   );
-    //   rightBlocks.add(blockUnit);
-    // }
     double gameMargin = (Dimension.screenMaxHeight -
             Dimension.blackBlockSize * Dimension.blackBlockRow) /
         2;
@@ -191,6 +115,25 @@ class ContainerBg extends CustomPainterComponent {
           (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2 +
               gameMargin,
           Dimension.screenMaginTop + gameMargin,
+        ),
+      ),
+      AreaData(
+        position: Vector2(
+          borderLeft +
+              Dimension.screenBorderMargin +
+              gameMargin +
+              Dimension.blackBlockSize * Dimension.blackBlockColumn +
+              Dimension.blackBlockPadding * 2 +
+              Dimension.dataMargin,
+          Dimension.screenMaginTop + gameMargin,
+        ),
+        size: Vector2(
+          Dimension.screenMaxWidth -
+              gameMargin -
+              Dimension.blackBlockSize * Dimension.blackBlockColumn -
+              Dimension.blackBlockPadding * 4 -
+              Dimension.dataMargin * 1.5,
+          Dimension.screenMaxHeight - gameMargin * 2,
         ),
       ),
     ]);

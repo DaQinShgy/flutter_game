@@ -3,9 +3,9 @@ class Dimension {
 
   static const double titleMarginTop = 30;
 
-  static const double screenMaxWidth = 240;
+  static const double screenMaxWidth = 248;
 
-  static const double screenMaxHeight = 320;
+  static const double screenMaxHeight = 300;
 
   static const double screenMaginTop = 65;
 
@@ -19,10 +19,13 @@ class Dimension {
 
   static const double blackBlockInnerSize = 8;
 
-  static const double blackBlockPadding = 1.2;
+  static const double blackBlockPadding = 1.4;
 
   static const int blackBlockColumn = 10;
 
   static const int blackBlockRow = 20;
 
+  static const double dataMargin = 6;
+
+  static const double dataTextSize = 10;
 }

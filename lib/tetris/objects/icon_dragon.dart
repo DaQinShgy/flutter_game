@@ -11,13 +11,13 @@ class IconDragon extends SpriteAnimationGroupComponent<DragonState>
 
   @override
   FutureOr<void> onLoad() async {
-    final blinkSprite0 = await Sprite.load(
-      'tetris.png',
+    final blinkSprite0 = Sprite(
+      game.images.fromCache('tetris.png'),
       srcPosition: Vector2(0, 100),
       srcSize: Vector2(80, 86),
     );
-    final blinkSprite1 = await Sprite.load(
-      'tetris.png',
+    final blinkSprite1 = Sprite(
+      game.images.fromCache('tetris.png'),
       srcPosition: Vector2(100, 100),
       srcSize: Vector2(80, 86),
     );
@@ -39,13 +39,13 @@ class IconDragon extends SpriteAnimationGroupComponent<DragonState>
       stepTimes: [1.5, 1.5, 0.2, 0.2, 0.2, 0.2, 0.2],
       loop: false,
     );
-    final runingSprite0 = await Sprite.load(
-      'tetris.png',
+    final runingSprite0 = Sprite(
+      game.images.fromCache('tetris.png'),
       srcPosition: Vector2(200, 100),
       srcSize: Vector2(80, 86),
     );
-    final runingSprite1 = await Sprite.load(
-      'tetris.png',
+    final runingSprite1 = Sprite(
+      game.images.fromCache('tetris.png'),
       srcPosition: Vector2(300, 100),
       srcSize: Vector2(80, 86),
     );

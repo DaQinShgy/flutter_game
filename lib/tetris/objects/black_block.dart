@@ -7,13 +7,13 @@ import 'package:flutter_game/tetris/constants/colors_value.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
 
 class BlackBlock extends CustomPainterComponent {
-  BlackBlock({super.position, this.status = BlackBlockStatus.black});
+  BlackBlock({super.position, this.status = BlackBlockStatus.black})
+      : super(size: Vector2.all(Dimension.blackBlockSize));
 
   BlackBlockStatus status;
 
   @override
   FutureOr<void> onLoad() {
-    size = Vector2.all(Dimension.blackBlockSize);
     painter = BlackBlockPainter(status: status);
   }
 }
@@ -23,7 +23,7 @@ class BlackBlockPainter extends CustomPainter {
   BlackBlockStatus status;
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = BasicPalette.black.paint();
+    Paint paint = Paint();
     paint.style = PaintingStyle.stroke;
     paint.strokeWidth = 1;
     paint.color = status == BlackBlockStatus.black

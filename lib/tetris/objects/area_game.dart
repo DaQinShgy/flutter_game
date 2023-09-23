@@ -9,16 +9,18 @@ import '../constants/strings.dart';
 import 'icon_dragon.dart';
 
 class AreaGame extends PositionComponent {
-  AreaGame({super.position});
+  AreaGame({super.position})
+      : super(
+          size: Vector2(
+            Dimension.blackBlockSize * Dimension.blackBlockColumn,
+            Dimension.blackBlockSize * Dimension.blackBlockRow,
+          ),
+        );
 
   final List<BlackBlock> _list = [];
 
   @override
   FutureOr<void> onLoad() {
-    size = Vector2(
-      Dimension.blackBlockSize * Dimension.blackBlockColumn,
-      Dimension.blackBlockSize * Dimension.blackBlockRow,
-    );
     for (int i = 0; i < Dimension.blackBlockColumn; i++) {
       for (int j = 0; j < Dimension.blackBlockRow; j++) {
         BlackBlock blackBlock = BlackBlock(
@@ -60,7 +62,7 @@ class AreaGame extends PositionComponent {
       await Future.delayed(const Duration(milliseconds: 50));
     }
     final textAppName = TextComponent(
-      position: Vector2(size.x / 2, Dimension.blackBlockSize * 7.5),
+      position: Vector2(size.x / 2, Dimension.blackBlockSize * 9),
       anchor: Anchor.topCenter,
       text: Strings.appName,
       textRenderer: TextPaint(
@@ -71,23 +73,11 @@ class AreaGame extends PositionComponent {
         ),
       ),
     );
-    final textAppNameEn = TextComponent(
-      position: Vector2(size.x / 2, Dimension.blackBlockSize * 9),
-      anchor: Anchor.topCenter,
-      text: Strings.appNameEn,
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 12,
-          letterSpacing: 3,
-        ),
-      ),
-    );
     final components = [
       IconDragon(
         position: Vector2(
           Dimension.blackBlockSize * 3,
-          Dimension.blackBlockSize * 3,
+          Dimension.blackBlockSize * 4,
         ),
         size: Vector2(
           Dimension.blackBlockSize * 4,
@@ -95,14 +85,17 @@ class AreaGame extends PositionComponent {
         ),
       ),
       textAppName,
-      textAppNameEn,
     ];
-    for (int i = 0; i < 2; i++) {
-      addAll(components);
-      await Future.delayed(const Duration(milliseconds: 150));
-      removeAll(components);
-      await Future.delayed(const Duration(milliseconds: 70));
-    }
     addAll(components);
+    for (int i = 0; i < 2; i++) {
+      await Future.delayed(const Duration(milliseconds: 150));
+      for (var element in components) {
+        element.scale = Vector2(0, 0);
+      }
+      await Future.delayed(const Duration(milliseconds: 70));
+      for (var element in components) {
+        element.scale = Vector2(1, 1);
+      }
+    }
   }
 }
