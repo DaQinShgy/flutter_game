@@ -5,6 +5,7 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_game/tetris/constants/colors_value.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
+import 'package:flutter_game/tetris/objects/area_control.dart';
 import 'package:flutter_game/tetris/objects/area_data.dart';
 import 'package:flutter_game/tetris/objects/area_game.dart';
 import 'package:flutter_game/tetris/objects/black_block.dart';
@@ -134,6 +135,22 @@ class ContainerBg extends CustomPainterComponent {
               Dimension.blackBlockPadding * 4 -
               Dimension.dataMargin * 1.5,
           Dimension.screenMaxHeight - gameMargin * 2,
+        ),
+      ),
+      AreaControl(
+        position: Vector2(
+          Dimension.controlHorizationMargin,
+          Dimension.screenMaginTop +
+              Dimension.screenMaxHeight +
+              Dimension.screenBorderMargin +
+              Dimension.screenBorderWidth,
+        ),
+        size: Vector2(
+          Dimension.containerMaxWidth - Dimension.controlHorizationMargin * 2,
+          size.y -
+              Dimension.screenMaxHeight -
+              Dimension.screenBorderMargin -
+              Dimension.screenMaginTop,
         ),
       ),
     ]);

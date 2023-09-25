@@ -10,4 +10,20 @@ class Strings {
   static const String level = 'Level';
 
   static const String next = 'Next';
+
+  static const String pause = 'PAUSE';
+
+  static const String sounds = 'SOUNDS';
+
+  static const String reset = 'RESET';
+
+  static const String drop = 'DROP';
+
+  static const String left = 'LEFT';
+
+  static const String right = 'RIGHT';
+
+  static const String down = 'DOWN';
+
+  static const String rotation = 'ROTATION';
 }

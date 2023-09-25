@@ -28,4 +28,22 @@ class Dimension {
   static const double dataMargin = 6;
 
   static const double dataTextSize = 10;
+
+  static const double controlHorizationMargin = 30;
+
+  static const double controlVerticalMargin = 20;
+
+  static const double buttonSizeSmall = 30;
+
+  static const double buttonSizeMedium = 55;
+
+  static const double buttonSizeLarge = 90;
+
+  static const double controlTextSize = 10;
+
+  static const double controlTextMargin = 5;
+
+  static const double controlTriangleWidth = 10;
+
+  static const double controlTriangleHeight = 11;
 }
