@@ -3,9 +3,11 @@ class Strings {
 
   static const String highestScore = 'Max';
 
-  static const String lastScore = 'Last Round';
+  static const String score = 'Score';
 
   static const String startLine = 'Start Line';
+
+  static const String cleanLine = 'Clean Line';
 
   static const String level = 'Level';
 

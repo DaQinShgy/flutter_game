@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:flutter_game/tetris/constants/dimension.dart';
+
 const blockUnitShapes = {
   BlockUnitType.I: [
     [1, 1, 1, 1]
@@ -113,11 +115,11 @@ class BlockUnit {
   }
 
   bool isValidInMatrix(List<List<int>> matrix) {
-    // if (xy[1] + shape.length > GAME_PAD_MATRIX_H ||
-    //     xy[0] < 0 ||
-    //     xy[0] + shape[0].length > GAME_PAD_MATRIX_W) {
-    //   return false;
-    // }
+    if (xy[1] + shape.length > Dimension.blackBlockRow ||
+        xy[0] < 0 ||
+        xy[0] + shape[0].length > Dimension.blackBlockColumn) {
+      return false;
+    }
     for (var i = 0; i < matrix.length; i++) {
       final line = matrix[i];
       for (var j = 0; j < line.length; j++) {
@@ -141,6 +143,7 @@ class BlockUnit {
   }
 
   int? getForBg(int x, int y) {
+    //shape=[[0, 0, 1], [1, 1, 1]]
     if (x < 0 || x >= shape[0].length || y < 0 || y >= shape.length) {
       return null;
     }

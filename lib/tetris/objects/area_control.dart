@@ -2,16 +2,21 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame/palette.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
+import 'package:flutter_game/tetris/bloc/stats_event.dart';
+import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
 import 'package:flutter_game/tetris/constants/strings.dart';
 import 'package:flutter_game/tetris/objects/round_button.dart';
 
-class AreaControl extends CustomPainterComponent {
+class AreaControl extends CustomPainterComponent
+    with FlameBlocReader<StatsBloc, StatsState> {
   AreaControl({super.position, super.size});
 
   @override
-  FutureOr<void> onLoad() {
+  Future<void> onLoad() {
     TextPaint textPaint = TextPaint(
       style: const TextStyle(
         color: Colors.black,
@@ -21,6 +26,14 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonPause = RoundButton(
       type: IconButtonType.green,
+      click: () {
+        if (bloc.state.status == GameStatus.initial ||
+            bloc.state.status == GameStatus.pause) {
+          bloc.add(const GameRunning());
+        } else if (bloc.state.status == GameStatus.running) {
+          bloc.add(const GamePause());
+        }
+      },
       position: Vector2(0, Dimension.controlVerticalMargin),
       size: Vector2.all(Dimension.buttonSizeSmall),
     );
@@ -37,6 +50,7 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonSounds = RoundButton(
       type: IconButtonType.green,
+      click: () {},
       position: Vector2(
         Dimension.buttonSizeSmall * 2,
         Dimension.controlVerticalMargin,
@@ -56,6 +70,7 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonReset = RoundButton(
       type: IconButtonType.red,
+      click: () {},
       position: Vector2(
         Dimension.buttonSizeSmall * 4,
         Dimension.controlVerticalMargin,
@@ -75,6 +90,14 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonDrop = RoundButton(
       type: IconButtonType.blue,
+      click: () {
+        if (bloc.state.status == GameStatus.initial ||
+            bloc.state.status == GameStatus.pause) {
+          bloc.add(const GameRunning());
+        } else if (bloc.state.status == GameStatus.running) {
+          bloc.add(const Drop());
+        }
+      },
       position: Vector2(
         Dimension.buttonSizeSmall,
         Dimension.controlVerticalMargin * 3 + Dimension.buttonSizeSmall,
@@ -95,6 +118,11 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonRotation = RoundButton(
       type: IconButtonType.blue,
+      click: () {
+        if (bloc.state.status == GameStatus.running) {
+          bloc.add(const Rotation());
+        }
+      },
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 2,
         Dimension.controlVerticalMargin,
@@ -111,6 +139,11 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonDown = RoundButton(
       type: IconButtonType.blue,
+      click: () {
+        if (bloc.state.status == GameStatus.running) {
+          bloc.add(const Down());
+        }
+      },
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 2,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2,
@@ -130,6 +163,11 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonLeft = RoundButton(
       type: IconButtonType.blue,
+      click: () {
+        if (bloc.state.status == GameStatus.running) {
+          bloc.add(const Left());
+        }
+      },
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 3,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium,
@@ -149,6 +187,11 @@ class AreaControl extends CustomPainterComponent {
     );
     RoundButton buttonRight = RoundButton(
       type: IconButtonType.blue,
+      click: () {
+        if (bloc.state.status == GameStatus.running) {
+          bloc.add(const Right());
+        }
+      },
       position: Vector2(
         size.x - Dimension.buttonSizeMedium,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium,
@@ -186,6 +229,8 @@ class AreaControl extends CustomPainterComponent {
     ]);
 
     painter = AreaControlPainter();
+
+    return super.onLoad();
   }
 }
 
@@ -264,9 +309,7 @@ class AreaControlPainter extends CustomPainter {
     );
     canvas.drawPath(
       getTrianglePath(
-        size.width -
-            Dimension.buttonSizeMedium -
-            Dimension.controlTextMargin,
+        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5,
         size.width -
             Dimension.buttonSizeMedium -

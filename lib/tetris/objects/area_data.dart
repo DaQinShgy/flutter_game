@@ -1,27 +1,42 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
+import 'package:flutter_game/tetris/bloc/stats_event.dart';
+import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
 import 'package:flutter_game/tetris/constants/strings.dart';
 import 'package:flutter_game/tetris/objects/black_block.dart';
+import 'package:flutter_game/tetris/objects/block_unit.dart';
 import 'package:flutter_game/tetris/objects/icon_digital_bg.dart';
+import 'package:flutter_game/tetris/objects/icon_number.dart';
 import 'package:flutter_game/tetris/objects/icon_pause.dart';
 import 'package:flutter_game/tetris/objects/icon_time.dart';
 import 'package:flutter_game/tetris/objects/icon_trumpet.dart';
 
-class AreaData extends PositionComponent {
+class AreaData extends PositionComponent
+    with FlameBlocListenable<StatsBloc, StatsState> {
   AreaData({super.position, super.size});
 
   late TextComponent highestScore;
 
-  late TextComponent lastScore;
+  late TextComponent currentScore;
 
   late TextComponent startLine;
+
+  late TextComponent cleanLine;
 
   late TextComponent level;
 
   late TextComponent next;
+
+  late IconNumber scoreIcon;
+
+  late IconNumber lineIcon;
+
+  late IconNumber levelIcon;
 
   @override
   FutureOr<void> onLoad() {
@@ -36,12 +51,17 @@ class AreaData extends PositionComponent {
       text: Strings.highestScore,
       textRenderer: textPaint,
     );
-    lastScore = TextComponent(
-      text: Strings.lastScore,
+    currentScore = TextComponent(
+      text: Strings.score,
       textRenderer: textPaint,
     );
     startLine = TextComponent(
       text: Strings.startLine,
+      position: Vector2(0, 50),
+      textRenderer: textPaint,
+    );
+    cleanLine = TextComponent(
+      text: Strings.cleanLine,
       position: Vector2(0, 50),
       textRenderer: textPaint,
     );
@@ -84,5 +104,73 @@ class AreaData extends PositionComponent {
       IconPause(position: Vector2(20, size.y - 15)),
       IconTime(position: Vector2(size.x - 40, size.y - 15)),
     ]);
+  }
+
+  @override
+  void onNewState(StatsState state) {
+    if (state.status == GameStatus.initial) {
+      removeAll([currentScore, cleanLine]);
+      addAll([highestScore, startLine]);
+    } else if (state.status == GameStatus.running) {
+      removeAll([highestScore, startLine]);
+      addAll([
+        currentScore,
+        cleanLine,
+        IconNumber(number: '0', position: Vector2(size.x - 10, 20)),
+      ]);
+    }
+  }
+
+  List<BlackBlock> blockUnit = [];
+
+  bool firstUpdate = true;
+
+  @override
+  void update(double dt) {
+    if (firstUpdate) {
+      firstUpdate = false;
+      scoreIcon = IconNumber(
+        number: bloc.state.score.toString(),
+        position: Vector2(size.x - 10, 20),
+      );
+      lineIcon = IconNumber(
+        number: bloc.state.startLine.toString(),
+        position: Vector2(size.x - 10, 70),
+      );
+      levelIcon = IconNumber(
+        number: bloc.state.level.toString(),
+        position: Vector2(size.x - 10, 120),
+      );
+      addAll([scoreIcon, lineIcon, levelIcon]);
+      buildNext(bloc.state.next);
+      bloc.on<Next>((event, emit) {
+        emit(bloc.state.copyWith(next: event.next));
+        removeAll(blockUnit);
+        buildNext(event.next);
+      });
+    }
+  }
+
+  void buildNext(BlockUnit unit) {
+    blockUnit.clear();
+    for (int i = 0; i < 2; i++) {
+      for (int j = 0; j < 4; j++) {
+        if (unit.getForBg(j, i) == 1) {
+          blockUnit.add(
+            BlackBlock(
+              position: Vector2(
+                size.x -
+                    (unit.type == BlockUnitType.O ? 3 - j : 4 - j) *
+                        Dimension.blackBlockSize,
+                170 +
+                    (unit.type == BlockUnitType.I ? i + 1 : i) *
+                        Dimension.blackBlockSize,
+              ),
+            ),
+          );
+        }
+      }
+    }
+    addAll(blockUnit);
   }
 }

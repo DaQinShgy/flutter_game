@@ -1,9 +1,13 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
+import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
+import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/teris_game.dart';
 
-class IconPause extends SpriteComponent with HasGameRef<TerisGame> {
+class IconPause extends SpriteComponent
+    with HasGameRef<TerisGame>, FlameBlocListenable<StatsBloc, StatsState> {
   IconPause({super.position}) : super(size: Vector2(18, 14));
 
   late Sprite spriteValid;
@@ -23,5 +27,14 @@ class IconPause extends SpriteComponent with HasGameRef<TerisGame> {
       srcSize: Vector2(25, 21),
     );
     sprite = spriteValid;
+  }
+
+  @override
+  void onNewState(StatsState state) {
+    if (state.status == GameStatus.running) {
+      sprite = spriteInvalid;
+    } else if (state.status == GameStatus.pause) {
+      sprite = spriteValid;
+    }
   }
 }

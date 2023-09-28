@@ -7,9 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_game/tetris/constants/colors_value.dart';
 
 class RoundButton extends CustomPainterComponent with TapCallbacks {
-  RoundButton({required this.type, super.position, super.size});
+  RoundButton({
+    required this.type,
+    required this.click,
+    super.position,
+    super.size,
+  });
 
   IconButtonType type;
+
+  VoidCallback click;
 
   @override
   FutureOr<void> onLoad() {
@@ -24,11 +31,13 @@ class RoundButton extends CustomPainterComponent with TapCallbacks {
   @override
   void onTapUp(TapUpEvent event) {
     setPainter(false);
+    click();
   }
 
   @override
   void onTapCancel(TapCancelEvent event) {
     setPainter(false);
+    click();
   }
 
   void setPainter(bool isPressed) {

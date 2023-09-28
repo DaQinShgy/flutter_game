@@ -7,13 +7,15 @@ import 'package:flutter_game/tetris/constants/colors_value.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
 
 class BlackBlock extends CustomPainterComponent {
-  BlackBlock({super.position, this.status = BlackBlockStatus.black})
-      : super(size: Vector2.all(Dimension.blackBlockSize));
+  BlackBlock({
+    super.position,
+    this.status = BlackBlockStatus.black,
+  }) : super(size: Vector2.all(Dimension.blackBlockSize));
 
   BlackBlockStatus status;
 
   @override
-  FutureOr<void> onLoad() {
+  FutureOr<void> onLoad() async {
     painter = BlackBlockPainter(status: status);
   }
 }
@@ -28,7 +30,9 @@ class BlackBlockPainter extends CustomPainter {
     paint.strokeWidth = 1;
     paint.color = status == BlackBlockStatus.black
         ? Colors.black
-        : const Color(ColorsValue.blockGrey);
+        : status == BlackBlockStatus.grey
+            ? const Color(ColorsValue.blockGrey)
+            : const Color(ColorsValue.blockRed);
     canvas.drawRect(
       Rect.fromLTWH(
         Dimension.blackBlockPadding,
@@ -48,7 +52,9 @@ class BlackBlockPainter extends CustomPainter {
       ),
       PaletteEntry(status == BlackBlockStatus.black
               ? Colors.black
-              : const Color(ColorsValue.blockGrey))
+              : status == BlackBlockStatus.grey
+                  ? const Color(ColorsValue.blockGrey)
+                  : const Color(ColorsValue.blockRed))
           .paint(),
     );
   }
@@ -59,4 +65,4 @@ class BlackBlockPainter extends CustomPainter {
   }
 }
 
-enum BlackBlockStatus { black, grey }
+enum BlackBlockStatus { black, grey, red }
