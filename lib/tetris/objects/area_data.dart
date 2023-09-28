@@ -107,11 +107,14 @@ class AreaData extends PositionComponent
   }
 
   @override
-  void onNewState(StatsState state) {
-    if (state.status == GameStatus.initial) {
+  bool listenWhen(StatsState previousState, StatsState newState) {
+    debugPrint('--listenWhen--');
+    if (previousState.status == GameStatus.running &&
+        newState.status == GameStatus.initial) {
       removeAll([currentScore, cleanLine]);
       addAll([highestScore, startLine]);
-    } else if (state.status == GameStatus.running) {
+    } else if (previousState.status == GameStatus.initial &&
+        newState.status == GameStatus.running) {
       removeAll([highestScore, startLine]);
       addAll([
         currentScore,
@@ -119,6 +122,7 @@ class AreaData extends PositionComponent
         IconNumber(number: '0', position: Vector2(size.x - 10, 20)),
       ]);
     }
+    return super.listenWhen(previousState, newState);
   }
 
   List<BlackBlock> blockUnit = [];

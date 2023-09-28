@@ -147,15 +147,6 @@ class AreaGame extends PositionComponent
       if (fallBlock != null && fallBlock.isValidInMatrix(_data)) {
         _current = fallBlock;
       } else {
-        // Add hit bottom blockUnit to data
-        for (int i = 0; i < _current!.shape.length; i++) {
-          for (int j = 0; j < _current!.shape[i].length; j++) {
-            if (_current!.shape[i][j] == 1) {
-              _data[_current!.xy[1] + i][_current!.xy[0] + j] = 1;
-            }
-          }
-        }
-
         _current = bloc.state.next;
         // Create next blockUnit
         bloc.add(Next(BlockUnit.getRandom()));
@@ -258,6 +249,16 @@ class AreaGame extends PositionComponent
                 : BlackBlockStatus.black,
           );
           _mixed.add(blackBlock);
+        }
+      }
+    }
+    if (hitBottom) {
+      // Add hit bottom blockUnit to data
+      for (int i = 0; i < _current!.shape.length; i++) {
+        for (int j = 0; j < _current!.shape[i].length; j++) {
+          if (_current!.shape[i][j] == 1) {
+            _data[_current!.xy[1] + i][_current!.xy[0] + j] = 1;
+          }
         }
       }
     }
