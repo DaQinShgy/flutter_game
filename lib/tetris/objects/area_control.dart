@@ -46,7 +46,9 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
     );
     RoundButton buttonSounds = RoundButton(
       type: IconButtonType.green,
-      click: () {},
+      click: () {
+        bloc.add(const Mute());
+      },
       position: Vector2(
         Dimension.buttonSizeSmall * 2,
         Dimension.controlVerticalMargin,

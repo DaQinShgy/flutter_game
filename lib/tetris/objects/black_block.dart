@@ -22,12 +22,14 @@ class BlackBlock extends CustomPainterComponent {
 
 class BlackBlockPainter extends CustomPainter {
   BlackBlockPainter({required this.status});
+
   BlackBlockStatus status;
+
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = 1;
+    paint.strokeWidth = Dimension.blackBlockBorderWidth;
     paint.color = status == BlackBlockStatus.black
         ? Colors.black
         : status == BlackBlockStatus.grey

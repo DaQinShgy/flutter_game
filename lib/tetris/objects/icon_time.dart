@@ -5,7 +5,7 @@ import 'package:flutter_game/tetris/objects/icon_colon.dart';
 import 'package:flutter_game/tetris/objects/icon_digital.dart';
 
 class IconTime extends PositionComponent {
-  IconTime({super.position}) : super(scale: Vector2(0.8, 0.8));
+  IconTime({super.position}) : super(scale: Vector2(1, 1));
 
   late IconDigital digitalHour0;
   late IconDigital digitalHour1;

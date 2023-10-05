@@ -101,7 +101,7 @@ class AreaData extends PositionComponent with FlameBlocListenable<StatsBloc, Sta
     addAll([
       IconTrumpet(position: Vector2(0, size.y - 15)),
       IconPause(position: Vector2(20, size.y - 15)),
-      IconTime(position: Vector2(size.x - 40, size.y - 15)),
+      IconTime(position: Vector2(size.x - 50, size.y - 17)),
     ]);
   }
 

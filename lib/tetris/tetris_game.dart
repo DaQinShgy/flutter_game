@@ -37,7 +37,6 @@ class TetrisGame extends FlameGame with KeyboardEvents {
 
   @override
   KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    debugPrint('event=$event,keysPressed=$keysPressed');
     if (event is RawKeyUpEvent) {
       return super.onKeyEvent(event, keysPressed);
     }

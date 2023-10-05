@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
@@ -82,6 +83,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
         _buildData();
       }
       speed = speedArr[bloc.state.level - 1];
+      if (!bloc.state.mute) {
+        FlameAudio.play('tetris/start.mp3');
+      }
     } else if (newState.status == GameStatus.reset) {
       reset();
       _current = null;
@@ -103,6 +107,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
             _buildData();
             _mixCurrentIntoData();
             bloc.add(const DropShake());
+            if (!bloc.state.mute) {
+              FlameAudio.play('tetris/drop.mp3');
+            }
             break;
           }
         }
@@ -112,6 +119,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
           _buildData();
+          if (!bloc.state.mute) {
+            FlameAudio.play('tetris/rotate.mp3');
+          }
         }
       });
       bloc.on<Down>((event, emit) {
@@ -119,6 +129,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
           _buildData();
+          if (!bloc.state.mute) {
+            FlameAudio.play('tetris/move.mp3');
+          }
         }
       });
       bloc.on<Left>((event, emit) {
@@ -126,6 +139,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
           _buildData();
+          if (!bloc.state.mute) {
+            FlameAudio.play('tetris/move.mp3');
+          }
         }
       });
       bloc.on<Right>((event, emit) {
@@ -133,6 +149,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
           _buildData();
+          if (!bloc.state.mute) {
+            FlameAudio.play('tetris/move.mp3');
+          }
         }
       });
     }
@@ -299,6 +318,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
       await Future.delayed(const Duration(milliseconds: 100));
       removeAll(mask);
     } else {
+      if (!bloc.state.mute) {
+        FlameAudio.play('tetris/clean.mp3');
+      }
       List<BlackBlock> mask = [];
       for (var i in clearLines) {
         for (int j = 0; j < Dimension.blackBlockColumn; j++) {
@@ -353,6 +375,9 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
 
     if (_data[0].contains(1)) {
       bloc.add(const GameReset());
+      if (!bloc.state.mute) {
+        FlameAudio.play('tetris/explosion.mp3');
+      }
     } else {
       bloc.add(const GameRunning());
     }

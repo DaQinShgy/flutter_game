@@ -154,3 +154,10 @@ class StartLineDecrease extends StatsEvent {
   @override
   List<Object?> get props => [];
 }
+
+class Mute extends StatsEvent {
+  const Mute();
+
+  @override
+  List<Object?> get props => [];
+}
