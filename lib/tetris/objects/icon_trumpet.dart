@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconTrumpet extends SpriteComponent with HasGameRef<TerisGame> {
+class IconTrumpet extends SpriteComponent with HasGameRef<TetrisGame> {
   IconTrumpet({super.position}) : super(size: Vector2(18, 14));
 
   late Sprite spriteValid;

@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconDigitalBg extends PositionComponent with HasGameRef<TerisGame> {
+class IconDigitalBg extends PositionComponent with HasGameRef<TetrisGame> {
   IconDigitalBg({super.position}) : super(size: Vector2(60, 17));
 
   @override

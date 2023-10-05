@@ -2,10 +2,11 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_game/tetris/objects/block_unit.dart';
 
 enum GameStatus {
+  reset,
   initial,
   running,
   pause,
-  gameOver,
+  mixing,
 }
 
 class StatsState extends Equatable {
@@ -34,7 +35,7 @@ class StatsState extends Equatable {
           startLine: 0,
           cleanLine: 0,
           level: 1,
-          status: GameStatus.initial,
+          status: GameStatus.reset,
           next: BlockUnit.getRandom(),
         );
 

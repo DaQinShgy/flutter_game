@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconDigital extends SpriteComponent with HasGameRef<TerisGame> {
+class IconDigital extends SpriteComponent with HasGameRef<TetrisGame> {
   IconDigital({
     required this.digital,
     super.position,

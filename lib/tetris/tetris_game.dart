@@ -7,7 +7,7 @@ import 'package:flutter_game/tetris/constants/dimension.dart';
 import 'package:flutter_game/tetris/objects/app_container.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 
-class TerisGame extends FlameGame {
+class TetrisGame extends FlameGame {
   @override
   Future<void> onLoad() async {
     await images.loadAll(['tetris.png']);

@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconColon extends SpriteComponent with HasGameRef<TerisGame> {
+class IconColon extends SpriteComponent with HasGameRef<TetrisGame> {
   IconColon({super.position}) : super(size: Vector2(10, 17));
 
   late Sprite spriteValid;

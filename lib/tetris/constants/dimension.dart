@@ -7,7 +7,7 @@ class Dimension {
 
   static const double screenMaxHeight = 300;
 
-  static const double screenMaginTop = 65;
+  static const double screenMarginTop = 65;
 
   static const double screenBorderWidth = 7;
 
@@ -29,7 +29,7 @@ class Dimension {
 
   static const double dataTextSize = 10;
 
-  static const double controlHorizationMargin = 30;
+  static const double controlHorizontalMargin = 30;
 
   static const double controlVerticalMargin = 20;
 

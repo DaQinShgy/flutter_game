@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flame/components.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
 class IconDragon extends SpriteAnimationGroupComponent<DragonState>
-    with HasGameRef<TerisGame> {
+    with HasGameRef<TetrisGame> {
   IconDragon({super.position, super.size});
 
   int runningCount = 0;
@@ -39,23 +39,23 @@ class IconDragon extends SpriteAnimationGroupComponent<DragonState>
       stepTimes: [1.5, 1.5, 0.2, 0.2, 0.2, 0.2, 0.2],
       loop: false,
     );
-    final runingSprite0 = Sprite(
+    final runningSprite0 = Sprite(
       game.images.fromCache('tetris.png'),
       srcPosition: Vector2(200, 100),
       srcSize: Vector2(80, 86),
     );
-    final runingSprite1 = Sprite(
+    final runningSprite1 = Sprite(
       game.images.fromCache('tetris.png'),
       srcPosition: Vector2(300, 100),
       srcSize: Vector2(80, 86),
     );
-    final runingAnim = SpriteAnimation.spriteList(
-        [runingSprite0, runingSprite1],
+    final runningAnim = SpriteAnimation.spriteList(
+        [runningSprite0, runningSprite1],
         stepTime: 0.1);
     animations = {
       DragonState.idle: idleAnim,
       DragonState.blink: blinkAnim,
-      DragonState.running: runingAnim,
+      DragonState.running: runningAnim,
     };
     current = DragonState.idle;
 

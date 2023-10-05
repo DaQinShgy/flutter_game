@@ -5,6 +5,20 @@ abstract class StatsEvent extends Equatable {
   const StatsEvent();
 }
 
+class GameReset extends StatsEvent {
+  const GameReset();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class GameInitial extends StatsEvent {
+  const GameInitial();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class GameRunning extends StatsEvent {
   const GameRunning();
 
@@ -19,6 +33,13 @@ class GamePause extends StatsEvent {
   List<Object?> get props => [];
 }
 
+class GameMixing extends StatsEvent {
+  const GameMixing();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class ScoreEvent extends StatsEvent {
   const ScoreEvent(this.score);
 
@@ -26,6 +47,24 @@ class ScoreEvent extends StatsEvent {
 
   @override
   List<Object?> get props => [score];
+}
+
+class LineEvent extends StatsEvent {
+  const LineEvent(this.line);
+
+  final int line;
+
+  @override
+  List<Object?> get props => [line];
+}
+
+class LevelEvent extends StatsEvent {
+  const LevelEvent(this.level);
+
+  final int level;
+
+  @override
+  List<Object?> get props => [level];
 }
 
 class Next extends StatsEvent {

@@ -21,7 +21,7 @@ class ContainerBg extends CustomPainterComponent {
     const borderLeft =
         (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2 -
             Dimension.screenBorderMargin;
-    const topMargin = Dimension.screenMaginTop -
+    const topMargin = Dimension.screenMarginTop -
         Dimension.screenBorderMargin +
         Dimension.blackBlockSize;
     List<BlackBlock> blackBlocks = [];
@@ -115,7 +115,7 @@ class ContainerBg extends CustomPainterComponent {
         position: Vector2(
           (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2 +
               gameMargin,
-          Dimension.screenMaginTop + gameMargin,
+          Dimension.screenMarginTop + gameMargin,
         ),
       ),
       AreaData(
@@ -126,7 +126,7 @@ class ContainerBg extends CustomPainterComponent {
               Dimension.blackBlockSize * Dimension.blackBlockColumn +
               Dimension.blackBlockPadding * 2 +
               Dimension.dataMargin,
-          Dimension.screenMaginTop + gameMargin,
+          Dimension.screenMarginTop + gameMargin,
         ),
         size: Vector2(
           Dimension.screenMaxWidth -
@@ -139,18 +139,18 @@ class ContainerBg extends CustomPainterComponent {
       ),
       AreaControl(
         position: Vector2(
-          Dimension.controlHorizationMargin,
-          Dimension.screenMaginTop +
+          Dimension.controlHorizontalMargin,
+          Dimension.screenMarginTop +
               Dimension.screenMaxHeight +
               Dimension.screenBorderMargin +
               Dimension.screenBorderWidth,
         ),
         size: Vector2(
-          Dimension.containerMaxWidth - Dimension.controlHorizationMargin * 2,
+          Dimension.containerMaxWidth - Dimension.controlHorizontalMargin * 2,
           size.y -
               Dimension.screenMaxHeight -
               Dimension.screenBorderMargin -
-              Dimension.screenMaginTop,
+              Dimension.screenMarginTop,
         ),
       ),
     ]);
@@ -174,7 +174,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft,
-        Dimension.screenMaginTop,
+        Dimension.screenMarginTop,
         Dimension.screenMaxWidth,
         Dimension.screenMaxHeight,
       ),
@@ -186,30 +186,30 @@ class ContainerBgPainter extends CustomPainter {
     screenShadowPaint.strokeWidth = Dimension.screenShadowWidth;
     canvas.drawLine(
       const Offset(screenLeft - Dimension.screenShadowWidth,
-          Dimension.screenMaginTop - Dimension.screenShadowWidth / 2),
+          Dimension.screenMarginTop - Dimension.screenShadowWidth / 2),
       const Offset(
         screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth,
-        Dimension.screenMaginTop - Dimension.screenShadowWidth / 2,
+        Dimension.screenMarginTop - Dimension.screenShadowWidth / 2,
       ),
       screenShadowPaint,
     );
     canvas.drawLine(
       const Offset(screenLeft - Dimension.screenShadowWidth / 2,
-          Dimension.screenMaginTop),
+          Dimension.screenMarginTop),
       const Offset(screenLeft - Dimension.screenShadowWidth / 2,
-          Dimension.screenMaginTop + Dimension.screenMaxHeight),
+          Dimension.screenMarginTop + Dimension.screenMaxHeight),
       screenShadowPaint,
     );
     canvas.drawLine(
       const Offset(
         screenLeft - Dimension.screenShadowWidth,
-        Dimension.screenMaginTop +
+        Dimension.screenMarginTop +
             Dimension.screenMaxHeight +
             Dimension.screenShadowWidth / 2,
       ),
       const Offset(
         screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth,
-        Dimension.screenMaginTop +
+        Dimension.screenMarginTop +
             Dimension.screenMaxHeight +
             Dimension.screenShadowWidth / 2,
       ),
@@ -218,11 +218,11 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawLine(
       const Offset(
         screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth / 2,
-        Dimension.screenMaginTop,
+        Dimension.screenMarginTop,
       ),
       const Offset(
         screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth / 2,
-        Dimension.screenMaginTop + Dimension.screenMaxHeight,
+        Dimension.screenMarginTop + Dimension.screenMaxHeight,
       ),
       screenShadowPaint,
     );
@@ -233,7 +233,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft,
-        Dimension.screenMaginTop,
+        Dimension.screenMarginTop,
         Dimension.screenMaxWidth,
         Dimension.screenMaxHeight,
       ),
@@ -244,7 +244,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMaginTop - Dimension.screenBorderMargin,
+        Dimension.screenMarginTop - Dimension.screenBorderMargin,
         Dimension.screenBorderWidth,
         Dimension.screenMaxHeight + Dimension.screenBorderMargin * 2,
       ),
@@ -257,7 +257,7 @@ class ContainerBgPainter extends CustomPainter {
             Dimension.screenMaxWidth +
             Dimension.screenBorderMargin -
             Dimension.screenBorderWidth,
-        Dimension.screenMaginTop - Dimension.screenBorderMargin,
+        Dimension.screenMarginTop - Dimension.screenBorderMargin,
         Dimension.screenBorderWidth,
         Dimension.screenMaxHeight + Dimension.screenBorderMargin * 2,
       ),
@@ -267,7 +267,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMaginTop +
+        Dimension.screenMarginTop +
             Dimension.screenMaxHeight +
             Dimension.screenBorderMargin,
         Dimension.screenMaxWidth + Dimension.screenBorderMargin * 2,
@@ -279,7 +279,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMaginTop -
+        Dimension.screenMarginTop -
             Dimension.screenBorderMargin -
             Dimension.screenBorderWidth,
         Dimension.screenBorderMargin,
@@ -290,7 +290,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       const Rect.fromLTWH(
         screenLeft + Dimension.screenMaxWidth,
-        Dimension.screenMaginTop -
+        Dimension.screenMarginTop -
             Dimension.screenBorderMargin -
             Dimension.screenBorderWidth,
         Dimension.screenBorderMargin,
@@ -305,7 +305,7 @@ class ContainerBgPainter extends CustomPainter {
           screenLeft +
               Dimension.screenBorderWidth * 2 * i -
               Dimension.screenBorderWidth,
-          Dimension.screenMaginTop -
+          Dimension.screenMarginTop -
               Dimension.screenBorderMargin -
               Dimension.screenBorderWidth,
           Dimension.screenBorderWidth,
@@ -321,7 +321,7 @@ class ContainerBgPainter extends CustomPainter {
           screenLeft +
               Dimension.screenMaxWidth -
               Dimension.screenBorderWidth * 2 * i,
-          Dimension.screenMaginTop -
+          Dimension.screenMarginTop -
               Dimension.screenBorderMargin -
               Dimension.screenBorderWidth,
           Dimension.screenBorderWidth,
@@ -343,7 +343,7 @@ class ContainerBgPainter extends CustomPainter {
     canvas.drawRect(
       Rect.fromLTWH(
         screenLeft + borderMargin,
-        Dimension.screenMaginTop + borderMargin,
+        Dimension.screenMarginTop + borderMargin,
         Dimension.blackBlockSize * Dimension.blackBlockColumn +
             Dimension.blackBlockPadding * 4,
         Dimension.blackBlockSize * Dimension.blackBlockRow +

@@ -11,10 +11,9 @@ import 'package:flutter_game/tetris/constants/strings.dart';
 import 'package:flutter_game/tetris/objects/black_block.dart';
 import 'package:flutter_game/tetris/objects/block_unit.dart';
 import 'package:flutter_game/tetris/objects/icon_dragon.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class AreaGame extends PositionComponent
-    with HasGameRef<TerisGame>, FlameBlocListenable<StatsBloc, StatsState> {
+class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocListenable<StatsBloc, StatsState> {
   AreaGame({super.position})
       : super(
           size: Vector2(
@@ -23,7 +22,7 @@ class AreaGame extends PositionComponent
           ),
         );
 
-  /// Game backgound of grey block
+  /// Game background of grey block
   final List<BlackBlock> _list = [];
 
   /// Init components, includs dragon icon and tetris text
@@ -61,30 +60,17 @@ class AreaGame extends PositionComponent
 
   @override
   void onInitialState(StatsState state) {
-    if (state.status == GameStatus.initial) {
-      reset();
-    }
-  }
-
-  @override
-  void onNewState(StatsState state) {
-    if (state.status == GameStatus.initial) {
+    if (state.status == GameStatus.reset) {
       reset();
     }
   }
 
   @override
   bool listenWhen(StatsState previousState, StatsState newState) {
-    if (newState.status == GameStatus.running) {
-      if (_current == null) {
-        _current = newState.next;
-        // Create next blockUnit
-        bloc.add(Next(BlockUnit.getRandom()));
-      }
-      if (previousState.status == GameStatus.initial) {
-        removeAll(_initComponents);
-        buildData();
-      } else {}
+    if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
+      removeAll(_initComponents);
+    } else if (newState.status == GameStatus.reset) {
+      reset();
     }
     return super.listenWhen(previousState, newState);
   }
@@ -100,7 +86,7 @@ class AreaGame extends PositionComponent
           BlockUnit? fallBlock = _current?.fall(step: j + 1);
           if (fallBlock != null && !fallBlock.isValidInMatrix(_data)) {
             _current = _current?.fall(step: j);
-            buildData();
+            _buildData();
             break;
           }
         }
@@ -109,28 +95,28 @@ class AreaGame extends PositionComponent
         BlockUnit? blockUnit = _current?.rotate();
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
-          buildData();
+          _buildData();
         }
       });
       bloc.on<Down>((event, emit) {
         BlockUnit? blockUnit = _current?.fall();
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
-          buildData();
+          _buildData();
         }
       });
       bloc.on<Left>((event, emit) {
         BlockUnit? blockUnit = _current?.left();
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
-          buildData();
+          _buildData();
         }
       });
       bloc.on<Right>((event, emit) {
         BlockUnit? blockUnit = _current?.right();
         if (blockUnit != null && blockUnit.isValidInMatrix(_data)) {
           _current = blockUnit;
-          buildData();
+          _buildData();
         }
       });
     }
@@ -143,15 +129,21 @@ class AreaGame extends PositionComponent
       } else {
         return;
       }
-      BlockUnit? fallBlock = _current?.fall();
-      if (fallBlock != null && fallBlock.isValidInMatrix(_data)) {
-        _current = fallBlock;
-      } else {
+      if (_current == null) {
         _current = bloc.state.next;
         // Create next blockUnit
         bloc.add(Next(BlockUnit.getRandom()));
+        _buildData();
+      } else {
+        BlockUnit? fallBlock = _current?.fall();
+        if (fallBlock != null && fallBlock.isValidInMatrix(_data)) {
+          _current = fallBlock;
+          _buildData();
+        } else {
+          _buildData();
+          _mixCurrentIntoData();
+        }
       }
-      buildData();
     }
   }
 
@@ -176,9 +168,18 @@ class AreaGame extends PositionComponent
       addAll(element);
       await Future.delayed(const Duration(milliseconds: 50));
     }
+    if (_mixed.isNotEmpty) {
+      removeAll(_mixed);
+      _mixed.clear();
+      for (int i = 0; i < Dimension.blackBlockColumn; i++) {
+        for (int j = 0; j < Dimension.blackBlockRow; j++) {
+          _data[j][i] = 0;
+        }
+      }
+    }
     for (final element in initList.reversed) {
       removeAll(element);
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 40));
     }
     if (_initComponents.isEmpty) {
       final textAppName = TextComponent(
@@ -218,54 +219,110 @@ class AreaGame extends PositionComponent
         element.scale = Vector2(1, 1);
       }
     }
+    bloc.add(const GameInitial());
   }
 
   /// black block list
   final List<BlackBlock> _mixed = [];
 
-  /// bulid game data
-  void buildData({bool ignoreHitBottom = false}) async {
+  /// build game data
+  void _buildData() {
     removeAll(_mixed);
     _mixed.clear();
-    bool hitBottom = false;
-    if (!ignoreHitBottom) {
-      BlockUnit? fallBlock = _current?.fall();
-      if (fallBlock != null && !fallBlock.isValidInMatrix(_data)) {
-        hitBottom = true;
-      }
-    }
     for (int i = 0; i < Dimension.blackBlockColumn; i++) {
       for (int j = 0; j < Dimension.blackBlockRow; j++) {
-        int? valueCurrent = _current?.get(i, j);
-        int value = valueCurrent ?? _data[j][i];
+        int value = _current?.get(i, j) ?? _data[j][i];
         if (value == 1) {
           BlackBlock blackBlock = BlackBlock(
             position: Vector2(
               i * Dimension.blackBlockSize,
               j * Dimension.blackBlockSize,
             ),
-            status: hitBottom && valueCurrent == 1
-                ? BlackBlockStatus.red
-                : BlackBlockStatus.black,
           );
           _mixed.add(blackBlock);
         }
       }
     }
-    if (hitBottom) {
-      // Add hit bottom blockUnit to data
-      for (int i = 0; i < _current!.shape.length; i++) {
-        for (int j = 0; j < _current!.shape[i].length; j++) {
-          if (_current!.shape[i][j] == 1) {
-            _data[_current!.xy[1] + i][_current!.xy[0] + j] = 1;
-          }
+    addAll(_mixed);
+  }
+
+  Future<void> _mixCurrentIntoData({VoidCallback? mixSound}) async {
+    if (_current == null) {
+      return;
+    }
+    bloc.add(const GameMixing());
+    // Add hit bottom blockUnit to data
+    for (int i = 0; i < _current!.shape.length; i++) {
+      for (int j = 0; j < _current!.shape[i].length; j++) {
+        if (_current!.shape[i][j] == 1 && _current!.xy[1] + i >= 0 && _current!.xy[0] + j >= 0) {
+          _data[_current!.xy[1] + i][_current!.xy[0] + j] = 1;
         }
       }
     }
-    addAll(_mixed);
-    if (hitBottom) {
+    final clearLines = [];
+    for (int i = 0; i < _data.length; i++) {
+      if (_data[i].every((d) => d == 1)) {
+        clearLines.add(i);
+      }
+    }
+    if (clearLines.isEmpty) {
+      List<BlackBlock> mask = [];
+      for (int i = 0; i < Dimension.blackBlockColumn; i++) {
+        for (int j = 0; j < Dimension.blackBlockRow; j++) {
+          if (_current?.get(i, j) == 1) {
+            BlackBlock blackBlock = BlackBlock(
+              position: Vector2(
+                i * Dimension.blackBlockSize,
+                j * Dimension.blackBlockSize,
+              ),
+              status: BlackBlockStatus.red,
+            );
+            mask.add(blackBlock);
+          }
+        }
+      }
+      addAll(mask);
       await Future.delayed(const Duration(milliseconds: 100));
-      buildData(ignoreHitBottom: true);
+      removeAll(mask);
+    } else {
+      List<BlackBlock> mask = [];
+      for (var i in clearLines) {
+        for (int j = 0; j < Dimension.blackBlockColumn; j++) {
+          BlackBlock blackBlock = BlackBlock(
+            position: Vector2(
+              j * Dimension.blackBlockSize,
+              i * Dimension.blackBlockSize,
+            ),
+            status: BlackBlockStatus.red,
+          );
+          mask.add(blackBlock);
+        }
+      }
+      for (int i = 0; i < 6; i++) {
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (i % 2 == 0) {
+          addAll(mask);
+        } else {
+          removeAll(mask);
+        }
+      }
+      // Remove clearLines of data
+      for (var line in clearLines) {
+        _data.setRange(1, line + 1, _data);
+        _data[0] = List.filled(Dimension.blackBlockColumn, 0);
+      }
+      // bloc event
+      bloc.add(LineEvent(clearLines.length));
+    }
+
+    _current = null;
+    // Refresh data
+    _buildData();
+
+    if (_data[0].contains(1)) {
+      bloc.add(const GameInitial());
+    } else {
+      bloc.add(const GameRunning());
     }
   }
 }

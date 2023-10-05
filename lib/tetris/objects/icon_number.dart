@@ -3,15 +3,22 @@ import 'dart:async';
 import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconNumber extends PositionComponent with HasGameRef<TerisGame> {
+class IconNumber extends PositionComponent with HasGameRef<TetrisGame> {
   IconNumber({required this.number, super.position});
 
   String number;
 
+  late SpriteBatchComponent component;
+
   @override
   FutureOr<void> onLoad() {
+    setComponent();
+    add(component);
+  }
+
+  void setComponent() {
     SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('tetris.png'));
     for (var i = 0; i < number.length; ++i) {
       final dx = 75.0 + 14 * int.parse(number.substring(i, i + 1));
@@ -21,6 +28,13 @@ class IconNumber extends PositionComponent with HasGameRef<TerisGame> {
         scale: 10 / 14,
       );
     }
-    add(SpriteBatchComponent(spriteBatch: spriteBatch));
+    component = SpriteBatchComponent(spriteBatch: spriteBatch);
+  }
+
+  void updateNumber(String number) {
+    this.number = number;
+    remove(component);
+    setComponent();
+    add(component);
   }
 }

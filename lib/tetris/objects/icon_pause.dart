@@ -4,10 +4,10 @@ import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
 import 'package:flutter_game/tetris/bloc/stats_state.dart';
-import 'package:flutter_game/tetris/teris_game.dart';
+import 'package:flutter_game/tetris/tetris_game.dart';
 
 class IconPause extends SpriteComponent
-    with HasGameRef<TerisGame>, FlameBlocListenable<StatsBloc, StatsState> {
+    with HasGameRef<TetrisGame>, FlameBlocListenable<StatsBloc, StatsState> {
   IconPause({super.position}) : super(size: Vector2(18, 14));
 
   late Sprite spriteValid;

@@ -16,8 +16,7 @@ import 'package:flutter_game/tetris/objects/icon_pause.dart';
 import 'package:flutter_game/tetris/objects/icon_time.dart';
 import 'package:flutter_game/tetris/objects/icon_trumpet.dart';
 
-class AreaData extends PositionComponent
-    with FlameBlocListenable<StatsBloc, StatsState> {
+class AreaData extends PositionComponent with FlameBlocListenable<StatsBloc, StatsState> {
   AreaData({super.position, super.size});
 
   late TextComponent highestScore;
@@ -108,13 +107,10 @@ class AreaData extends PositionComponent
 
   @override
   bool listenWhen(StatsState previousState, StatsState newState) {
-    debugPrint('--listenWhen--');
-    if (previousState.status == GameStatus.running &&
-        newState.status == GameStatus.initial) {
+    if (previousState.status == GameStatus.mixing && newState.status == GameStatus.initial) {
       removeAll([currentScore, cleanLine]);
       addAll([highestScore, startLine]);
-    } else if (previousState.status == GameStatus.initial &&
-        newState.status == GameStatus.running) {
+    } else if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
       removeAll([highestScore, startLine]);
       addAll([
         currentScore,
@@ -152,6 +148,19 @@ class AreaData extends PositionComponent
         removeAll(blockUnit);
         buildNext(event.next);
       });
+      bloc.on<ScoreEvent>((event, emit) {
+        emit(bloc.state.copyWith(score: bloc.state.score + event.score));
+        scoreIcon.updateNumber(bloc.state.score.toString());
+      });
+      bloc.on<LineEvent>((event, emit) {
+        emit(bloc.state.copyWith(cleanLine: bloc.state.cleanLine + event.line));
+        debugPrint('line:${bloc.state.cleanLine.toString()}');
+        lineIcon.updateNumber(bloc.state.cleanLine.toString());
+      });
+      bloc.on<LevelEvent>((event, emit) {
+        emit(bloc.state.copyWith(level: event.level));
+        levelIcon.updateNumber(bloc.state.level.toString());
+      });
     }
   }
 
@@ -163,12 +172,8 @@ class AreaData extends PositionComponent
           blockUnit.add(
             BlackBlock(
               position: Vector2(
-                size.x -
-                    (unit.type == BlockUnitType.O ? 3 - j : 4 - j) *
-                        Dimension.blackBlockSize,
-                170 +
-                    (unit.type == BlockUnitType.I ? i + 1 : i) *
-                        Dimension.blackBlockSize,
+                size.x - (unit.type == BlockUnitType.O ? 3 - j : 4 - j) * Dimension.blackBlockSize,
+                170 + (unit.type == BlockUnitType.I ? i + 1 : i) * Dimension.blackBlockSize,
               ),
             ),
           );
