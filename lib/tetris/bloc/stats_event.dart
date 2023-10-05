@@ -58,6 +58,15 @@ class LineEvent extends StatsEvent {
   List<Object?> get props => [line];
 }
 
+class StartLineEvent extends StatsEvent {
+  const StartLineEvent(this.startLine);
+
+  final int startLine;
+
+  @override
+  List<Object?> get props => [startLine];
+}
+
 class LevelEvent extends StatsEvent {
   const LevelEvent(this.level);
 
@@ -78,6 +87,13 @@ class Next extends StatsEvent {
 
 class Drop extends StatsEvent {
   const Drop();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class DropShake extends StatsEvent {
+  const DropShake();
 
   @override
   List<Object?> get props => [];
@@ -106,6 +122,34 @@ class Left extends StatsEvent {
 
 class Right extends StatsEvent {
   const Right();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class LevelIncrease extends StatsEvent {
+  const LevelIncrease();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class LevelDecrease extends StatsEvent {
+  const LevelDecrease();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class StartLineIncrease extends StatsEvent {
+  const StartLineIncrease();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class StartLineDecrease extends StatsEvent {
+  const StartLineDecrease();
 
   @override
   List<Object?> get props => [];

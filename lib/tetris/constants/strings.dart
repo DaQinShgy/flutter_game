@@ -1,7 +1,7 @@
 class Strings {
   static const String appName = 'TETRIS';
 
-  static const String highestScore = 'Max';
+  static const String highestScore = 'Highest Score';
 
   static const String score = 'Score';
 

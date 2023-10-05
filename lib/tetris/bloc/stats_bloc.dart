@@ -6,7 +6,7 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
   StatsBloc() : super(StatsState.empty()) {
     on<GameReset>(
       (event, emit) => emit(
-        state.copyWith(status: GameStatus.reset),
+        state.copyWith(status: GameStatus.reset, score: 0, cleanLine: 0),
       ),
     );
 
@@ -32,6 +32,30 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       (event, emit) => emit(
         state.copyWith(status: GameStatus.mixing),
       ),
+    );
+
+    on<LevelIncrease>(
+      (event, emit) {
+        add(LevelEvent(state.level >= 6 ? 1 : state.level + 1));
+      },
+    );
+
+    on<LevelDecrease>(
+      (event, emit) {
+        add(LevelEvent(state.level <= 1 ? 6 : state.level - 1));
+      },
+    );
+
+    on<StartLineIncrease>(
+      (event, emit) {
+        add(StartLineEvent(state.startLine >= 10 ? 0 : state.startLine + 1));
+      },
+    );
+
+    on<StartLineDecrease>(
+      (event, emit) {
+        add(StartLineEvent(state.startLine <= 0 ? 10 : state.startLine - 1));
+      },
     );
   }
 }

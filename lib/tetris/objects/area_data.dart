@@ -107,16 +107,22 @@ class AreaData extends PositionComponent with FlameBlocListenable<StatsBloc, Sta
 
   @override
   bool listenWhen(StatsState previousState, StatsState newState) {
-    if (previousState.status == GameStatus.mixing && newState.status == GameStatus.initial) {
-      removeAll([currentScore, cleanLine]);
-      addAll([highestScore, startLine]);
+    if (previousState.status == GameStatus.reset && newState.status == GameStatus.initial) {
+      if (highestScore.parent == null) {
+        removeAll([currentScore, cleanLine]);
+        addAll([highestScore, startLine]);
+        scoreIcon.position = Vector2(size.x - bloc.state.maxScore.toString().length * 10, 20);
+        scoreIcon.updateNumber(bloc.state.maxScore.toString());
+        lineIcon.position = Vector2(size.x - bloc.state.startLine.toString().length * 10, 70);
+        lineIcon.updateNumber(bloc.state.startLine.toString());
+      }
     } else if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
       removeAll([highestScore, startLine]);
-      addAll([
-        currentScore,
-        cleanLine,
-        IconNumber(number: '0', position: Vector2(size.x - 10, 20)),
-      ]);
+      addAll([currentScore, cleanLine]);
+      scoreIcon.position = Vector2(size.x - 10, 20);
+      scoreIcon.updateNumber('0');
+      lineIcon.position = Vector2(size.x - 10, 70);
+      lineIcon.updateNumber('0');
     }
     return super.listenWhen(previousState, newState);
   }
@@ -150,12 +156,24 @@ class AreaData extends PositionComponent with FlameBlocListenable<StatsBloc, Sta
       });
       bloc.on<ScoreEvent>((event, emit) {
         emit(bloc.state.copyWith(score: bloc.state.score + event.score));
-        scoreIcon.updateNumber(bloc.state.score.toString());
+        String number = bloc.state.score.toString();
+        scoreIcon.position = Vector2(size.x - number.length * 10, 20);
+        scoreIcon.updateNumber(number);
+        if (bloc.state.maxScore < bloc.state.score) {
+          emit(bloc.state.copyWith(maxScore: bloc.state.score));
+        }
       });
       bloc.on<LineEvent>((event, emit) {
         emit(bloc.state.copyWith(cleanLine: bloc.state.cleanLine + event.line));
-        debugPrint('line:${bloc.state.cleanLine.toString()}');
-        lineIcon.updateNumber(bloc.state.cleanLine.toString());
+        String number = bloc.state.cleanLine.toString();
+        lineIcon.position = Vector2(size.x - number.length * 10, 70);
+        lineIcon.updateNumber(number);
+      });
+      bloc.on<StartLineEvent>((event, emit) {
+        emit(bloc.state.copyWith(startLine: event.startLine));
+        String number = bloc.state.startLine.toString();
+        lineIcon.position = Vector2(size.x - number.length * 10, 70);
+        lineIcon.updateNumber(number);
       });
       bloc.on<LevelEvent>((event, emit) {
         emit(bloc.state.copyWith(level: event.level));

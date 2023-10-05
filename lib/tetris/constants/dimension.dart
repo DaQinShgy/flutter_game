@@ -46,4 +46,6 @@ class Dimension {
   static const double controlTriangleWidth = 10;
 
   static const double controlTriangleHeight = 11;
+
+  static const double dropShake = 5;
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
@@ -25,10 +26,12 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
   /// Game background of grey block
   final List<BlackBlock> _list = [];
 
-  /// Init components, includs dragon icon and tetris text
+  /// Init components, includes dragon icon and tetris text
   List<PositionComponent> _initComponents = [];
 
   double speed = 1;
+
+  final speedArr = [0.8, 0.65, 0.5, 0.37, 0.25, 0.16];
 
   double _currentTimer = 0;
 
@@ -69,8 +72,19 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
   bool listenWhen(StatsState previousState, StatsState newState) {
     if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
       removeAll(_initComponents);
+      _initComponents.clear();
+      if (bloc.state.startLine > 0) {
+        for (int i = 0; i < Dimension.blackBlockColumn; i++) {
+          for (int j = Dimension.blackBlockRow - 1; j >= Dimension.blackBlockRow - bloc.state.startLine; j--) {
+            _data[j][i] = math.Random().nextInt(2);
+          }
+        }
+        _buildData();
+      }
+      speed = speedArr[bloc.state.level - 1];
     } else if (newState.status == GameStatus.reset) {
       reset();
+      _current = null;
     }
     return super.listenWhen(previousState, newState);
   }
@@ -87,6 +101,8 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
           if (fallBlock != null && !fallBlock.isValidInMatrix(_data)) {
             _current = _current?.fall(step: j);
             _buildData();
+            _mixCurrentIntoData();
+            bloc.add(const DropShake());
             break;
           }
         }
@@ -166,7 +182,7 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
     }
     for (final element in initList) {
       addAll(element);
-      await Future.delayed(const Duration(milliseconds: 50));
+      await Future.delayed(const Duration(milliseconds: 30));
     }
     if (_mixed.isNotEmpty) {
       removeAll(_mixed);
@@ -179,35 +195,33 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
     }
     for (final element in initList.reversed) {
       removeAll(element);
-      await Future.delayed(const Duration(milliseconds: 40));
+      await Future.delayed(const Duration(milliseconds: 30));
     }
-    if (_initComponents.isEmpty) {
-      final textAppName = TextComponent(
-        position: Vector2(size.x / 2, Dimension.blackBlockSize * 9),
-        anchor: Anchor.topCenter,
-        text: Strings.appName,
-        textRenderer: TextPaint(
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 12,
-            letterSpacing: 4,
-          ),
+    final textAppName = TextComponent(
+      position: Vector2(size.x / 2, Dimension.blackBlockSize * 9),
+      anchor: Anchor.topCenter,
+      text: Strings.appName,
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 12,
+          letterSpacing: 4,
         ),
-      );
-      _initComponents = [
-        IconDragon(
-          position: Vector2(
-            Dimension.blackBlockSize * 3,
-            Dimension.blackBlockSize * 4,
-          ),
-          size: Vector2(
-            Dimension.blackBlockSize * 4,
-            Dimension.blackBlockSize * 4,
-          ),
+      ),
+    );
+    _initComponents = [
+      IconDragon(
+        position: Vector2(
+          Dimension.blackBlockSize * 3,
+          Dimension.blackBlockSize * 4,
         ),
-        textAppName,
-      ];
-    }
+        size: Vector2(
+          Dimension.blackBlockSize * 4,
+          Dimension.blackBlockSize * 4,
+        ),
+      ),
+      textAppName,
+    ];
     addAll(_initComponents);
     for (int i = 0; i < 2; i++) {
       await Future.delayed(const Duration(milliseconds: 150));
@@ -313,6 +327,24 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
       }
       // bloc event
       bloc.add(LineEvent(clearLines.length));
+      //1: 	100 × level
+      //2: 	300 × level
+      //3: 	500 × level
+      //4: 	800 × level
+      bloc.add(ScoreEvent(bloc.state.level *
+          (clearLines.length == 1
+              ? 100
+              : clearLines.length == 2
+                  ? 300
+                  : clearLines.length == 3
+                      ? 500
+                      : 800)));
+      //up level possible when cleared
+      int level = (bloc.state.cleanLine ~/ 50) + 1;
+      if (level <= 6 && level > bloc.state.level) {
+        bloc.add(LevelEvent(level));
+        speed = speedArr[level - 1];
+      }
     }
 
     _current = null;
@@ -320,7 +352,7 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
     _buildData();
 
     if (_data[0].contains(1)) {
-      bloc.add(const GameInitial());
+      bloc.add(const GameReset());
     } else {
       bloc.add(const GameRunning());
     }

@@ -11,8 +11,7 @@ import 'package:flutter_game/tetris/constants/dimension.dart';
 import 'package:flutter_game/tetris/constants/strings.dart';
 import 'package:flutter_game/tetris/objects/round_button.dart';
 
-class AreaControl extends CustomPainterComponent
-    with FlameBlocReader<StatsBloc, StatsState> {
+class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc, StatsState> {
   AreaControl({super.position, super.size});
 
   @override
@@ -27,8 +26,7 @@ class AreaControl extends CustomPainterComponent
     RoundButton buttonPause = RoundButton(
       type: IconButtonType.green,
       click: () {
-        if (bloc.state.status == GameStatus.initial ||
-            bloc.state.status == GameStatus.pause) {
+        if (bloc.state.status == GameStatus.initial || bloc.state.status == GameStatus.pause) {
           bloc.add(const GameRunning());
         } else if (bloc.state.status == GameStatus.running) {
           bloc.add(const GamePause());
@@ -40,9 +38,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textPause = TextComponent(
       position: Vector2(
         Dimension.buttonSizeSmall / 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeSmall +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.pause,
@@ -60,9 +56,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textSounds = TextComponent(
       position: Vector2(
         Dimension.buttonSizeSmall / 2 + Dimension.buttonSizeSmall * 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeSmall +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.sounds,
@@ -70,7 +64,15 @@ class AreaControl extends CustomPainterComponent
     );
     RoundButton buttonReset = RoundButton(
       type: IconButtonType.red,
-      click: () {},
+      click: () {
+        if (bloc.state.status == GameStatus.initial) {
+          bloc.add(const GameRunning());
+        } else if (bloc.state.status == GameStatus.running ||
+            bloc.state.status == GameStatus.pause ||
+            bloc.state.status == GameStatus.mixing) {
+          bloc.add(const GameReset());
+        }
+      },
       position: Vector2(
         Dimension.buttonSizeSmall * 4,
         Dimension.controlVerticalMargin,
@@ -80,9 +82,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textReset = TextComponent(
       position: Vector2(
         Dimension.buttonSizeSmall / 2 + Dimension.buttonSizeSmall * 4,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeSmall +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.reset,
@@ -91,8 +91,7 @@ class AreaControl extends CustomPainterComponent
     RoundButton buttonDrop = RoundButton(
       type: IconButtonType.blue,
       click: () {
-        if (bloc.state.status == GameStatus.initial ||
-            bloc.state.status == GameStatus.pause) {
+        if (bloc.state.status == GameStatus.initial || bloc.state.status == GameStatus.pause) {
           bloc.add(const GameRunning());
         } else if (bloc.state.status == GameStatus.running) {
           bloc.add(const Drop());
@@ -121,6 +120,8 @@ class AreaControl extends CustomPainterComponent
       click: () {
         if (bloc.state.status == GameStatus.running) {
           bloc.add(const Rotation());
+        } else if (bloc.state.status == GameStatus.initial) {
+          bloc.add(const StartLineIncrease());
         }
       },
       position: Vector2(
@@ -142,6 +143,8 @@ class AreaControl extends CustomPainterComponent
       click: () {
         if (bloc.state.status == GameStatus.running) {
           bloc.add(const Down());
+        } else if (bloc.state.status == GameStatus.initial) {
+          bloc.add(const StartLineDecrease());
         }
       },
       position: Vector2(
@@ -153,9 +156,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textDown = TextComponent(
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 3 +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 3 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.down,
@@ -166,6 +167,8 @@ class AreaControl extends CustomPainterComponent
       click: () {
         if (bloc.state.status == GameStatus.running) {
           bloc.add(const Left());
+        } else if (bloc.state.status == GameStatus.initial) {
+          bloc.add(const LevelDecrease());
         }
       },
       position: Vector2(
@@ -177,9 +180,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textLeft = TextComponent(
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 2.5,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 2 +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.left,
@@ -190,6 +191,8 @@ class AreaControl extends CustomPainterComponent
       click: () {
         if (bloc.state.status == GameStatus.running) {
           bloc.add(const Right());
+        } else if (bloc.state.status == GameStatus.initial) {
+          bloc.add(const LevelIncrease());
         }
       },
       position: Vector2(
@@ -201,9 +204,7 @@ class AreaControl extends CustomPainterComponent
     TextComponent textRight = TextComponent(
       position: Vector2(
         size.x - Dimension.buttonSizeMedium * 0.5,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 2 +
-            Dimension.controlTextMargin,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.right,
@@ -241,19 +242,13 @@ class AreaControlPainter extends CustomPainter {
     canvas.drawPath(
       getTrianglePath(
         size.width - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium +
-            Dimension.controlTextMargin,
-        size.width -
-            Dimension.buttonSizeMedium * 1.5 -
-            Dimension.controlTriangleWidth / 2,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium + Dimension.controlTextMargin,
+        size.width - Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
         Dimension.controlVerticalMargin +
             Dimension.buttonSizeMedium +
             Dimension.controlTextMargin +
             Dimension.controlTriangleHeight,
-        size.width -
-            Dimension.buttonSizeMedium * 1.5 +
-            Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
         Dimension.controlVerticalMargin +
             Dimension.buttonSizeMedium +
             Dimension.controlTextMargin +
@@ -264,19 +259,13 @@ class AreaControlPainter extends CustomPainter {
     canvas.drawPath(
       getTrianglePath(
         size.width - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 2 -
-            Dimension.controlTextMargin,
-        size.width -
-            Dimension.buttonSizeMedium * 1.5 -
-            Dimension.controlTriangleWidth / 2,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 - Dimension.controlTextMargin,
+        size.width - Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
         Dimension.controlVerticalMargin +
             Dimension.buttonSizeMedium * 2 -
             Dimension.controlTextMargin -
             Dimension.controlTriangleHeight,
-        size.width -
-            Dimension.buttonSizeMedium * 1.5 +
-            Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
         Dimension.controlVerticalMargin +
             Dimension.buttonSizeMedium * 2 -
             Dimension.controlTextMargin -
@@ -286,24 +275,12 @@ class AreaControlPainter extends CustomPainter {
     );
     canvas.drawPath(
       getTrianglePath(
-        size.width -
-            Dimension.buttonSizeMedium * 2 +
-            Dimension.controlTextMargin,
+        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5,
-        size.width -
-            Dimension.buttonSizeMedium * 2 +
-            Dimension.controlTextMargin +
-            Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 1.5 +
-            Dimension.controlTriangleWidth / 2,
-        size.width -
-            Dimension.buttonSizeMedium * 2 +
-            Dimension.controlTextMargin +
-            Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 1.5 -
-            Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
       ),
       paint,
     );
@@ -311,27 +288,16 @@ class AreaControlPainter extends CustomPainter {
       getTrianglePath(
         size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin,
         Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5,
-        size.width -
-            Dimension.buttonSizeMedium -
-            Dimension.controlTextMargin -
-            Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 1.5 +
-            Dimension.controlTriangleWidth / 2,
-        size.width -
-            Dimension.buttonSizeMedium -
-            Dimension.controlTextMargin -
-            Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 1.5 -
-            Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
+        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
       ),
       paint,
     );
   }
 
-  Path getTrianglePath(
-      double x0, double y0, double x1, double y1, double x2, double y2) {
+  Path getTrianglePath(double x0, double y0, double x1, double y1, double x2, double y2) {
     return Path()
       ..moveTo(x0, y0)
       ..lineTo(x1, y1)
