@@ -13,7 +13,7 @@ UI参考来源于 [react-tetris](https://github.com/chvin/react-tetris)，代码
 ----
 
 ### 效果预览
-![效果预览](https://github.com/DaQinShgy/flutter_game/images/tetris0.png)
+![效果预览](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris0.png)
 
 ## 如何开始
 

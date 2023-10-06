@@ -13,7 +13,7 @@ Open [https://daqinshgy.github.io/flutter_game/](https://daqinshgy.github.io/flu
 ----
 
 ### Interface preview
-![interface preview](https://github.com/DaQinShgy/flutter_game/images/tetris0.png)
+![interface preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris0.png)
 
 ## Getting Started
 
