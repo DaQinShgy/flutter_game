@@ -2,12 +2,10 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
 import 'package:flutter_game/tetris/bloc/stats_event.dart';
 import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
-import 'package:flutter_game/tetris/constants/strings.dart';
 import 'package:flutter_game/tetris/objects/area_control.dart';
 import 'package:flutter_game/tetris/objects/container_component.dart';
 
@@ -27,25 +25,20 @@ class AppContainer extends RectangleComponent with FlameBlocListenable<StatsBloc
   FutureOr<void> onLoad() async {
     ContainerBg containerBg = ContainerBg(size: super.size);
     containerComponent = ContainerComponent(
+      position: Vector2(0, (size.y - size.x * 1.4) / 4),
       size: Vector2(
         size.x,
-        Dimension.screenMarginTop +
-            Dimension.screenMaxHeight +
-            Dimension.screenBorderMargin +
-            Dimension.screenBorderWidth,
+        size.x * 0.9,
       ),
     );
     AreaControl areaControl = AreaControl(
       position: Vector2(
-        Dimension.controlHorizontalMargin,
-        Dimension.screenMarginTop +
-            Dimension.screenMaxHeight +
-            Dimension.screenBorderMargin +
-            Dimension.screenBorderWidth,
+        Dimension.containerMaxWidth * 0.1,
+        size.x * 0.9 + (size.y - size.x * 1.4) / 2,
       ),
       size: Vector2(
-        Dimension.containerMaxWidth - Dimension.controlHorizontalMargin * 2,
-        size.y - Dimension.screenMaxHeight - Dimension.screenBorderMargin - Dimension.screenMarginTop,
+        Dimension.containerMaxWidth * 0.8,
+        Dimension.containerMaxWidth * 0.55,
       ),
     );
     addAll([containerBg, containerComponent, areaControl]);

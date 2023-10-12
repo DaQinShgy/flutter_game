@@ -12,14 +12,21 @@ import 'package:flutter_game/tetris/objects/black_block.dart';
 import 'package:flutter_game/tetris/objects/block_unit.dart';
 
 class ContainerComponent extends CustomPainterComponent {
-  ContainerComponent({super.size});
+  ContainerComponent({super.position, super.size});
 
   @override
   FutureOr<void> onLoad() async {
     painter = ContainerComponentPainter();
 
+    double screenLeft = Dimension.containerMaxWidth * 0.4 / 2;
+    double screenTop = (size.y - Dimension.containerMaxWidth * 0.6 * 1.2) / 2;
+    double screenWidth = Dimension.containerMaxWidth * 0.6;
+    double screenBorderWidth = Dimension.containerMaxWidth * 0.015;
+    double screenBorderMargin = Dimension.containerMaxWidth * 0.054;
+    double screenHeight = Dimension.containerMaxWidth * 0.6 * 1.2;
+
     TextComponent titleText = TextComponent(
-      position: Vector2(size.x / 2, Dimension.titleMarginTop),
+      position: Vector2(size.x / 2, screenTop - screenBorderMargin - screenBorderWidth / 2),
       text: Strings.appName,
       anchor: Anchor.center,
       textRenderer: TextPaint(
@@ -30,9 +37,9 @@ class ContainerComponent extends CustomPainterComponent {
         ),
       ),
     );
-
-    const borderLeft = (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2 - Dimension.screenBorderMargin;
-    const topMargin = Dimension.screenMarginTop - Dimension.screenBorderMargin + Dimension.blackBlockSize;
+    //
+    double borderLeft = screenLeft - screenBorderMargin - screenBorderWidth;
+    double topMargin = screenTop - screenBorderMargin + Dimension.blackBlockSize / 4;
     List<BlackBlock> blackBlocks = [];
     // left blocks
     List<BlockUnit> leftBlockUnits = [
@@ -53,10 +60,7 @@ class ContainerComponent extends CustomPainterComponent {
       BlockUnit.fromTypeRotate(BlockUnitType.I, 90),
     ];
     double leftX = (borderLeft - Dimension.blackBlockSize * 2) / 2;
-    double rightX = borderLeft +
-        Dimension.screenBorderMargin * 2 +
-        Dimension.screenMaxWidth +
-        (borderLeft - Dimension.blackBlockSize * 2) / 2;
+    double rightX = screenLeft + screenWidth + screenBorderMargin + screenBorderWidth + leftX;
     for (int i = 0; i < leftBlockUnits.length; i++) {
       BlockUnit leftBlockUnit = leftBlockUnits[i];
       BlockUnit rightBlockUnit = rightBlockUnits[i];
@@ -115,33 +119,32 @@ class ContainerComponent extends CustomPainterComponent {
         }
       }
     }
-    double gameMargin = (Dimension.screenMaxHeight - Dimension.blackBlockSize * Dimension.blackBlockRow) / 2;
+    double gameMargin = (screenHeight - Dimension.blackBlockSize * Dimension.blackBlockRow) / 2;
     addAll([
       titleText,
       ...blackBlocks,
       AreaGame(
         position: Vector2(
-          (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2 + gameMargin,
-          Dimension.screenMarginTop + gameMargin,
+          screenLeft + gameMargin,
+          screenTop + gameMargin,
         ),
       ),
       AreaData(
         position: Vector2(
-          borderLeft +
-              Dimension.screenBorderMargin +
+          screenLeft +
               gameMargin +
               Dimension.blackBlockSize * Dimension.blackBlockColumn +
-              Dimension.blackBlockPadding * 2 +
-              Dimension.dataMargin,
-          Dimension.screenMarginTop + gameMargin,
+              Dimension.blackBlockPadding * 4 +
+              gameMargin * 0.5,
+          screenTop + gameMargin,
         ),
         size: Vector2(
-          Dimension.screenMaxWidth -
+          screenWidth -
               gameMargin -
               Dimension.blackBlockSize * Dimension.blackBlockColumn -
               Dimension.blackBlockPadding * 4 -
-              Dimension.dataMargin * 1.5,
-          Dimension.screenMaxHeight - gameMargin * 2,
+              gameMargin,
+          screenHeight - gameMargin * 2,
         ),
       ),
     ]);
@@ -151,54 +154,52 @@ class ContainerComponent extends CustomPainterComponent {
 class ContainerComponentPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    const screenLeft = (Dimension.containerMaxWidth - Dimension.screenMaxWidth) / 2;
+    double screenLeft = Dimension.containerMaxWidth * 0.4 / 2;
+    double screenTop = (size.height - Dimension.containerMaxWidth * 0.6 * 1.2) / 2;
+    double screenWidth = Dimension.containerMaxWidth * 0.6;
+    double screenHeight = Dimension.containerMaxWidth * 0.6 * 1.2;
     // screen background
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft,
-        Dimension.screenMarginTop,
-        Dimension.screenMaxWidth,
-        Dimension.screenMaxHeight,
-      ),
+      Rect.fromLTWH(screenLeft, screenTop, screenWidth, screenHeight),
       const PaletteEntry(Color(ColorsValue.screenBg)).paint(),
     );
     // screen shadow
+    double screenShadowWidth = Dimension.containerMaxWidth * 0.0075;
     Paint screenShadowPaint = Paint();
     screenShadowPaint.color = const Color(ColorsValue.screenShadow);
-    screenShadowPaint.strokeWidth = Dimension.screenShadowWidth;
+    screenShadowPaint.strokeWidth = screenShadowWidth;
     canvas.drawLine(
-      const Offset(
-          screenLeft - Dimension.screenShadowWidth, Dimension.screenMarginTop - Dimension.screenShadowWidth / 2),
-      const Offset(
-        screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth,
-        Dimension.screenMarginTop - Dimension.screenShadowWidth / 2,
+      Offset(screenLeft - screenShadowWidth, screenTop - screenShadowWidth / 2),
+      Offset(
+        screenLeft + screenWidth + screenShadowWidth,
+        screenTop - screenShadowWidth / 2,
       ),
       screenShadowPaint,
     );
     canvas.drawLine(
-      const Offset(screenLeft - Dimension.screenShadowWidth / 2, Dimension.screenMarginTop),
-      const Offset(screenLeft - Dimension.screenShadowWidth / 2, Dimension.screenMarginTop + Dimension.screenMaxHeight),
+      Offset(screenLeft - screenShadowWidth / 2, screenTop - screenShadowWidth),
+      Offset(screenLeft - screenShadowWidth / 2, screenTop + screenHeight + screenShadowWidth),
       screenShadowPaint,
     );
     canvas.drawLine(
-      const Offset(
-        screenLeft - Dimension.screenShadowWidth,
-        Dimension.screenMarginTop + Dimension.screenMaxHeight + Dimension.screenShadowWidth / 2,
+      Offset(
+        screenLeft - screenShadowWidth,
+        screenTop + screenHeight + screenShadowWidth / 2,
       ),
-      const Offset(
-        screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth,
-        Dimension.screenMarginTop + Dimension.screenMaxHeight + Dimension.screenShadowWidth / 2,
+      Offset(
+        screenLeft + screenWidth + screenShadowWidth,
+        screenTop + screenHeight + screenShadowWidth / 2,
       ),
       screenShadowPaint,
     );
     canvas.drawLine(
-      const Offset(
-        screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth / 2,
-        Dimension.screenMarginTop,
+      Offset(
+        screenLeft + screenWidth + screenShadowWidth / 2,
+        screenTop - screenShadowWidth,
       ),
-      const Offset(
-        screenLeft + Dimension.screenMaxWidth + Dimension.screenShadowWidth / 2,
-        Dimension.screenMarginTop + Dimension.screenMaxHeight,
+      Offset(
+        screenLeft + screenWidth + screenShadowWidth / 2,
+        screenTop + screenHeight + screenShadowWidth,
       ),
       screenShadowPaint,
     );
@@ -207,61 +208,58 @@ class ContainerComponentPainter extends CustomPainter {
     innerBorderPaint.style = PaintingStyle.stroke;
     innerBorderPaint.color = Colors.black;
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft,
-        Dimension.screenMarginTop,
-        Dimension.screenMaxWidth,
-        Dimension.screenMaxHeight,
-      ),
+      Rect.fromLTWH(screenLeft, screenTop, screenWidth, screenHeight),
       innerBorderPaint,
     );
 
+    double screenBorderWidth = Dimension.containerMaxWidth * 0.015;
+    double screenBorderMargin = Dimension.containerMaxWidth * 0.054;
     // left border of screen
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMarginTop - Dimension.screenBorderMargin,
-        Dimension.screenBorderWidth,
-        Dimension.screenMaxHeight + Dimension.screenBorderMargin * 2,
+      Rect.fromLTWH(
+        screenLeft - screenBorderMargin - screenBorderWidth,
+        screenTop - screenBorderMargin,
+        screenBorderWidth,
+        screenHeight + screenBorderMargin * 2 + screenBorderWidth,
       ),
       BasicPalette.black.paint(),
     );
     // right border of screen
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft + Dimension.screenMaxWidth + Dimension.screenBorderMargin - Dimension.screenBorderWidth,
-        Dimension.screenMarginTop - Dimension.screenBorderMargin,
-        Dimension.screenBorderWidth,
-        Dimension.screenMaxHeight + Dimension.screenBorderMargin * 2,
+      Rect.fromLTWH(
+        screenLeft + screenWidth + screenBorderMargin,
+        screenTop - screenBorderMargin,
+        screenBorderWidth,
+        screenHeight + screenBorderMargin * 2 + screenBorderWidth,
       ),
       BasicPalette.black.paint(),
     );
     // bottom border of screen
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMarginTop + Dimension.screenMaxHeight + Dimension.screenBorderMargin,
-        Dimension.screenMaxWidth + Dimension.screenBorderMargin * 2,
-        Dimension.screenBorderWidth,
+      Rect.fromLTWH(
+        screenLeft - screenBorderMargin,
+        screenTop + screenHeight + screenBorderMargin,
+        screenWidth + screenBorderMargin * 2,
+        screenBorderWidth,
       ),
       BasicPalette.black.paint(),
     );
     // top border of screen
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft - Dimension.screenBorderMargin,
-        Dimension.screenMarginTop - Dimension.screenBorderMargin - Dimension.screenBorderWidth,
-        Dimension.screenBorderMargin,
-        Dimension.screenBorderWidth,
+      Rect.fromLTWH(
+        screenLeft - screenBorderMargin - screenBorderWidth,
+        screenTop - screenBorderMargin - screenBorderWidth,
+        screenBorderMargin + screenBorderWidth,
+        screenBorderWidth,
       ),
       BasicPalette.black.paint(),
     );
     canvas.drawRect(
-      const Rect.fromLTWH(
-        screenLeft + Dimension.screenMaxWidth,
-        Dimension.screenMarginTop - Dimension.screenBorderMargin - Dimension.screenBorderWidth,
-        Dimension.screenBorderMargin,
-        Dimension.screenBorderWidth,
+      Rect.fromLTWH(
+        screenLeft + screenWidth,
+        screenTop - screenBorderMargin - screenBorderWidth,
+        screenBorderMargin + screenBorderWidth,
+        screenBorderWidth,
       ),
       BasicPalette.black.paint(),
     );
@@ -269,10 +267,10 @@ class ContainerComponentPainter extends CustomPainter {
     for (var i = 1; i <= 3; i++) {
       canvas.drawRect(
         Rect.fromLTWH(
-          screenLeft + Dimension.screenBorderWidth * 2 * i - Dimension.screenBorderWidth,
-          Dimension.screenMarginTop - Dimension.screenBorderMargin - Dimension.screenBorderWidth,
-          Dimension.screenBorderWidth,
-          Dimension.screenBorderWidth,
+          screenLeft + screenBorderWidth * 2 * i - screenBorderWidth,
+          screenTop - screenBorderMargin - screenBorderWidth,
+          screenBorderWidth,
+          screenBorderWidth,
         ),
         BasicPalette.black.paint(),
       );
@@ -281,20 +279,18 @@ class ContainerComponentPainter extends CustomPainter {
     for (var i = 1; i <= 3; i++) {
       canvas.drawRect(
         Rect.fromLTWH(
-          screenLeft + Dimension.screenMaxWidth - Dimension.screenBorderWidth * 2 * i,
-          Dimension.screenMarginTop - Dimension.screenBorderMargin - Dimension.screenBorderWidth,
-          Dimension.screenBorderWidth,
-          Dimension.screenBorderWidth,
+          screenLeft + screenWidth - screenBorderWidth * 2 * i,
+          screenTop - screenBorderMargin - screenBorderWidth,
+          screenBorderWidth,
+          screenBorderWidth,
         ),
         BasicPalette.black.paint(),
       );
     }
 
     // game border
-    double borderMargin = (Dimension.screenMaxHeight -
-            Dimension.blackBlockSize * Dimension.blackBlockRow -
-            Dimension.blackBlockPadding * 4) /
-        2;
+    double borderMargin =
+        (screenHeight - Dimension.blackBlockSize * Dimension.blackBlockRow - Dimension.blackBlockPadding * 4) / 2;
     Paint gameBorderPaint = Paint();
     gameBorderPaint.style = PaintingStyle.stroke;
     gameBorderPaint.strokeWidth = 1;
@@ -302,7 +298,7 @@ class ContainerComponentPainter extends CustomPainter {
     canvas.drawRect(
       Rect.fromLTWH(
         screenLeft + borderMargin,
-        Dimension.screenMarginTop + borderMargin,
+        screenTop + borderMargin,
         Dimension.blackBlockSize * Dimension.blackBlockColumn + Dimension.blackBlockPadding * 4,
         Dimension.blackBlockSize * Dimension.blackBlockRow + Dimension.blackBlockPadding * 4,
       ),

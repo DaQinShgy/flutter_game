@@ -17,6 +17,9 @@ class TetrisGame extends FlameGame with KeyboardEvents {
   @override
   Future<void> onLoad() async {
     await images.loadAll(['tetris.png']);
+    Dimension.containerMaxWidth = size.x < Dimension.containerMaxWidth ? size.x : Dimension.containerMaxWidth;
+    Dimension.blackBlockSize = Dimension.containerMaxWidth * 0.0335;
+    Dimension.blackBlockPadding = Dimension.blackBlockSize * 0.093;
     AppContainer appContainer = AppContainer(
       position: size / 2,
       size: Vector2(Dimension.containerMaxWidth, size.y),
@@ -84,6 +87,7 @@ class TetrisGame extends FlameGame with KeyboardEvents {
         }
         break;
       case LogicalKeyboardKey.keyS:
+        bloc.add(const Mute());
         break;
       case LogicalKeyboardKey.keyR:
         if (bloc.state.status == GameStatus.initial) {

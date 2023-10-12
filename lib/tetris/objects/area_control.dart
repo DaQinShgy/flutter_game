@@ -23,6 +23,7 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
         fontSize: Dimension.controlTextSize,
       ),
     );
+    double buttonSizeSmall = Dimension.containerMaxWidth * 0.078;
     RoundButton buttonPause = RoundButton(
       type: IconButtonType.green,
       click: () {
@@ -32,13 +33,13 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
           bloc.add(const GamePause());
         }
       },
-      position: Vector2(0, Dimension.controlVerticalMargin),
-      size: Vector2.all(Dimension.buttonSizeSmall),
+      position: Vector2(0, 0),
+      size: Vector2.all(buttonSizeSmall),
     );
     TextComponent textPause = TextComponent(
       position: Vector2(
-        Dimension.buttonSizeSmall / 2,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
+        buttonSizeSmall / 2,
+        buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.pause,
@@ -49,16 +50,13 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
       click: () {
         bloc.add(const Mute());
       },
-      position: Vector2(
-        Dimension.buttonSizeSmall * 2,
-        Dimension.controlVerticalMargin,
-      ),
-      size: Vector2.all(Dimension.buttonSizeSmall),
+      position: Vector2(buttonSizeSmall * 2, 0),
+      size: Vector2.all(buttonSizeSmall),
     );
     TextComponent textSounds = TextComponent(
       position: Vector2(
-        Dimension.buttonSizeSmall / 2 + Dimension.buttonSizeSmall * 2,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
+        buttonSizeSmall / 2 + buttonSizeSmall * 2,
+        buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.sounds,
@@ -75,21 +73,19 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
           bloc.add(const GameReset());
         }
       },
-      position: Vector2(
-        Dimension.buttonSizeSmall * 4,
-        Dimension.controlVerticalMargin,
-      ),
-      size: Vector2.all(Dimension.buttonSizeSmall),
+      position: Vector2(buttonSizeSmall * 4, 0),
+      size: Vector2.all(buttonSizeSmall),
     );
     TextComponent textReset = TextComponent(
       position: Vector2(
-        Dimension.buttonSizeSmall / 2 + Dimension.buttonSizeSmall * 4,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeSmall + Dimension.controlTextMargin,
+        buttonSizeSmall / 2 + buttonSizeSmall * 4,
+        buttonSizeSmall + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.reset,
       textRenderer: textPaint,
     );
+    double buttonSizeLarge = Dimension.containerMaxWidth * 0.24688;
     RoundButton buttonDrop = RoundButton(
       type: IconButtonType.blue,
       click: () {
@@ -100,23 +96,19 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
         }
       },
       position: Vector2(
-        Dimension.buttonSizeSmall,
-        Dimension.controlVerticalMargin * 3 + Dimension.buttonSizeSmall,
+        buttonSizeSmall / 2,
+        size.y - buttonSizeLarge - Dimension.controlTextMargin - 20,
       ),
-      size: Vector2.all(Dimension.buttonSizeLarge),
+      size: Vector2.all(buttonSizeLarge),
     );
     TextComponent textDrop = TextComponent(
-      position: Vector2(
-        Dimension.buttonSizeSmall + Dimension.buttonSizeLarge / 2,
-        Dimension.controlVerticalMargin * 3 +
-            Dimension.buttonSizeSmall +
-            Dimension.buttonSizeLarge +
-            Dimension.controlTextMargin,
-      ),
+      position: Vector2(buttonSizeSmall / 2 + buttonSizeLarge / 2, size.y - 20),
       anchor: Anchor.topCenter,
       text: Strings.drop,
       textRenderer: textPaint,
     );
+    double buttonSizeMedium = Dimension.containerMaxWidth * 0.15;
+    double controlVerticalMargin = (size.y - buttonSizeMedium * 3) / 2;
     RoundButton buttonRotation = RoundButton(
       type: IconButtonType.blue,
       click: () {
@@ -126,16 +118,13 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
           bloc.add(const StartLineIncrease());
         }
       },
-      position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 2,
-        Dimension.controlVerticalMargin,
-      ),
-      size: Vector2.all(Dimension.buttonSizeMedium),
+      position: Vector2(size.x - buttonSizeMedium * 2, controlVerticalMargin),
+      size: Vector2.all(buttonSizeMedium),
     );
     TextComponent textRotation = TextComponent(
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium + Dimension.controlTextMargin,
-        Dimension.controlVerticalMargin + Dimension.controlTextMargin,
+        size.x - buttonSizeMedium,
+        controlVerticalMargin + Dimension.controlTextMargin,
       ),
       text: Strings.rotation,
       textRenderer: textPaint,
@@ -150,15 +139,15 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
         }
       },
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 2,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2,
+        size.x - buttonSizeMedium * 2,
+        controlVerticalMargin + buttonSizeMedium * 2,
       ),
-      size: Vector2.all(Dimension.buttonSizeMedium),
+      size: Vector2.all(buttonSizeMedium),
     );
     TextComponent textDown = TextComponent(
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 3 + Dimension.controlTextMargin,
+        size.x - buttonSizeMedium * 1.5,
+        controlVerticalMargin + buttonSizeMedium * 3 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.down,
@@ -174,15 +163,15 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
         }
       },
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 3,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium,
+        size.x - buttonSizeMedium * 3,
+        controlVerticalMargin + buttonSizeMedium,
       ),
-      size: Vector2.all(Dimension.buttonSizeMedium),
+      size: Vector2.all(buttonSizeMedium),
     );
     TextComponent textLeft = TextComponent(
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 2.5,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
+        size.x - buttonSizeMedium * 2.5,
+        controlVerticalMargin + buttonSizeMedium * 2 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.left,
@@ -198,15 +187,15 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
         }
       },
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium,
+        size.x - buttonSizeMedium,
+        controlVerticalMargin + buttonSizeMedium,
       ),
-      size: Vector2.all(Dimension.buttonSizeMedium),
+      size: Vector2.all(buttonSizeMedium),
     );
     TextComponent textRight = TextComponent(
       position: Vector2(
-        size.x - Dimension.buttonSizeMedium * 0.5,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
+        size.x - buttonSizeMedium * 0.5,
+        controlVerticalMargin + buttonSizeMedium * 2 + Dimension.controlTextMargin,
       ),
       anchor: Anchor.topCenter,
       text: Strings.right,
@@ -240,60 +229,51 @@ class AreaControl extends CustomPainterComponent with FlameBlocReader<StatsBloc,
 class AreaControlPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
+    double buttonSizeMedium = Dimension.containerMaxWidth * 0.153;
+    double controlVerticalMargin = (size.height - buttonSizeMedium * 3) / 2;
+
     Paint paint = BasicPalette.black.paint();
     canvas.drawPath(
       getTrianglePath(
-        size.width - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium + Dimension.controlTextMargin,
-        size.width - Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium +
-            Dimension.controlTextMargin +
-            Dimension.controlTriangleHeight,
-        size.width - Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium +
-            Dimension.controlTextMargin +
-            Dimension.controlTriangleHeight,
+        size.width - buttonSizeMedium * 1.5,
+        controlVerticalMargin + buttonSizeMedium + Dimension.controlTextMargin,
+        size.width - buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
+        controlVerticalMargin + buttonSizeMedium + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
+        size.width - buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        controlVerticalMargin + buttonSizeMedium + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
       ),
       paint,
     );
     canvas.drawPath(
       getTrianglePath(
-        size.width - Dimension.buttonSizeMedium * 1.5,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 2 - Dimension.controlTextMargin,
-        size.width - Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 2 -
-            Dimension.controlTextMargin -
-            Dimension.controlTriangleHeight,
-        size.width - Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
-        Dimension.controlVerticalMargin +
-            Dimension.buttonSizeMedium * 2 -
-            Dimension.controlTextMargin -
-            Dimension.controlTriangleHeight,
+        size.width - buttonSizeMedium * 1.5,
+        controlVerticalMargin + buttonSizeMedium * 2 - Dimension.controlTextMargin,
+        size.width - buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
+        controlVerticalMargin + buttonSizeMedium * 2 - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
+        size.width - buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        controlVerticalMargin + buttonSizeMedium * 2 - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
       ),
       paint,
     );
     canvas.drawPath(
       getTrianglePath(
-        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5,
-        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
-        size.width - Dimension.buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
+        size.width - buttonSizeMedium * 2 + Dimension.controlTextMargin,
+        controlVerticalMargin + buttonSizeMedium * 1.5,
+        size.width - buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
+        controlVerticalMargin + buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        size.width - buttonSizeMedium * 2 + Dimension.controlTextMargin + Dimension.controlTriangleHeight,
+        controlVerticalMargin + buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
       ),
       paint,
     );
     canvas.drawPath(
       getTrianglePath(
-        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5,
-        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
-        size.width - Dimension.buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
-        Dimension.controlVerticalMargin + Dimension.buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
+        size.width - buttonSizeMedium - Dimension.controlTextMargin,
+        controlVerticalMargin + buttonSizeMedium * 1.5,
+        size.width - buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
+        controlVerticalMargin + buttonSizeMedium * 1.5 + Dimension.controlTriangleWidth / 2,
+        size.width - buttonSizeMedium - Dimension.controlTextMargin - Dimension.controlTriangleHeight,
+        controlVerticalMargin + buttonSizeMedium * 1.5 - Dimension.controlTriangleWidth / 2,
       ),
       paint,
     );

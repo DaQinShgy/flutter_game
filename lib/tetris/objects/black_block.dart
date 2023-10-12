@@ -27,9 +27,11 @@ class BlackBlockPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    double blackBlockInnerSize = Dimension.blackBlockSize * 0.566;
+
     Paint paint = Paint();
     paint.style = PaintingStyle.stroke;
-    paint.strokeWidth = Dimension.blackBlockBorderWidth;
+    paint.strokeWidth = Dimension.blackBlockPadding * 0.93;
     paint.color = status == BlackBlockStatus.black
         ? Colors.black
         : status == BlackBlockStatus.grey
@@ -46,11 +48,11 @@ class BlackBlockPainter extends CustomPainter {
     );
 
     canvas.drawRect(
-      const Rect.fromLTWH(
-        (Dimension.blackBlockSize - Dimension.blackBlockInnerSize) / 2,
-        (Dimension.blackBlockSize - Dimension.blackBlockInnerSize) / 2,
-        Dimension.blackBlockInnerSize,
-        Dimension.blackBlockInnerSize,
+      Rect.fromLTWH(
+        (Dimension.blackBlockSize - blackBlockInnerSize) / 2,
+        (Dimension.blackBlockSize - blackBlockInnerSize) / 2,
+        blackBlockInnerSize,
+        blackBlockInnerSize,
       ),
       PaletteEntry(status == BlackBlockStatus.black
               ? Colors.black

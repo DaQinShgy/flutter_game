@@ -279,7 +279,7 @@ class AreaGame extends PositionComponent with HasGameRef<TetrisGame>, FlameBlocL
     addAll(_mixed);
   }
 
-  Future<void> _mixCurrentIntoData({VoidCallback? mixSound}) async {
+  Future<void> _mixCurrentIntoData() async {
     if (_current == null) {
       return;
     }
