@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -17,7 +19,11 @@ class TetrisGame extends FlameGame with KeyboardEvents {
   @override
   Future<void> onLoad() async {
     await images.loadAll(['tetris.png']);
-    Dimension.containerMaxWidth = size.x < Dimension.containerMaxWidth ? size.x : Dimension.containerMaxWidth;
+    Dimension.containerMaxWidth = size.x < Dimension.containerMaxWidth
+        ? size.x
+        : Dimension.containerMaxWidth / size.y > 0.65
+            ? size.y * 0.65
+            : Dimension.containerMaxWidth;
     Dimension.blackBlockSize = Dimension.containerMaxWidth * 0.0335;
     Dimension.blackBlockPadding = Dimension.blackBlockSize * 0.093;
     AppContainer appContainer = AppContainer(
@@ -39,7 +45,8 @@ class TetrisGame extends FlameGame with KeyboardEvents {
   Color backgroundColor() => const Color(0xFF009688);
 
   @override
-  KeyEventResult onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(
+      RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     if (event is RawKeyUpEvent) {
       return super.onKeyEvent(event, keysPressed);
     }
@@ -73,14 +80,16 @@ class TetrisGame extends FlameGame with KeyboardEvents {
         }
         break;
       case LogicalKeyboardKey.space:
-        if (bloc.state.status == GameStatus.initial || bloc.state.status == GameStatus.pause) {
+        if (bloc.state.status == GameStatus.initial ||
+            bloc.state.status == GameStatus.pause) {
           bloc.add(const GameRunning());
         } else if (bloc.state.status == GameStatus.running) {
           bloc.add(const Drop());
         }
         break;
       case LogicalKeyboardKey.keyP:
-        if (bloc.state.status == GameStatus.initial || bloc.state.status == GameStatus.pause) {
+        if (bloc.state.status == GameStatus.initial ||
+            bloc.state.status == GameStatus.pause) {
           bloc.add(const GameRunning());
         } else if (bloc.state.status == GameStatus.running) {
           bloc.add(const GamePause());
