@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/palette.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_game/tetris/bloc/stats_event.dart';
 import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/constants/dimension.dart';
 import 'package:flutter_game/tetris/objects/app_container.dart';
-import 'package:flame_bloc/flame_bloc.dart';
 
 class TetrisGame extends FlameGame with KeyboardEvents {
   late StatsBloc bloc;
