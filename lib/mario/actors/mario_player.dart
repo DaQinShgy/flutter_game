@@ -37,7 +37,7 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   FutureOr<void> onLoad() {
     scale = scale * game.unitSize;
-    image = game.images.fromCache('mario_bros.png');
+    image = game.images.fromCache('mario/bros.png');
     add(RectangleHitbox());
     _loadStatus(MarioStatus.normal);
   }

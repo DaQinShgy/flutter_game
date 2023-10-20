@@ -19,7 +19,7 @@ class CoinBoxBlock extends SpriteAnimationComponent with HasGameRef<MarioGame> {
   @override
   FutureOr<void> onLoad() {
     scale = scale * game.unitSize;
-    image = game.images.fromCache('mario_tile_set.png');
+    image = game.images.fromCache('mario/tile_set.png');
     animation = SpriteAnimation.variableSpriteList(
       twinkleVector
           .map((e) => Sprite(image, srcPosition: e[0], srcSize: e[1]))

@@ -10,7 +10,7 @@ class IconDigitalBg extends PositionComponent with HasGameRef<TetrisGame> {
 
   @override
   FutureOr<void> onLoad() {
-    SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('tetris.png'));
+    SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('tetris/tetris.png'));
     for (var i = 0; i < 6; ++i) {
       spriteBatch.add(
         source: const Rect.fromLTWH(215, 25, 14, 23.8),

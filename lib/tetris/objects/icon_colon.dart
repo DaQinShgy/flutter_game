@@ -15,12 +15,12 @@ class IconColon extends SpriteComponent with HasGameRef<TetrisGame> {
   @override
   FutureOr<void> onLoad() {
     spriteValid = Sprite(
-      game.images.fromCache('tetris.png'),
+      game.images.fromCache('tetris/tetris.png'),
       srcPosition: Vector2(229, 25),
       srcSize: Vector2(14, 24),
     );
     spriteInvalid = Sprite(
-      game.images.fromCache('tetris.png'),
+      game.images.fromCache('tetris/tetris.png'),
       srcPosition: Vector2(243, 25),
       srcSize: Vector2(14, 24),
     );

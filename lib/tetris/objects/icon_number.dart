@@ -19,7 +19,7 @@ class IconNumber extends PositionComponent with HasGameRef<TetrisGame> {
   }
 
   void setComponent() {
-    SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('tetris.png'));
+    SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('tetris/tetris.png'));
     for (var i = 0; i < number.length; ++i) {
       final dx = 75.0 + 14 * int.parse(number.substring(i, i + 1));
       spriteBatch.add(

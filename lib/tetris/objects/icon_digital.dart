@@ -20,7 +20,7 @@ class IconDigital extends SpriteComponent with HasGameRef<TetrisGame> {
   updateDigital(int digital) {
     final dx = 75.0 + 14 * digital;
     sprite = Sprite(
-      game.images.fromCache('tetris.png'),
+      game.images.fromCache('tetris/tetris.png'),
       srcPosition: Vector2(dx, 25),
       srcSize: Vector2(14, 23.8),
     );

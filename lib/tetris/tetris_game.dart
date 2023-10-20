@@ -16,7 +16,7 @@ class TetrisGame extends FlameGame with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    await images.loadAll(['tetris.png']);
+    await images.loadAll(['tetris/tetris.png']);
     Dimension.containerMaxWidth = size.x < Dimension.containerMaxWidth
         ? size.x
         : Dimension.containerMaxWidth / size.y > 0.65

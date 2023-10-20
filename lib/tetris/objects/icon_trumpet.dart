@@ -7,7 +7,8 @@ import 'package:flutter_game/tetris/bloc/stats_event.dart';
 import 'package:flutter_game/tetris/bloc/stats_state.dart';
 import 'package:flutter_game/tetris/tetris_game.dart';
 
-class IconTrumpet extends SpriteComponent with HasGameRef<TetrisGame>, FlameBlocReader<StatsBloc, StatsState> {
+class IconTrumpet extends SpriteComponent
+    with HasGameRef<TetrisGame>, FlameBlocReader<StatsBloc, StatsState> {
   IconTrumpet({super.position}) : super(size: Vector2(18, 14));
 
   late Sprite spriteValid;
@@ -17,12 +18,12 @@ class IconTrumpet extends SpriteComponent with HasGameRef<TetrisGame>, FlameBloc
   @override
   Future<void> onLoad() {
     spriteValid = Sprite(
-      game.images.fromCache('tetris.png'),
+      game.images.fromCache('tetris/tetris.png'),
       srcPosition: Vector2(150, 75),
       srcSize: Vector2(25, 21),
     );
     spriteInvalid = Sprite(
-      game.images.fromCache('tetris.png'),
+      game.images.fromCache('tetris/tetris.png'),
       srcPosition: Vector2(175, 75),
       srcSize: Vector2(25, 21),
     );

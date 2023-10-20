@@ -30,3 +30,5 @@ flutter:
   assets:
     - assets/audio/tetris/
     - assets/images/
+    - assets/images/tetris/
+    - assets/images/mario/
