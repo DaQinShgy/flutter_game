@@ -34,7 +34,7 @@ class GameBackground extends SpriteComponent
     // Ground height: 24
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
 
-    _buildBlock();
+    // _buildBlock();
   }
 
   void _buildBlock() {

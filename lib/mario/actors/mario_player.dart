@@ -3,11 +3,18 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
-    with HasGameRef<MarioGame>, KeyboardHandler, CollisionCallbacks {
+    with
+        HasGameRef<MarioGame>,
+        KeyboardHandler,
+        CollisionCallbacks,
+        FlameBlocListenable<StatsBloc, StatsState> {
   MarioPlayer({super.position}) : super(anchor: Anchor.bottomLeft);
 
   @override
@@ -70,6 +77,9 @@ class MarioPlayer extends SpriteAnimationComponent
 
   @override
   bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (bloc.state.status != GameStatus.running) {
+      return true;
+    }
     if (event is RawKeyUpEvent) {
       _loadStatus(MarioStatus.normal);
       horizontalDirection = 0;
