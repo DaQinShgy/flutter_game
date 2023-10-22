@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
@@ -9,8 +8,7 @@ import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/coin_box_block.dart';
 
-class GameBackground extends SpriteComponent
-    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
+class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
   GameBackground({super.size}) : super(position: Vector2(0, 0));
 
   /// Brick vector list
@@ -33,8 +31,6 @@ class GameBackground extends SpriteComponent
     // 3392 x 224
     // Ground height: 24
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
-
-    // _buildBlock();
   }
 
   void _buildBlock() {
@@ -72,5 +68,13 @@ class GameBackground extends SpriteComponent
   void onInitialState(StatsState state) {
     super.onInitialState(state);
     if (state.status == GameStatus.initial) {}
+  }
+
+  @override
+  bool listenWhen(StatsState previousState, StatsState newState) {
+    if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
+      _buildBlock();
+    }
+    return super.listenWhen(previousState, newState);
   }
 }

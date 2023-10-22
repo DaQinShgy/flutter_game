@@ -5,7 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 
 class CoinIcon extends SpriteAnimationComponent with HasGameRef<MarioGame> {
-  CoinIcon({super.position}) : super(size: Vector2(10, 14));
+  CoinIcon({super.position});
 
   late Image image;
 
@@ -18,11 +18,10 @@ class CoinIcon extends SpriteAnimationComponent with HasGameRef<MarioGame> {
 
   @override
   FutureOr<void> onLoad() {
+    scale = scale * 1.2;
     image = game.images.fromCache('mario/tile_set.png');
     animation = SpriteAnimation.variableSpriteList(
-      twinkleVector
-          .map((e) => Sprite(image, srcPosition: e, srcSize: Vector2(10, 14)))
-          .toList(),
+      twinkleVector.map((e) => Sprite(image, srcPosition: e, srcSize: Vector2(10, 14))).toList(),
       stepTimes: [0.4, 0.2, 0.2],
     );
   }

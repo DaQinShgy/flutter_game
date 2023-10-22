@@ -28,7 +28,7 @@ class MarioGame extends FlameGame with HasKeyboardHandlerComponents {
   @override
   Future<void> onLoad() async {
     await images.loadAll([
-      'mario/bros.png',
+      'mario/mario_bros.png',
       'mario/enemies.png',
       'mario/item_objects.png',
       'mario/level_1.png',
