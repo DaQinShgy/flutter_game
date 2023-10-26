@@ -9,7 +9,8 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/objects/game_background.dart';
 import 'package:flutter_game/mario/overlays/hud.dart';
 
-class MarioGame extends FlameGame with HasKeyboardHandlerComponents {
+class MarioGame extends FlameGame
+    with HasKeyboardHandlerComponents, HasCollisionDetection {
   late final CameraComponent cameraComponent;
 
   late final double backgroundHeight;

@@ -4,10 +4,12 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/collider_block.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
     with
@@ -118,6 +120,34 @@ class MarioPlayer extends SpriteAnimationComponent
       game.objectSpeed = -moveSpeed;
     }
     position += velocity * dt;
+  }
+
+  @override
+  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
+    super.onCollision(intersectionPoints, other);
+    debugPrint('intersectionPoints0=$intersectionPoints');
+    // debugPrint('other=$other');
+    if (other is ColliderBlock) {
+      position = Vector2(other.position.x - size.x, position.y);
+      // if (intersectionPoints.length == 2) {
+      //   debugPrint('intersectionPoints=$intersectionPoints');
+      //   final mid = (intersectionPoints.elementAt(0) +
+      //           intersectionPoints.elementAt(1)) /
+      //       2;
+      //   debugPrint('mid=$mid');
+      //   final collisionNormal = absoluteCenter - mid;
+      //   debugPrint('collisionNormal=$collisionNormal');
+      //   final separationDistance = (size.x / 2) - collisionNormal.length;
+      //   debugPrint('separationDistance=$separationDistance');
+      //   collisionNormal.normalize();
+      //
+      //   // if (fromAbove.dot(collisionNormal) > 0.9) {
+      //   //   isOnGround = true;
+      //   // }
+      //   debugPrint('position=${collisionNormal.scaled(separationDistance)}');
+      //   position += collisionNormal.scaled(separationDistance);
+      // }
+    }
   }
 }
 

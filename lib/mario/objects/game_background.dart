@@ -7,8 +7,10 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/coin_box_block.dart';
+import 'package:flutter_game/mario/objects/collider_block.dart';
 
-class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
+class GameBackground extends SpriteComponent
+    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
   GameBackground({super.size}) : super(position: Vector2(0, 0));
 
   /// Brick vector list
@@ -26,11 +28,18 @@ class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBl
     Vector2(23, 4),
   ];
 
+  /// Collider vector list
+  List<List<Vector2>> colliderVectorList = [
+    [Vector2(8, 2), Vector2(2, 2)],
+    [Vector2(28, 2), Vector2(2, 2)],
+  ];
+
   @override
   FutureOr<void> onLoad() {
     // 3392 x 224
     // Ground height: 24
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
+    _buildCollider();
   }
 
   void _buildBlock() {
@@ -56,6 +65,23 @@ class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBl
     );
   }
 
+  void _buildCollider() {
+    addAll(
+      colliderVectorList.map(
+        (e) => ColliderBlock(
+          position: Vector2(
+            e[0].x * 16 * game.unitSize,
+            game.groundHeight - e[0].y * 16 * game.unitSize,
+          ),
+          size: Vector2(
+            e[1].x * 16 * game.unitSize,
+            e[1].y * 16 * game.unitSize,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -72,7 +98,8 @@ class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBl
 
   @override
   bool listenWhen(StatsState previousState, StatsState newState) {
-    if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
+    if (previousState.status == GameStatus.initial &&
+        newState.status == GameStatus.running) {
       _buildBlock();
     }
     return super.listenWhen(previousState, newState);

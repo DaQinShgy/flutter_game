@@ -12,7 +12,10 @@ import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/overlays/hud_background.dart';
 
 class Hub extends PositionComponent
-    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState>, KeyboardHandler {
+    with
+        HasGameRef<MarioGame>,
+        FlameBlocListenable<StatsBloc, StatsState>,
+        KeyboardHandler {
   Hub({super.position, super.size});
 
   late Component scoreLabel;
@@ -88,10 +91,13 @@ class Hub extends PositionComponent
   FutureOr<void> onLoad() async {
     double centerX = size.x / 2;
     double topMargin = 11 * game.unitSize;
-    add(_buildLabel('MARIO', Vector2(centerX - 16 * 8 * game.unitSize, topMargin)));
+    add(_buildLabel(
+        'MARIO', Vector2(centerX - 16 * 8 * game.unitSize, topMargin)));
     add(_buildLabel('WORLD', Vector2(centerX + 16 * game.unitSize, topMargin)));
-    add(_buildLabel('TIME', Vector2(centerX + 16 * 6 * game.unitSize, topMargin)));
-    add(_buildLabel('1-1', Vector2(centerX + 22 * game.unitSize, topMargin * 2)));
+    add(_buildLabel(
+        'TIME', Vector2(centerX + 16 * 6 * game.unitSize, topMargin)));
+    add(_buildLabel(
+        '1-1', Vector2(centerX + 22 * game.unitSize, topMargin * 2)));
     scoreLabel = _buildLabel(
       '000000',
       Vector2(centerX - 16 * 8 * game.unitSize, 21 * game.unitSize),
@@ -101,8 +107,10 @@ class Hub extends PositionComponent
       position: Vector2(centerX - 16 * 4 * game.unitSize, 21.5 * game.unitSize),
     );
     add(coinIcon);
-    add(_buildLabel('*', Vector2(centerX - (16 * 4 - 6) * game.unitSize, 21 * game.unitSize)));
-    coinCount = _buildLabel('00', Vector2(centerX - (16 * 4 - 14) * game.unitSize, 21 * game.unitSize));
+    add(_buildLabel('*',
+        Vector2(centerX - (16 * 4 - 6) * game.unitSize, 21 * game.unitSize)));
+    coinCount = _buildLabel('00',
+        Vector2(centerX - (16 * 4 - 14) * game.unitSize, 21 * game.unitSize));
     add(coinCount);
 
     spriteComponentBoard = SpriteComponent(
@@ -126,16 +134,19 @@ class Hub extends PositionComponent
       position: Vector2(centerX - 16 * 4 * game.unitSize, 140 * game.unitSize),
     );
     add(mushrooms);
-    player1 = _buildLabel('1 PLAYER GAME', Vector2(centerX - 16 * 2.5 * game.unitSize, 140.5 * game.unitSize));
+    player1 = _buildLabel('1 PLAYER GAME',
+        Vector2(centerX - 16 * 2.5 * game.unitSize, 140.5 * game.unitSize));
     add(player1);
-    player2 =
-        _buildLabel('2 PLAYER GAME - COMING SOON', Vector2(centerX - 16 * 2.5 * game.unitSize, 160.5 * game.unitSize));
+    player2 = _buildLabel('2 PLAYER GAME - COMING SOON',
+        Vector2(centerX - 16 * 2.5 * game.unitSize, 160.5 * game.unitSize));
     add(player2);
-    top = _buildLabel('TOP - 000000', Vector2(centerX - 16 * 2 * game.unitSize, 180 * game.unitSize));
+    top = _buildLabel('TOP - 000000',
+        Vector2(centerX - 16 * 2 * game.unitSize, 180 * game.unitSize));
     add(top);
 
     blackBg = HudBackground(size: size);
-    level = _buildLabel('WORLD   1-1  ', Vector2(centerX - 6 * 7 * game.unitSize, 80 * game.unitSize));
+    level = _buildLabel('WORLD   1-1  ',
+        Vector2(centerX - 6 * 7 * game.unitSize, 80 * game.unitSize));
     mario = SpriteComponent(
       sprite: Sprite(
         game.images.fromCache('mario/mario_bros.png'),
@@ -145,11 +156,14 @@ class Hub extends PositionComponent
       scale: scale * game.unitSize,
       position: Vector2(centerX - 35 * game.unitSize, 110 * game.unitSize),
     );
-    health = _buildLabel('X   3', Vector2(centerX - 8 * game.unitSize, 115 * game.unitSize));
+    health = _buildLabel(
+        'X   3', Vector2(centerX - 8 * game.unitSize, 115 * game.unitSize));
   }
 
-  PositionComponent _buildLabel(String string, Vector2 position, {Anchor anchor = Anchor.topLeft}) {
-    SpriteBatch spriteBatch = SpriteBatch(game.images.fromCache('mario/text_images.png'));
+  PositionComponent _buildLabel(String string, Vector2 position,
+      {Anchor anchor = Anchor.topLeft}) {
+    SpriteBatch spriteBatch =
+        SpriteBatch(game.images.fromCache('mario/text_images.png'));
     for (int i = 0; i < string.length; i++) {
       Vector2 vector2 = characterMap[string[i]] ?? Vector2(0, 0);
       spriteBatch.add(
@@ -181,8 +195,8 @@ class Hub extends PositionComponent
           keysPressed.contains(LogicalKeyboardKey.keyS) ||
           keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
         playerCount = playerCount == 1 ? 2 : 1;
-        mushrooms.position =
-            Vector2(size.x / 2 - 16 * 4 * game.unitSize, (playerCount == 1 ? 140 : 160) * game.unitSize);
+        mushrooms.position = Vector2(size.x / 2 - 16 * 4 * game.unitSize,
+            (playerCount == 1 ? 140 : 160) * game.unitSize);
       } else if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         if (blackBg.parent != null) {
           return true;
@@ -198,7 +212,7 @@ class Hub extends PositionComponent
   Future<void> _buildData() async {
     removeAll([spriteComponentBoard, mushrooms, player1, player2, top]);
     addAll([blackBg, level, mario, health]);
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
     removeAll([blackBg, level, mario, health]);
     bloc.add(const GameRunning());
   }
