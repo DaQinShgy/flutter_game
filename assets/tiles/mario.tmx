@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="424" height="28" tilewidth="8" tileheight="8" infinite="0" nextlayerid="9" nextobjectid="12">
+ <imagelayer id="2" name="background" visible="0">
+  <image source="../images/mario/level_1.png" width="3392" height="224"/>
+ </imagelayer>
+ <objectgroup id="3" name="question blocks">
+  <object id="5" x="368" y="136" width="16" height="16"/>
+  <object id="7" x="352" y="72" width="16" height="16"/>
+  <object id="3" x="336" y="136" width="16" height="16"/>
+  <object id="1" x="256" y="136" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="5" name="brick blocks">
+  <object id="6" x="384" y="136" width="16" height="16"/>
+  <object id="4" x="352" y="136" width="16" height="16"/>
+  <object id="2" x="320" y="136" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="8" name="collider">
+  <object id="11" x="912" y="136" width="32" height="64"/>
+  <object id="10" x="736" y="136" width="32" height="64"/>
+  <object id="9" x="608" y="152" width="32" height="48"/>
+  <object id="8" x="448" y="168" width="32" height="32"/>
+ </objectgroup>
+</map>

@@ -18,7 +18,7 @@ class StatsState extends Equatable {
 
   const StatsState.empty()
       : this(
-          status: GameStatus.initial,
+          status: GameStatus.running,
           coinScore: 0,
         );
 

@@ -2,92 +2,53 @@ import 'dart:async';
 
 import 'package:flame/components.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
-import 'package:flutter_game/mario/objects/coin_box_block.dart';
+import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 
 class GameBackground extends SpriteComponent
     with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
   GameBackground({super.size}) : super(position: Vector2(0, 0));
 
-  /// Brick vector list
-  List<Vector2> brickVectorList = [
-    Vector2(20, 4),
-    Vector2(22, 4),
-    Vector2(24, 4),
-  ];
-
-  /// Coin box vector list
-  List<Vector2> coinBoxVectorList = [
-    Vector2(16, 4),
-    Vector2(21, 4),
-    Vector2(22, 8),
-    Vector2(23, 4),
-  ];
-
-  /// Collider vector list
-  List<List<Vector2>> colliderVectorList = [
-    [Vector2(8, 2), Vector2(2, 2)],
-    [Vector2(28, 2), Vector2(2, 2)],
-  ];
-
   @override
   FutureOr<void> onLoad() {
-    // 3392 x 224
-    // Ground height: 24
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
     _buildCollider();
+    _buildBlock();
   }
 
   void _buildBlock() {
-    addAll(
-      brickVectorList.map(
-        (e) => BrickBlock(
-          position: Vector2(
-            e.x * 16 * game.unitSize,
-            game.groundHeight - e.y * 16 * game.unitSize,
-          ),
-        ),
-      ),
-    );
-    addAll(
-      coinBoxVectorList.map(
-        (e) => CoinBoxBlock(
-          position: Vector2(
-            e.x * 16 * game.unitSize,
-            game.groundHeight - e.y * 16 * game.unitSize,
-          ),
-        ),
-      ),
-    );
+    final questionBlocks =
+        game.mapComponent.tileMap.getLayer<ObjectGroup>('question blocks');
+    addAll(questionBlocks!.objects
+        .map((object) => CoinBoxBlock(
+              position: Vector2(object.x, object.y),
+            ))
+        .toList());
+    final brickBlocks =
+        game.mapComponent.tileMap.getLayer<ObjectGroup>('brick blocks');
+    addAll(brickBlocks!.objects
+        .map((object) => BrickBlock(
+              position: Vector2(object.x, object.y),
+            ))
+        .toList());
   }
 
   void _buildCollider() {
+    final collider =
+        game.mapComponent.tileMap.getLayer<ObjectGroup>('collider');
     addAll(
-      colliderVectorList.map(
-        (e) => ColliderBlock(
-          position: Vector2(
-            e[0].x * 16 * game.unitSize,
-            game.groundHeight - e[0].y * 16 * game.unitSize,
-          ),
-          size: Vector2(
-            e[1].x * 16 * game.unitSize,
-            e[1].y * 16 * game.unitSize,
-          ),
+      collider!.objects.map(
+        (object) => ColliderBlock(
+          position: Vector2(object.x, object.y),
+          size: Vector2(object.width, object.height),
         ),
       ),
     );
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    Vector2 velocity = Vector2.zero();
-    velocity.x = game.objectSpeed;
-    position += velocity * dt;
   }
 
   @override
@@ -100,7 +61,7 @@ class GameBackground extends SpriteComponent
   bool listenWhen(StatsState previousState, StatsState newState) {
     if (previousState.status == GameStatus.initial &&
         newState.status == GameStatus.running) {
-      _buildBlock();
+      // _buildBlock();
     }
     return super.listenWhen(previousState, newState);
   }

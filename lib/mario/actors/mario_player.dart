@@ -45,7 +45,6 @@ class MarioPlayer extends SpriteAnimationComponent
 
   @override
   FutureOr<void> onLoad() {
-    scale = scale * game.unitSize;
     image = game.images.fromCache('mario/mario_bros.png');
     add(RectangleHitbox());
     _loadStatus(MarioStatus.normal);
@@ -109,15 +108,21 @@ class MarioPlayer extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     velocity.x = horizontalDirection * moveSpeed;
-    game.objectSpeed = 0;
-    if (position.x - size.x * game.unitSize <= 0 && horizontalDirection < 0) {
+    if (position.x + (velocity * dt).x - size.x <=
+            game.cameraComponent.viewfinder.position.x &&
+        horizontalDirection < 0) {
       // Prevent Mario from going backwards at screen edge.
-      velocity.x = 0;
+      position = Vector2(
+          game.cameraComponent.viewfinder.position.x + size.x, position.y);
+      return;
     }
-    if (position.x >= game.size.x / 2 && horizontalDirection > 0) {
-      // Prevent Mario from going beyond half screen.
-      velocity.x = 0;
-      game.objectSpeed = -moveSpeed;
+    double halfScreenWidth = game.size.x / game.scaleSize / 2;
+    if (position.x >=
+            game.cameraComponent.viewfinder.position.x + halfScreenWidth &&
+        horizontalDirection > 0) {
+      // Viewfinder moves to the right
+      game.cameraComponent.viewfinder.position =
+          Vector2(position.x - halfScreenWidth, 0);
     }
     position += velocity * dt;
   }

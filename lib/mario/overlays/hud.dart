@@ -90,27 +90,27 @@ class Hub extends PositionComponent
   @override
   FutureOr<void> onLoad() async {
     double centerX = size.x / 2;
-    double topMargin = 11 * game.unitSize;
+    double topMargin = 11 * game.scaleSize;
     add(_buildLabel(
-        'MARIO', Vector2(centerX - 16 * 8 * game.unitSize, topMargin)));
-    add(_buildLabel('WORLD', Vector2(centerX + 16 * game.unitSize, topMargin)));
+        'MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
+    add(_buildLabel('WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
     add(_buildLabel(
-        'TIME', Vector2(centerX + 16 * 6 * game.unitSize, topMargin)));
+        'TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
     add(_buildLabel(
-        '1-1', Vector2(centerX + 22 * game.unitSize, topMargin * 2)));
+        '1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
     scoreLabel = _buildLabel(
       '000000',
-      Vector2(centerX - 16 * 8 * game.unitSize, 21 * game.unitSize),
+      Vector2(centerX - 16 * 8 * game.scaleSize, 21 * game.scaleSize),
     );
     add(scoreLabel);
     coinIcon = CoinIcon(
-      position: Vector2(centerX - 16 * 4 * game.unitSize, 21.5 * game.unitSize),
+      position: Vector2(centerX - 16 * 4 * game.scaleSize, 21.5 * game.scaleSize),
     );
     add(coinIcon);
     add(_buildLabel('*',
-        Vector2(centerX - (16 * 4 - 6) * game.unitSize, 21 * game.unitSize)));
+        Vector2(centerX - (16 * 4 - 6) * game.scaleSize, 21 * game.scaleSize)));
     coinCount = _buildLabel('00',
-        Vector2(centerX - (16 * 4 - 14) * game.unitSize, 21 * game.unitSize));
+        Vector2(centerX - (16 * 4 - 14) * game.scaleSize, 21 * game.scaleSize));
     add(coinCount);
 
     spriteComponentBoard = SpriteComponent(
@@ -120,8 +120,8 @@ class Hub extends PositionComponent
         srcPosition: Vector2(1, 60),
       ),
       anchor: Anchor.topCenter,
-      scale: scale * game.unitSize,
-      position: Vector2(centerX, 35 * game.unitSize),
+      scale: scale * game.scaleSize,
+      position: Vector2(centerX, 35 * game.scaleSize),
     );
     add(spriteComponentBoard);
     mushrooms = SpriteComponent(
@@ -130,34 +130,34 @@ class Hub extends PositionComponent
         srcSize: Vector2(8, 8),
         srcPosition: Vector2(3, 155),
       ),
-      scale: scale * game.unitSize,
-      position: Vector2(centerX - 16 * 4 * game.unitSize, 140 * game.unitSize),
+      scale: scale * game.scaleSize,
+      position: Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
     );
     add(mushrooms);
     player1 = _buildLabel('1 PLAYER GAME',
-        Vector2(centerX - 16 * 2.5 * game.unitSize, 140.5 * game.unitSize));
+        Vector2(centerX - 16 * 2.5 * game.scaleSize, 140.5 * game.scaleSize));
     add(player1);
     player2 = _buildLabel('2 PLAYER GAME - COMING SOON',
-        Vector2(centerX - 16 * 2.5 * game.unitSize, 160.5 * game.unitSize));
+        Vector2(centerX - 16 * 2.5 * game.scaleSize, 160.5 * game.scaleSize));
     add(player2);
     top = _buildLabel('TOP - 000000',
-        Vector2(centerX - 16 * 2 * game.unitSize, 180 * game.unitSize));
+        Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
     add(top);
 
     blackBg = HudBackground(size: size);
     level = _buildLabel('WORLD   1-1  ',
-        Vector2(centerX - 6 * 7 * game.unitSize, 80 * game.unitSize));
+        Vector2(centerX - 6 * 7 * game.scaleSize, 80 * game.scaleSize));
     mario = SpriteComponent(
       sprite: Sprite(
         game.images.fromCache('mario/mario_bros.png'),
         srcSize: Vector2(15, 16),
         srcPosition: Vector2(178, 32),
       ),
-      scale: scale * game.unitSize,
-      position: Vector2(centerX - 35 * game.unitSize, 110 * game.unitSize),
+      scale: scale * game.scaleSize,
+      position: Vector2(centerX - 35 * game.scaleSize, 110 * game.scaleSize),
     );
     health = _buildLabel(
-        'X   3', Vector2(centerX - 8 * game.unitSize, 115 * game.unitSize));
+        'X   3', Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
   }
 
   PositionComponent _buildLabel(String string, Vector2 position,
@@ -173,7 +173,7 @@ class Hub extends PositionComponent
     }
     return PositionComponent(
       position: position,
-      scale: scale * game.unitSize,
+      scale: scale * game.scaleSize,
       children: [SpriteBatchComponent(spriteBatch: spriteBatch)],
     );
   }
@@ -195,8 +195,8 @@ class Hub extends PositionComponent
           keysPressed.contains(LogicalKeyboardKey.keyS) ||
           keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
         playerCount = playerCount == 1 ? 2 : 1;
-        mushrooms.position = Vector2(size.x / 2 - 16 * 4 * game.unitSize,
-            (playerCount == 1 ? 140 : 160) * game.unitSize);
+        mushrooms.position = Vector2(size.x / 2 - 16 * 4 * game.scaleSize,
+            (playerCount == 1 ? 140 : 160) * game.scaleSize);
       } else if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         if (blackBg.parent != null) {
           return true;

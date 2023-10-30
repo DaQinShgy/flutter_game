@@ -9,7 +9,6 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
 
   @override
   FutureOr<void> onLoad() {
-    scale = scale * game.unitSize;
     sprite = Sprite(
       game.images.fromCache('mario/tile_set.png'),
       srcSize: Vector2.all(16),

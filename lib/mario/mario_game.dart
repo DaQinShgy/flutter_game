@@ -1,27 +1,29 @@
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flame_tiled/flame_tiled.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
+import 'package:flutter_game/mario/objects/brick_block.dart';
+import 'package:flutter_game/mario/objects/collider_block.dart';
+import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/game_background.dart';
-import 'package:flutter_game/mario/overlays/hud.dart';
 
 class MarioGame extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection {
   late final CameraComponent cameraComponent;
 
-  late final double backgroundHeight;
-
   late final double groundHeight;
 
-  late final double unitSize;
+  late final double scaleSize;
+
+  late final TiledComponent mapComponent;
 
   late final MarioPlayer _marioPlayer;
-
-  double objectSpeed = 0.0;
 
   @override
   final world = World();
@@ -39,32 +41,34 @@ class MarioGame extends FlameGame
       'mario/title_screen.png',
     ]);
     cameraComponent = CameraComponent(world: world);
-    cameraComponent.viewfinder.anchor = Anchor.topLeft;
+
+    mapComponent = await TiledComponent.load(
+      'mario.tmx',
+      Vector2.all(8),
+    );
+
+    scaleSize = size.y / mapComponent.height;
+    groundHeight = size.y - 24 * scaleSize;
+
+    cameraComponent.viewfinder
+      ..zoom = scaleSize
+      ..anchor = Anchor.topLeft;
     await add(
       FlameBlocProvider<StatsBloc, StatsState>(
         create: () => StatsBloc(),
-        children: [cameraComponent, world, initializeGame()],
+        children: [cameraComponent, world],
       ),
     );
+    _marioPlayer = MarioPlayer(
+      position: Vector2(32, 200),
+    );
+    world.addAll([GameBackground(), mapComponent, _marioPlayer]);
   }
 
   @override
   Color backgroundColor() => Colors.black;
 
-  Component initializeGame() {
-    backgroundHeight = size.y * 0.9;
-    unitSize = backgroundHeight / 224;
-    groundHeight = backgroundHeight - 24 * unitSize;
-    _marioPlayer = MarioPlayer(
-      position: Vector2(32 * unitSize, groundHeight),
-    );
-    world.add(_marioPlayer);
-    cameraComponent.viewport.add(Hub(size: size));
-    return GameBackground(
-      size: Vector2(
-        unitSize * 3392,
-        backgroundHeight,
-      ),
-    );
+  void _buildBlocks(TiledComponent mapComponent) {
+
   }
 }

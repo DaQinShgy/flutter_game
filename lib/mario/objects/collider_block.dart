@@ -4,8 +4,6 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 
 class ColliderBlock extends PositionComponent {
-  /// Invisible sprites placed overtop background parts
-  /// that can be collided with (pipes, steps, ground, etc.)
   ColliderBlock({super.position, super.size});
 
   @override
