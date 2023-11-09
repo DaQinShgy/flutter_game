@@ -25,7 +25,7 @@ class GameBackground extends SpriteComponent
     final questionBlocks =
         game.mapComponent.tileMap.getLayer<ObjectGroup>('question blocks');
     addAll(questionBlocks!.objects
-        .map((object) => CoinBoxBlock(
+        .map((object) => QuestionBlock(
               position: Vector2(object.x, object.y),
             ))
         .toList());

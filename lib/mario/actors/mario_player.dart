@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flame/collisions.dart';
@@ -9,7 +10,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
+import 'package:flutter_game/mario/objects/question_block.dart';
+import 'package:flutter_game/mario/widgets/FlipSprite.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
     with
@@ -18,9 +22,6 @@ class MarioPlayer extends SpriteAnimationComponent
         CollisionCallbacks,
         FlameBlocListenable<StatsBloc, StatsState> {
   MarioPlayer({super.position}) : super(anchor: Anchor.bottomLeft);
-
-  @override
-  bool get debugMode => true;
 
   late Image image;
 
@@ -83,8 +84,14 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.normal:
         animation = _getAnimation(normalSmallVector);
         break;
-      case MarioStatus.walking:
+      case MarioStatus.normalFlip:
+        animation = _getAnimation(normalSmallVector, flip: true);
+        break;
+      case MarioStatus.forwardWalking:
         animation = _getAnimation(normalSmallWalkingVector);
+        break;
+      case MarioStatus.backwardWalking:
+        animation = _getAnimation(normalSmallWalkingVector, flip: true);
         break;
       case MarioStatus.skid:
         animation = _getAnimation(normalSmallSkidVector);
@@ -97,11 +104,12 @@ class MarioPlayer extends SpriteAnimationComponent
     }
   }
 
-  SpriteAnimation _getAnimation(List<List<double>> list) {
+  SpriteAnimation _getAnimation(List<List<double>> list, {bool flip = false}) {
     return SpriteAnimation.spriteList(
       list
-          .map((e) => Sprite(
+          .map((e) => FlipSprite(
                 image,
+                flip,
                 srcPosition: Vector2(e[0], e[1]),
                 srcSize: Vector2(e[2], e[3]),
               ))
@@ -152,17 +160,16 @@ class MarioPlayer extends SpriteAnimationComponent
       jumpSpeed = 0;
 
       if (horizontalDirection > 0) {
-        _loadStatus(MarioStatus.walking);
-        if (scale.x < 0) {
-          flipHorizontallyAroundCenter();
-        }
+        _loadStatus(MarioStatus.forwardWalking);
       } else if (horizontalDirection < 0) {
-        _loadStatus(MarioStatus.walking);
-        if (scale.x > 0) {
-          flipHorizontallyAroundCenter();
-        }
+        _loadStatus(MarioStatus.backwardWalking);
       } else {
-        _loadStatus(MarioStatus.normal);
+        if (_status == MarioStatus.backwardWalking ||
+            _status == MarioStatus.normalFlip) {
+          _loadStatus(MarioStatus.normalFlip);
+        } else {
+          _loadStatus(MarioStatus.normal);
+        }
       }
     }
     // Change mario position.x
@@ -194,11 +201,10 @@ class MarioPlayer extends SpriteAnimationComponent
         moveSpeed += moveAccel;
       }
     }
-    if (position.x + moveSpeed * dt - size.x <=
+    if (position.x + moveSpeed * dt <=
         game.cameraComponent.viewfinder.position.x) {
       // Prevent Mario from going backwards at screen edge.
-      position = Vector2(
-          game.cameraComponent.viewfinder.position.x + size.x, position.y);
+      x = game.cameraComponent.viewfinder.position.x;
       return;
     }
     double halfScreenWidth = game.size.x / game.scaleSize / 2;
@@ -215,10 +221,49 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    debugPrint('intersectionPoints0=$intersectionPoints');
-    // debugPrint('other=$other');
+    if (intersectionPoints.length < 2) {
+      return;
+    }
+    // debugPrint('intersectionPoints=$intersectionPoints');
+    // 0 top; 1 right; 2 bottom; 3 left;
+    int hitEdge = -1;
+    List<double> listX = intersectionPoints.map((e) => e.x).toList();
+    double diffX = listX.reduce(max) - listX.reduce(min);
+    List<double> listY = intersectionPoints.map((e) => e.y).toList();
+    double diffY = listY.reduce(max) - listY.reduce(min);
+    debugPrint('diffX=$diffX,diffY=$diffY');
+    if (diffX > diffY) {
+      if ((intersectionPoints.elementAt(0).y - other.y).abs() <
+          (intersectionPoints.elementAt(0).y - other.y - other.size.y).abs()) {
+        hitEdge = 0;
+      } else {
+        hitEdge = 2;
+      }
+    } else {
+      if ((intersectionPoints.elementAt(0).x - other.x).abs() <
+          (intersectionPoints.elementAt(0).x - other.x - other.size.x).abs()) {
+        hitEdge = 3;
+      } else {
+        hitEdge = 1;
+      }
+    }
+    debugPrint('hitEdge=$hitEdge');
+    if (hitEdge == 0) {
+      if (jumpSpeed != 0) {
+        jumpSpeed = 0;
+        groundHeight -= other.size.y;
+      }
+    } else if (hitEdge == 3) {
+      x = other.position.x - size.x;
+    } else if (hitEdge == 1) {
+      x = other.position.x + other.size.x;
+    }
     if (other is ColliderBlock) {
-      position = Vector2(other.position.x - size.x, position.y);
+    } else if (other is BrickBlock) {
+    } else if (other is QuestionBlock) {
+      if (hitEdge == 2) {
+        jumpSpeed = -jumpSpeed;
+      }
     }
   }
 }
@@ -226,7 +271,9 @@ class MarioPlayer extends SpriteAnimationComponent
 enum MarioStatus {
   initial,
   normal,
-  walking,
+  normalFlip,
+  forwardWalking,
+  backwardWalking,
   skid,
   jump,
 }

@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 
-class CoinBoxBlock extends SpriteAnimationComponent with HasGameRef<MarioGame> {
-  CoinBoxBlock({super.position}) : super(size: Vector2.all(16));
+class QuestionBlock extends SpriteAnimationComponent
+    with HasGameRef<MarioGame> {
+  QuestionBlock({super.position}) : super(size: Vector2.all(16));
 
   late Image image;
 
@@ -25,5 +27,6 @@ class CoinBoxBlock extends SpriteAnimationComponent with HasGameRef<MarioGame> {
           .toList(),
       stepTimes: [0.4, 0.2, 0.2],
     );
+    add(RectangleHitbox(collisionType: CollisionType.passive));
   }
 }
