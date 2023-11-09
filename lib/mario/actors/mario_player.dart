@@ -27,6 +27,8 @@ class MarioPlayer extends SpriteAnimationComponent
 
   MarioStatus _status = MarioStatus.initial;
 
+  bool isFlip = false;
+
   int horizontalDirection = 0;
 
   int verticalDirection = 0;
@@ -43,7 +45,11 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double groundHeight = 0;
 
-  bool get isOnGround => (y >= groundHeight);
+  double platformHeight = 0;
+
+  bool get isOnPlatform => (y >= platformHeight);
+
+  PositionComponent? _currentPlatform;
 
   //Vector for normal small mario
   List<List<double>> normalSmallVector = [
@@ -72,7 +78,8 @@ class MarioPlayer extends SpriteAnimationComponent
     image = game.images.fromCache('mario/mario_bros.png');
     add(RectangleHitbox());
     _loadStatus(MarioStatus.normal);
-    groundHeight = position.y;
+    groundHeight = y;
+    platformHeight = y;
   }
 
   void _loadStatus(MarioStatus status) {
@@ -84,14 +91,8 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.normal:
         animation = _getAnimation(normalSmallVector);
         break;
-      case MarioStatus.normalFlip:
-        animation = _getAnimation(normalSmallVector, flip: true);
-        break;
-      case MarioStatus.forwardWalking:
+      case MarioStatus.walking:
         animation = _getAnimation(normalSmallWalkingVector);
-        break;
-      case MarioStatus.backwardWalking:
-        animation = _getAnimation(normalSmallWalkingVector, flip: true);
         break;
       case MarioStatus.skid:
         animation = _getAnimation(normalSmallSkidVector);
@@ -104,12 +105,12 @@ class MarioPlayer extends SpriteAnimationComponent
     }
   }
 
-  SpriteAnimation _getAnimation(List<List<double>> list, {bool flip = false}) {
+  SpriteAnimation _getAnimation(List<List<double>> list) {
     return SpriteAnimation.spriteList(
       list
           .map((e) => FlipSprite(
                 image,
-                flip,
+                isFlip,
                 srcPosition: Vector2(e[0], e[1]),
                 srcSize: Vector2(e[2], e[3]),
               ))
@@ -125,9 +126,11 @@ class MarioPlayer extends SpriteAnimationComponent
     }
     if (keysPressed.contains(LogicalKeyboardKey.keyA) ||
         keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
+      isFlip = true;
       horizontalDirection = -1;
     } else if (keysPressed.contains(LogicalKeyboardKey.keyD) ||
         keysPressed.contains(LogicalKeyboardKey.arrowRight)) {
+      isFlip = false;
       horizontalDirection = 1;
     } else {
       horizontalDirection = 0;
@@ -135,7 +138,7 @@ class MarioPlayer extends SpriteAnimationComponent
     if (keysPressed.contains(LogicalKeyboardKey.space)) {
       if (verticalDirection != 1) {
         verticalDirection = 1;
-        if (isOnGround) {
+        if (isOnPlatform) {
           jumpSpeed = -270;
         }
       }
@@ -155,21 +158,16 @@ class MarioPlayer extends SpriteAnimationComponent
       jumpSpeed += gravityAccel * dt;
       y += jumpSpeed * dt;
     }
-    if (isOnGround) {
-      y = groundHeight;
+    if (isOnPlatform) {
+      y = platformHeight;
       jumpSpeed = 0;
 
       if (horizontalDirection > 0) {
-        _loadStatus(MarioStatus.forwardWalking);
+        _loadStatus(MarioStatus.walking);
       } else if (horizontalDirection < 0) {
-        _loadStatus(MarioStatus.backwardWalking);
+        _loadStatus(MarioStatus.walking);
       } else {
-        if (_status == MarioStatus.backwardWalking ||
-            _status == MarioStatus.normalFlip) {
-          _loadStatus(MarioStatus.normalFlip);
-        } else {
-          _loadStatus(MarioStatus.normal);
-        }
+        _loadStatus(MarioStatus.normal);
       }
     }
     // Change mario position.x
@@ -201,21 +199,34 @@ class MarioPlayer extends SpriteAnimationComponent
         moveSpeed += moveAccel;
       }
     }
-    if (position.x + moveSpeed * dt <=
-        game.cameraComponent.viewfinder.position.x) {
+    if (x + moveSpeed * dt <= game.cameraComponent.viewfinder.position.x) {
       // Prevent Mario from going backwards at screen edge.
       x = game.cameraComponent.viewfinder.position.x;
       return;
     }
     double halfScreenWidth = game.size.x / game.scaleSize / 2;
-    if (position.x + size.x >=
+    if (x + width >=
             game.cameraComponent.viewfinder.position.x + halfScreenWidth &&
         horizontalDirection > 0) {
       // Viewfinder moves to the right
       game.cameraComponent.viewfinder.position =
-          Vector2(position.x + size.x - halfScreenWidth, 0);
+          Vector2(x + width - halfScreenWidth, 0);
     }
     x += moveSpeed * dt;
+
+    //Check mario is at the top of currentPlatform
+    if (_currentPlatform != null) {
+      if (platformHeight == groundHeight - _currentPlatform!.height) {
+        if (x <= _currentPlatform!.x - width ||
+            x >= _currentPlatform!.x + _currentPlatform!.width) {
+          platformHeight = groundHeight;
+          jumpSpeed = 1;
+        }
+      }
+      if (platformHeight == groundHeight) {
+        _currentPlatform = null;
+      }
+    }
   }
 
   @override
@@ -234,14 +245,14 @@ class MarioPlayer extends SpriteAnimationComponent
     debugPrint('diffX=$diffX,diffY=$diffY');
     if (diffX > diffY) {
       if ((intersectionPoints.elementAt(0).y - other.y).abs() <
-          (intersectionPoints.elementAt(0).y - other.y - other.size.y).abs()) {
+          (intersectionPoints.elementAt(0).y - other.y - other.height).abs()) {
         hitEdge = 0;
       } else {
         hitEdge = 2;
       }
     } else {
       if ((intersectionPoints.elementAt(0).x - other.x).abs() <
-          (intersectionPoints.elementAt(0).x - other.x - other.size.x).abs()) {
+          (intersectionPoints.elementAt(0).x - other.x - other.width).abs()) {
         hitEdge = 3;
       } else {
         hitEdge = 1;
@@ -249,14 +260,16 @@ class MarioPlayer extends SpriteAnimationComponent
     }
     debugPrint('hitEdge=$hitEdge');
     if (hitEdge == 0) {
+      _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
-        groundHeight -= other.size.y;
+        platformHeight -= other.height;
       }
-    } else if (hitEdge == 3) {
-      x = other.position.x - size.x;
     } else if (hitEdge == 1) {
-      x = other.position.x + other.size.x;
+      x = other.x + other.width;
+    } else if (hitEdge == 3) {
+      moveSpeed = 0;
+      x = other.x - width;
     }
     if (other is ColliderBlock) {
     } else if (other is BrickBlock) {
@@ -271,9 +284,7 @@ class MarioPlayer extends SpriteAnimationComponent
 enum MarioStatus {
   initial,
   normal,
-  normalFlip,
-  forwardWalking,
-  backwardWalking,
+  walking,
   skid,
   jump,
 }
