@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
+import 'package:flutter_game/mario/constants/mario_value.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
@@ -35,13 +36,7 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double moveSpeed = 0;
 
-  final double moveSpeedMax = 180;
-
-  final double moveAccel = 10;
-
   double jumpSpeed = 0;
-
-  final double gravityAccel = 800;
 
   double groundHeight = 0;
 
@@ -136,13 +131,15 @@ class MarioPlayer extends SpriteAnimationComponent
       horizontalDirection = 0;
     }
     if (keysPressed.contains(LogicalKeyboardKey.space)) {
+      debugPrint('======space===');
       if (verticalDirection != 1) {
         verticalDirection = 1;
         if (isOnPlatform) {
-          jumpSpeed = -270;
+          jumpSpeed = -MarioValue.jumpSpeedMax;
         }
       }
     } else {
+      debugPrint('======unspace===');
       verticalDirection = 0;
     }
     return true;
@@ -155,7 +152,12 @@ class MarioPlayer extends SpriteAnimationComponent
     // Change mario position.y
     if (jumpSpeed != 0) {
       _loadStatus(MarioStatus.jump);
-      jumpSpeed += gravityAccel * dt;
+      if (verticalDirection == 1 && jumpSpeed > -170 && jumpSpeed < 0) {
+        // Long space key event, mario jump higher
+        jumpSpeed += MarioValue.gravityAccel * dt * MarioValue.jumpHigherFactor;
+      } else {
+        jumpSpeed += MarioValue.gravityAccel * dt;
+      }
       y += jumpSpeed * dt;
     }
     if (isOnPlatform) {
@@ -175,28 +177,28 @@ class MarioPlayer extends SpriteAnimationComponent
       if (moveSpeed < 0) {
         _loadStatus(MarioStatus.skid);
       }
-      if (moveSpeed < moveSpeedMax) {
-        moveSpeed += moveAccel;
+      if (moveSpeed < MarioValue.moveSpeedMax) {
+        moveSpeed += MarioValue.moveAccel;
       } else {
-        moveSpeed = moveSpeedMax;
+        moveSpeed = MarioValue.moveSpeedMax;
       }
     } else if (horizontalDirection < 0) {
       if (moveSpeed > 0) {
         _loadStatus(MarioStatus.skid);
       }
-      if (moveSpeed > -moveSpeedMax) {
-        moveSpeed -= moveAccel;
+      if (moveSpeed > -MarioValue.moveSpeedMax) {
+        moveSpeed -= MarioValue.moveAccel;
       } else {
-        moveSpeed = -moveSpeedMax;
+        moveSpeed = -MarioValue.moveSpeedMax;
       }
     } else {
-      if (moveSpeed.abs() > 0 && moveSpeed.abs() < moveAccel) {
+      if (moveSpeed.abs() > 0 && moveSpeed.abs() < MarioValue.moveAccel) {
         moveSpeed = 0;
       }
       if (moveSpeed > 0) {
-        moveSpeed -= moveAccel;
+        moveSpeed -= MarioValue.moveAccel;
       } else if (moveSpeed < 0) {
-        moveSpeed += moveAccel;
+        moveSpeed += MarioValue.moveAccel;
       }
     }
     if (x + moveSpeed * dt <= game.cameraComponent.viewfinder.position.x) {
