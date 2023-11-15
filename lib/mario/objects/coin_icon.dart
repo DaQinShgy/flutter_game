@@ -1,28 +1,63 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 
 class CoinIcon extends SpriteAnimationComponent with HasGameRef<MarioGame> {
-  CoinIcon({super.position});
+  CoinIcon(
+    this.type, {
+    super.position,
+    super.anchor = Anchor.topCenter,
+    super.priority = -1,
+  });
 
-  late Image image;
+  final CoinType type;
 
   //Vector of twinkle coin
-  List<Vector2> twinkleVector = [
-    Vector2(387, 18),
-    Vector2(403, 18),
-    Vector2(419, 18),
+  List<List<double>> twinkleVector = [
+    [387, 18, 10, 14],
+    [403, 18, 10, 14],
+    [419, 18, 10, 14],
+  ];
+
+  //Vector of spinning coin
+  List<List<double>> spinningVector = [
+    [52, 113, 8, 14],
+    [4, 113, 8, 14],
+    [20, 113, 8, 14],
+    [36, 113, 8, 14],
   ];
 
   @override
   FutureOr<void> onLoad() {
-    scale = scale * 1.2;
-    image = game.images.fromCache('mario/tile_set.png');
-    animation = SpriteAnimation.variableSpriteList(
-      twinkleVector.map((e) => Sprite(image, srcPosition: e, srcSize: Vector2(10, 14))).toList(),
-      stepTimes: [0.4, 0.2, 0.2],
-    );
+    if (type == CoinType.twinkle) {
+      scale = scale * 1.2;
+      animation = SpriteAnimation.variableSpriteList(
+        twinkleVector
+            .map((e) => Sprite(
+                  game.images.fromCache('mario/tile_set.png'),
+                  srcPosition: Vector2(e[0], e[1]),
+                  srcSize: Vector2(e[2], e[3]),
+                ))
+            .toList(),
+        stepTimes: [0.4, 0.2, 0.2],
+      );
+    } else {
+      animation = SpriteAnimation.spriteList(
+        spinningVector
+            .map((e) => Sprite(
+                  game.images.fromCache('mario/item_objects.png'),
+                  srcPosition: Vector2(e[0], e[1]),
+                  srcSize: Vector2(e[2], e[3]),
+                ))
+            .toList(),
+        stepTime: 0.15,
+      );
+    }
   }
+}
+
+enum CoinType {
+  twinkle,
+  spinning,
 }

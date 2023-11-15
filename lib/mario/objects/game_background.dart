@@ -7,8 +7,8 @@ import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
-import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
+import 'package:flutter_game/mario/objects/question_block.dart';
 
 class GameBackground extends SpriteComponent
     with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {

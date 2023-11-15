@@ -32,8 +32,8 @@ class GameOver extends StatsEvent {
   List<Object?> get props => [];
 }
 
-class CoinScore extends StatsEvent {
-  const CoinScore(this.score);
+class GameScore extends StatsEvent {
+  const GameScore(this.score);
 
   final double score;
 

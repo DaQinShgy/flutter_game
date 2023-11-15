@@ -93,7 +93,8 @@ class Hub extends PositionComponent
     double topMargin = 11 * game.scaleSize;
     add(_buildLabel(
         'MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
-    add(_buildLabel('WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
+    add(_buildLabel(
+        'WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
     add(_buildLabel(
         'TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
     add(_buildLabel(
@@ -104,7 +105,9 @@ class Hub extends PositionComponent
     );
     add(scoreLabel);
     coinIcon = CoinIcon(
-      position: Vector2(centerX - 16 * 4 * game.scaleSize, 21.5 * game.scaleSize),
+      CoinType.twinkle,
+      position:
+          Vector2(centerX - 16 * 4 * game.scaleSize, 21.5 * game.scaleSize),
     );
     add(coinIcon);
     add(_buildLabel('*',
@@ -131,7 +134,8 @@ class Hub extends PositionComponent
         srcPosition: Vector2(3, 155),
       ),
       scale: scale * game.scaleSize,
-      position: Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
+      position:
+          Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
     );
     add(mushrooms);
     player1 = _buildLabel('1 PLAYER GAME',

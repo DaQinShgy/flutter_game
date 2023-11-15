@@ -131,7 +131,6 @@ class MarioPlayer extends SpriteAnimationComponent
       horizontalDirection = 0;
     }
     if (keysPressed.contains(LogicalKeyboardKey.space)) {
-      debugPrint('======space===');
       if (verticalDirection != 1) {
         verticalDirection = 1;
         if (isOnPlatform) {
@@ -139,7 +138,6 @@ class MarioPlayer extends SpriteAnimationComponent
         }
       }
     } else {
-      debugPrint('======unspace===');
       verticalDirection = 0;
     }
     return true;
@@ -164,9 +162,7 @@ class MarioPlayer extends SpriteAnimationComponent
       y = platformHeight;
       jumpSpeed = 0;
 
-      if (horizontalDirection > 0) {
-        _loadStatus(MarioStatus.walking);
-      } else if (horizontalDirection < 0) {
+      if (horizontalDirection != 0 || moveSpeed != 0) {
         _loadStatus(MarioStatus.walking);
       } else {
         _loadStatus(MarioStatus.normal);
@@ -208,8 +204,7 @@ class MarioPlayer extends SpriteAnimationComponent
     }
     double halfScreenWidth = game.size.x / game.scaleSize / 2;
     if (x + width >=
-            game.cameraComponent.viewfinder.position.x + halfScreenWidth &&
-        horizontalDirection > 0) {
+        game.cameraComponent.viewfinder.position.x + halfScreenWidth) {
       // Viewfinder moves to the right
       game.cameraComponent.viewfinder.position =
           Vector2(x + width - halfScreenWidth, 0);
@@ -218,7 +213,7 @@ class MarioPlayer extends SpriteAnimationComponent
 
     //Check mario is at the top of currentPlatform
     if (_currentPlatform != null) {
-      if (platformHeight == groundHeight - _currentPlatform!.height) {
+      if (platformHeight == _currentPlatform!.y) {
         if (x <= _currentPlatform!.x - width ||
             x >= _currentPlatform!.x + _currentPlatform!.width) {
           platformHeight = groundHeight;
@@ -234,6 +229,7 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
+    // TODO: When mario hits multiple hitBoxes, handle component has more collision, ignore others.
     if (intersectionPoints.length < 2) {
       return;
     }
@@ -244,7 +240,7 @@ class MarioPlayer extends SpriteAnimationComponent
     double diffX = listX.reduce(max) - listX.reduce(min);
     List<double> listY = intersectionPoints.map((e) => e.y).toList();
     double diffY = listY.reduce(max) - listY.reduce(min);
-    debugPrint('diffX=$diffX,diffY=$diffY');
+    // debugPrint('diffX=$diffX,diffY=$diffY');
     if (diffX > diffY) {
       if ((intersectionPoints.elementAt(0).y - other.y).abs() <
           (intersectionPoints.elementAt(0).y - other.y - other.height).abs()) {
@@ -265,19 +261,26 @@ class MarioPlayer extends SpriteAnimationComponent
       _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
-        platformHeight -= other.height;
+        platformHeight = other.y;
       }
     } else if (hitEdge == 1) {
       x = other.x + other.width;
+    } else if (hitEdge == 2) {
+      if (jumpSpeed < 0) {
+        jumpSpeed = -jumpSpeed;
+      }
     } else if (hitEdge == 3) {
       moveSpeed = 0;
       x = other.x - width;
     }
     if (other is ColliderBlock) {
     } else if (other is BrickBlock) {
+      if (hitEdge == 2) {
+        other.bump();
+      }
     } else if (other is QuestionBlock) {
       if (hitEdge == 2) {
-        jumpSpeed = -jumpSpeed;
+        other.bump();
       }
     }
   }

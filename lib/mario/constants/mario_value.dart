@@ -1,7 +1,7 @@
 class MarioValue {
-  static const double moveSpeedMax = 180;
+  static const double moveSpeedMax = 130;
 
-  static const double moveAccel = 10;
+  static const double moveAccel = 5;
 
   static const double gravityAccel = 850;
 

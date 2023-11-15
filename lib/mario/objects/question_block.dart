@@ -3,30 +3,100 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/coin_icon.dart';
+import 'package:flutter_game/mario/objects/coin_score.dart';
 
-class QuestionBlock extends SpriteAnimationComponent
-    with HasGameRef<MarioGame> {
+class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   QuestionBlock({super.position}) : super(size: Vector2.all(16));
 
   late Image image;
 
+  late Component component;
+
   //Default twinkle status
-  List<List<Vector2>> twinkleVector = [
-    [Vector2(384, 0), Vector2(16, 16)],
-    [Vector2(400, 0), Vector2(16, 16)],
-    [Vector2(416, 0), Vector2(16, 16)],
+  List<List<double>> twinkleVector = [
+    [384, 0, 16, 16],
+    [400, 0, 16, 16],
+    [416, 0, 16, 16],
   ];
+
+  //Bumped status
+  List<double> bumpedVector = [432, 0, 16, 16];
 
   @override
   FutureOr<void> onLoad() {
     image = game.images.fromCache('mario/tile_set.png');
-    animation = SpriteAnimation.variableSpriteList(
-      twinkleVector
-          .map((e) => Sprite(image, srcPosition: e[0], srcSize: e[1]))
-          .toList(),
-      stepTimes: [0.4, 0.2, 0.2],
+    component = SpriteAnimationComponent(
+      animation: SpriteAnimation.variableSpriteList(
+        twinkleVector
+            .map((e) => Sprite(
+                  image,
+                  srcPosition: Vector2(e[0], e[1]),
+                  srcSize: Vector2(e[2], e[3]),
+                ))
+            .toList(),
+        stepTimes: [0.4, 0.2, 0.2],
+      ),
     );
+    add(component);
     add(RectangleHitbox(collisionType: CollisionType.passive));
+  }
+
+  /// Action after Mario has bumped the box from below
+  void bump() {
+    if (component is SpriteComponent) {
+      return;
+    }
+    // Update questionBlock state
+    remove(component);
+    component = SpriteComponent(
+      sprite: Sprite(
+        image,
+        srcPosition: Vector2(bumpedVector[0], bumpedVector[1]),
+        srcSize: Vector2(bumpedVector[2], bumpedVector[3]),
+      ),
+    );
+    add(component);
+
+    CoinIcon coinIcon =
+        CoinIcon(CoinType.spinning, position: Vector2(width / 2, 0));
+    add(coinIcon);
+    coinIcon.add(MoveByEffect(
+      Vector2(0, -56),
+      EffectController(
+        duration: 0.42,
+        curve: Curves.fastEaseInToSlowEaseOut,
+      ),
+      onComplete: () {
+        coinIcon.add(MoveByEffect(
+          Vector2(0, 32),
+          EffectController(
+            duration: 0.24,
+            curve: Curves.fastOutSlowIn,
+          ),
+          onComplete: () {
+            remove(coinIcon);
+            CoinScore coinScore = CoinScore(
+              '200',
+              position: Vector2(width / 2, -16),
+            );
+            add(coinScore);
+            coinScore.add(MoveByEffect(
+              Vector2(0, -32),
+              EffectController(
+                duration: 0.3,
+                curve: Curves.fastEaseInToSlowEaseOut,
+              ),
+              onComplete: () {
+                remove(coinScore);
+              },
+            ));
+          },
+        ));
+      },
+    ));
   }
 }
