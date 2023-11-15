@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
+import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
@@ -60,7 +61,7 @@ class MarioGame extends FlameGame
       ),
     );
     _marioPlayer = MarioPlayer(
-      position: Vector2(32, 200),
+      position: Vector2(32, ObjectValues.groundY),
     );
     world.addAll([GameBackground(), mapComponent, _marioPlayer]);
   }
@@ -68,7 +69,5 @@ class MarioGame extends FlameGame
   @override
   Color backgroundColor() => Colors.black;
 
-  void _buildBlocks(TiledComponent mapComponent) {
-
-  }
+  void _buildBlocks(TiledComponent mapComponent) {}
 }

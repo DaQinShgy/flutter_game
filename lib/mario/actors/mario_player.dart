@@ -9,11 +9,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
-import 'package:flutter_game/mario/constants/mario_value.dart';
+import 'package:flutter_game/mario/constants/mario_vectors.dart';
+import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
+import 'package:flutter_game/mario/objects/question_mushroom.dart';
 import 'package:flutter_game/mario/widgets/FlipSprite.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
@@ -27,6 +29,8 @@ class MarioPlayer extends SpriteAnimationComponent
   late Image image;
 
   MarioStatus _status = MarioStatus.initial;
+
+  MarioSize _size = MarioSize.small;
 
   bool isFlip = false;
 
@@ -46,28 +50,6 @@ class MarioPlayer extends SpriteAnimationComponent
 
   PositionComponent? _currentPlatform;
 
-  //Vector for normal small mario
-  List<List<double>> normalSmallVector = [
-    [178, 32, 12, 16],
-  ];
-
-  //Vector for normal small mario walking
-  List<List<double>> normalSmallWalkingVector = [
-    [80, 32, 15, 16],
-    [96, 32, 16, 16],
-    [112, 32, 16, 16],
-  ];
-
-  //Vector for normal small mario skid
-  List<List<double>> normalSmallSkidVector = [
-    [130, 32, 14, 16],
-  ];
-
-  //Vector for normal small mario jump
-  List<List<double>> normalSmallJumpVector = [
-    [144, 32, 16, 16],
-  ];
-
   @override
   FutureOr<void> onLoad() {
     image = game.images.fromCache('mario/mario_bros.png');
@@ -84,23 +66,45 @@ class MarioPlayer extends SpriteAnimationComponent
     _status = status;
     switch (_status) {
       case MarioStatus.normal:
-        animation = _getAnimation(normalSmallVector);
+        animation = _getAnimation(_size == MarioSize.small
+            ? MarioVectors.normalSmallVector
+            : MarioVectors.normalBigVector);
         break;
-      case MarioStatus.walking:
-        animation = _getAnimation(normalSmallWalkingVector);
+      case MarioStatus.walk:
+        animation = _getAnimation(_size == MarioSize.small
+            ? MarioVectors.normalSmallWalkVector
+            : MarioVectors.normalBigWalkVector);
         break;
       case MarioStatus.skid:
-        animation = _getAnimation(normalSmallSkidVector);
+        animation = _getAnimation(_size == MarioSize.small
+            ? MarioVectors.normalSmallSkidVector
+            : MarioVectors.normalBigSkidVector);
         break;
       case MarioStatus.jump:
-        animation = _getAnimation(normalSmallJumpVector);
+        animation = _getAnimation(_size == MarioSize.small
+            ? MarioVectors.normalSmallJumpVector
+            : MarioVectors.normalBigJumpVector);
         break;
+      case MarioStatus.smallToBig:
+        animation = _getAnimation(MarioVectors.smallToBigVector,
+            loop: false, stepTime: 0.07);
       default:
         break;
     }
   }
 
-  SpriteAnimation _getAnimation(List<List<double>> list) {
+  void _loadSize(MarioSize size) {
+    if (size == _size) {
+      return;
+    }
+    _size = size;
+  }
+
+  SpriteAnimation _getAnimation(
+    List<List<double>> list, {
+    bool loop = true,
+    double stepTime = 0.1,
+  }) {
     return SpriteAnimation.spriteList(
       list
           .map((e) => FlipSprite(
@@ -110,7 +114,8 @@ class MarioPlayer extends SpriteAnimationComponent
                 srcSize: Vector2(e[2], e[3]),
               ))
           .toList(),
-      stepTime: 0.1,
+      stepTime: stepTime,
+      loop: loop,
     );
   }
 
@@ -134,7 +139,7 @@ class MarioPlayer extends SpriteAnimationComponent
       if (verticalDirection != 1) {
         verticalDirection = 1;
         if (isOnPlatform) {
-          jumpSpeed = -MarioValue.jumpSpeedMax;
+          jumpSpeed = -ObjectValues.marioJumpSpeedMax;
         }
       }
     } else {
@@ -146,15 +151,24 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (_status == MarioStatus.smallToBig) {
+      animationTicker?.onComplete = () {
+        _loadSize(MarioSize.big);
+        _loadStatus(MarioStatus.normal);
+      };
+      return;
+    }
 
     // Change mario position.y
     if (jumpSpeed != 0) {
       _loadStatus(MarioStatus.jump);
       if (verticalDirection == 1 && jumpSpeed > -170 && jumpSpeed < 0) {
         // Long space key event, mario jump higher
-        jumpSpeed += MarioValue.gravityAccel * dt * MarioValue.jumpHigherFactor;
+        jumpSpeed += ObjectValues.marioGravityAccel *
+            dt *
+            ObjectValues.marioJumpHigherFactor;
       } else {
-        jumpSpeed += MarioValue.gravityAccel * dt;
+        jumpSpeed += ObjectValues.marioGravityAccel * dt;
       }
       y += jumpSpeed * dt;
     }
@@ -163,7 +177,7 @@ class MarioPlayer extends SpriteAnimationComponent
       jumpSpeed = 0;
 
       if (horizontalDirection != 0 || moveSpeed != 0) {
-        _loadStatus(MarioStatus.walking);
+        _loadStatus(MarioStatus.walk);
       } else {
         _loadStatus(MarioStatus.normal);
       }
@@ -173,28 +187,29 @@ class MarioPlayer extends SpriteAnimationComponent
       if (moveSpeed < 0) {
         _loadStatus(MarioStatus.skid);
       }
-      if (moveSpeed < MarioValue.moveSpeedMax) {
-        moveSpeed += MarioValue.moveAccel;
+      if (moveSpeed < ObjectValues.marioMoveSpeedMax) {
+        moveSpeed += ObjectValues.marioMoveAccel;
       } else {
-        moveSpeed = MarioValue.moveSpeedMax;
+        moveSpeed = ObjectValues.marioMoveSpeedMax;
       }
     } else if (horizontalDirection < 0) {
       if (moveSpeed > 0) {
         _loadStatus(MarioStatus.skid);
       }
-      if (moveSpeed > -MarioValue.moveSpeedMax) {
-        moveSpeed -= MarioValue.moveAccel;
+      if (moveSpeed > -ObjectValues.marioMoveSpeedMax) {
+        moveSpeed -= ObjectValues.marioMoveAccel;
       } else {
-        moveSpeed = -MarioValue.moveSpeedMax;
+        moveSpeed = -ObjectValues.marioMoveSpeedMax;
       }
     } else {
-      if (moveSpeed.abs() > 0 && moveSpeed.abs() < MarioValue.moveAccel) {
+      if (moveSpeed.abs() > 0 &&
+          moveSpeed.abs() < ObjectValues.marioMoveAccel) {
         moveSpeed = 0;
       }
       if (moveSpeed > 0) {
-        moveSpeed -= MarioValue.moveAccel;
+        moveSpeed -= ObjectValues.marioMoveAccel;
       } else if (moveSpeed < 0) {
-        moveSpeed += MarioValue.moveAccel;
+        moveSpeed += ObjectValues.marioMoveAccel;
       }
     }
     if (x + moveSpeed * dt <= game.cameraComponent.viewfinder.position.x) {
@@ -231,6 +246,10 @@ class MarioPlayer extends SpriteAnimationComponent
     super.onCollision(intersectionPoints, other);
     // TODO: When mario hits multiple hitBoxes, handle component has more collision, ignore others.
     if (intersectionPoints.length < 2) {
+      return;
+    }
+    if (other is QuestionMushroom) {
+      _loadStatus(MarioStatus.smallToBig);
       return;
     }
     // debugPrint('intersectionPoints=$intersectionPoints');
@@ -289,7 +308,13 @@ class MarioPlayer extends SpriteAnimationComponent
 enum MarioStatus {
   initial,
   normal,
-  walking,
+  walk,
   skid,
   jump,
+  smallToBig,
+}
+
+enum MarioSize {
+  small,
+  big,
 }

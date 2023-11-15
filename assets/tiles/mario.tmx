@@ -4,10 +4,10 @@
   <image source="../images/mario/level_1.png" width="3392" height="224"/>
  </imagelayer>
  <objectgroup id="3" name="question blocks">
-  <object id="5" x="368" y="136" width="16" height="16"/>
-  <object id="7" x="352" y="72" width="16" height="16"/>
-  <object id="3" x="336" y="136" width="16" height="16"/>
-  <object id="1" x="256" y="136" width="16" height="16"/>
+  <object id="5" type="coin" x="368" y="136" width="16" height="16"/>
+  <object id="7" type="coin" x="352" y="72" width="16" height="16"/>
+  <object id="3" type="mushroom" x="336" y="136" width="16" height="16"/>
+  <object id="1" type="coin" x="256" y="136" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="5" name="brick blocks">
   <object id="6" x="384" y="136" width="16" height="16"/>

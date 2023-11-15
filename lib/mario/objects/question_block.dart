@@ -8,9 +8,12 @@ import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
+import 'package:flutter_game/mario/objects/question_mushroom.dart';
 
 class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
-  QuestionBlock({super.position}) : super(size: Vector2.all(16));
+  QuestionBlock(this.type, {super.position}) : super(size: Vector2.all(16));
+
+  late QuestionType type;
 
   late Image image;
 
@@ -61,6 +64,17 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     );
     add(component);
 
+    switch (type) {
+      case QuestionType.coin:
+        _handleCoin();
+        break;
+      case QuestionType.mushroom:
+        _handleMushroom();
+        break;
+    }
+  }
+
+  void _handleCoin() {
     CoinIcon coinIcon =
         CoinIcon(CoinType.spinning, position: Vector2(width / 2, 0));
     add(coinIcon);
@@ -99,4 +113,13 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
       },
     ));
   }
+
+  void _handleMushroom() {
+    add(QuestionMushroom());
+  }
+}
+
+enum QuestionType {
+  coin,
+  mushroom,
 }
