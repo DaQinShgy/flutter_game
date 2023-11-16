@@ -252,6 +252,9 @@ class MarioPlayer extends SpriteAnimationComponent
       _loadStatus(MarioStatus.smallToBig);
       return;
     }
+    if (other is BrickBlock && other.opacity == 0) {
+      return;
+    }
     // debugPrint('intersectionPoints=$intersectionPoints');
     // 0 top; 1 right; 2 bottom; 3 left;
     int hitEdge = -1;
@@ -295,7 +298,7 @@ class MarioPlayer extends SpriteAnimationComponent
     if (other is ColliderBlock) {
     } else if (other is BrickBlock) {
       if (hitEdge == 2) {
-        other.bump();
+        other.bump(_size);
       }
     } else if (other is QuestionBlock) {
       if (hitEdge == 2) {

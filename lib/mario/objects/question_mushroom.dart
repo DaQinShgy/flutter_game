@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
@@ -44,7 +43,6 @@ class QuestionMushroom extends SpriteComponent
   void update(double dt) {
     super.update(dt);
     x += ObjectValues.mushroomMoveSpeed * horizontalDirection * dt;
-    debugPrint('x=$x,y=$y');
     if (x >= 64 && !isOnGround) {
       jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
       y += jumpSpeed * dt;

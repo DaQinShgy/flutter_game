@@ -64,6 +64,16 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     );
     add(component);
 
+    add(MoveByEffect(
+      Vector2(0, -8),
+      EffectController(
+        duration: 0.1,
+        curve: Curves.fastEaseInToSlowEaseOut,
+        reverseDuration: 0.1,
+        reverseCurve: Curves.fastOutSlowIn,
+      ),
+    ));
+
     switch (type) {
       case QuestionType.coin:
         _handleCoin();
@@ -78,40 +88,39 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     CoinIcon coinIcon =
         CoinIcon(CoinType.spinning, position: Vector2(width / 2, 0));
     add(coinIcon);
-    coinIcon.add(MoveByEffect(
-      Vector2(0, -56),
-      EffectController(
-        duration: 0.42,
-        curve: Curves.fastEaseInToSlowEaseOut,
+    coinIcon.add(SequenceEffect([
+      MoveByEffect(
+        Vector2(0, -56),
+        EffectController(
+          duration: 0.42,
+          curve: Curves.fastEaseInToSlowEaseOut,
+        ),
       ),
-      onComplete: () {
-        coinIcon.add(MoveByEffect(
-          Vector2(0, 32),
-          EffectController(
-            duration: 0.24,
-            curve: Curves.fastOutSlowIn,
-          ),
-          onComplete: () {
-            remove(coinIcon);
-            CoinScore coinScore = CoinScore(
-              '200',
-              position: Vector2(width / 2, -16),
-            );
-            add(coinScore);
-            coinScore.add(MoveByEffect(
-              Vector2(0, -32),
-              EffectController(
-                duration: 0.3,
-                curve: Curves.fastEaseInToSlowEaseOut,
-              ),
-              onComplete: () {
-                remove(coinScore);
-              },
-            ));
-          },
-        ));
-      },
-    ));
+      MoveByEffect(
+        Vector2(0, 32),
+        EffectController(
+          duration: 0.24,
+          curve: Curves.fastOutSlowIn,
+        ),
+      ),
+      RemoveEffect(),
+    ], onComplete: () {
+      CoinScore coinScore = CoinScore(
+        '200',
+        position: Vector2(width / 2, -16),
+      );
+      add(coinScore);
+      coinScore.add(MoveByEffect(
+        Vector2(0, -32),
+        EffectController(
+          duration: 0.3,
+          curve: Curves.fastEaseInToSlowEaseOut,
+        ),
+        onComplete: () {
+          remove(coinScore);
+        },
+      ));
+    }));
   }
 
   void _handleMushroom() {
