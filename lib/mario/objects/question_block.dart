@@ -46,6 +46,10 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     );
     add(component);
     add(RectangleHitbox(collisionType: CollisionType.passive));
+
+    if (type == QuestionType.greenMushroom) {
+      (component as SpriteAnimationComponent).opacity = 0;
+    }
   }
 
   /// Action after Mario has bumped the box from below
@@ -78,7 +82,10 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
       case QuestionType.coin:
         _handleCoin();
         break;
-      case QuestionType.mushroom:
+      case QuestionType.redMushroom:
+        _handleMushroom();
+        break;
+      case QuestionType.greenMushroom:
         _handleMushroom();
         break;
     }
@@ -130,5 +137,6 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
 
 enum QuestionType {
   coin,
-  mushroom,
+  redMushroom,
+  greenMushroom,
 }

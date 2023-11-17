@@ -350,7 +350,9 @@ class MarioPlayer extends SpriteAnimationComponent
         platformY = other.y;
       }
     } else if (hitEdge == 1) {
-      if (!invisibility) {
+      if (invisibility && other is EnemyGoomba) {
+        // invisibility, Goomba Mario doesn't affect each other
+      } else {
         moveSpeed = 0;
         x = other.x + other.width;
       }
@@ -359,7 +361,9 @@ class MarioPlayer extends SpriteAnimationComponent
         jumpSpeed = -jumpSpeed;
       }
     } else if (hitEdge == 3) {
-      if (!invisibility) {
+      if (invisibility && other is EnemyGoomba) {
+        // invisibility, Goomba Mario doesn't affect each other
+      } else {
         moveSpeed = 0;
         x = other.x - width;
       }
