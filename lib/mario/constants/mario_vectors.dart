@@ -36,6 +36,21 @@ class MarioVectors {
     [176, 0, 16, 32],
   ];
 
+  //Vector of big to small
+  static const List<List<double>> bigToSmallVector = [
+    [144, 0, 16, 32],
+    [272, 2, 16, 29],
+    [241, 33, 16, 16],
+    [272, 2, 16, 29],
+    [241, 33, 16, 16],
+    [272, 2, 16, 29],
+    [241, 33, 16, 16],
+    [272, 2, 16, 29],
+    [241, 33, 16, 16],
+    [272, 2, 16, 29],
+    [241, 33, 16, 16],
+  ];
+
   //Vector of normal big Mario
   static const List<List<double>> normalBigVector = [
     [176, 0, 16, 32],
@@ -56,5 +71,10 @@ class MarioVectors {
   //Vector of normal big Mario jump
   static const List<List<double>> normalBigJumpVector = [
     [144, 0, 16, 32],
+  ];
+
+  //Vector of Mario die
+  static const List<List<double>> dieVector = [
+    [160, 32, 15, 16],
   ];
 }

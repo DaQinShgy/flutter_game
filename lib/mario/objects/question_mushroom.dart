@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 
 class QuestionMushroom extends SpriteComponent
@@ -15,6 +16,8 @@ class QuestionMushroom extends SpriteComponent
   // Vector of mushroom
   List<double> mushroomVector = [0, 0, 16, 16];
 
+  late RectangleHitbox _hitbox;
+
   @override
   FutureOr<void> onLoad() {
     sprite = Sprite(
@@ -22,7 +25,8 @@ class QuestionMushroom extends SpriteComponent
       srcPosition: Vector2(mushroomVector[0], mushroomVector[1]),
       srcSize: Vector2(mushroomVector[2], mushroomVector[3]),
     );
-    add(RectangleHitbox());
+    _hitbox = RectangleHitbox();
+    add(_hitbox);
 
     add(MoveByEffect(
       Vector2(0, -16),
@@ -42,6 +46,9 @@ class QuestionMushroom extends SpriteComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (opacity == 0) {
+      return;
+    }
     x += ObjectValues.mushroomMoveSpeed * horizontalDirection * dt;
     if (x >= 64 && !isOnGround) {
       jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
@@ -64,7 +71,23 @@ class QuestionMushroom extends SpriteComponent
     if (other is ColliderBlock) {
       horizontalDirection = -1;
     } else if (other is MarioPlayer) {
-      removeFromParent();
+      remove(_hitbox);
+      opacity = 0;
+      CoinScore coinScore = CoinScore(
+        '1000',
+        position: Vector2(width / 2, -10),
+      );
+      add(coinScore);
+      coinScore.add(MoveByEffect(
+        Vector2(0, -40),
+        EffectController(
+          duration: 0.5,
+        ),
+        onComplete: () {
+          remove(coinScore);
+          removeFromParent();
+        },
+      ));
     }
   }
 }

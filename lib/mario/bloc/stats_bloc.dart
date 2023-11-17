@@ -16,12 +16,6 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       ),
     );
 
-    on<GamePause>(
-      (event, emit) => emit(
-        state.copyWith(status: GameStatus.pause),
-      ),
-    );
-
     on<GameOver>(
       (event, emit) => emit(
         state.copyWith(status: GameStatus.over),

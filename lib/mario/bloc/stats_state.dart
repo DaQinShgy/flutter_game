@@ -3,7 +3,6 @@ import 'package:equatable/equatable.dart';
 enum GameStatus {
   initial,
   running,
-  pause,
   over,
 }
 

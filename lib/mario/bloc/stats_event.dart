@@ -18,13 +18,6 @@ class GameRunning extends StatsEvent {
   List<Object?> get props => [];
 }
 
-class GamePause extends StatsEvent {
-  const GamePause();
-
-  @override
-  List<Object?> get props => [];
-}
-
 class GameOver extends StatsEvent {
   const GameOver();
 

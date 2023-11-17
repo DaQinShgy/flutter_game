@@ -4,16 +4,19 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter/animation.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/mario_vectors.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
-import 'package:flutter_game/mario/objects/collider_block.dart';
+import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/question_mushroom.dart';
 import 'package:flutter_game/mario/widgets/FlipSprite.dart';
@@ -28,9 +31,11 @@ class MarioPlayer extends SpriteAnimationComponent
 
   late Image image;
 
-  MarioStatus _status = MarioStatus.initial;
+  MarioStatus _status = MarioStatus.stand;
 
   MarioSize _size = MarioSize.small;
+
+  bool get isSmall => _size == MarioSize.small;
 
   bool isFlip = false;
 
@@ -42,30 +47,34 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  double groundHeight = 0;
+  double groundY = 0;
 
-  double platformHeight = 0;
+  double platformY = 0;
 
-  bool get isOnPlatform => (y >= platformHeight);
+  bool get isOnPlatform => y >= platformY;
 
   PositionComponent? _currentPlatform;
+
+  double twinkleTime = 0;
+
+  bool get invisibility => twinkleTime != 0;
 
   @override
   FutureOr<void> onLoad() {
     image = game.images.fromCache('mario/mario_bros.png');
     add(RectangleHitbox());
-    _loadStatus(MarioStatus.normal);
-    groundHeight = y;
-    platformHeight = y;
+    _loadStatus(MarioStatus.stand);
+    groundY = y;
+    platformY = y;
   }
 
   void _loadStatus(MarioStatus status) {
-    if (status == _status) {
+    if (status == _status && animation != null) {
       return;
     }
     _status = status;
     switch (_status) {
-      case MarioStatus.normal:
+      case MarioStatus.stand:
         animation = _getAnimation(_size == MarioSize.small
             ? MarioVectors.normalSmallVector
             : MarioVectors.normalBigVector);
@@ -88,6 +97,36 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.smallToBig:
         animation = _getAnimation(MarioVectors.smallToBigVector,
             loop: false, stepTime: 0.07);
+        break;
+      case MarioStatus.bigToSmall:
+        animation = _getAnimation(MarioVectors.bigToSmallVector,
+            loop: false, stepTime: 0.07);
+        twinkleTime = 0.01;
+        break;
+      case MarioStatus.die:
+        animation = _getAnimation(MarioVectors.dieVector);
+        bloc.add(const GameOver());
+        add(SequenceEffect(
+          [
+            MoveByEffect(
+              Vector2(0, -48),
+              EffectController(
+                duration: 0.3,
+                curve: Curves.fastEaseInToSlowEaseOut,
+                startDelay: 0.8,
+              ),
+            ),
+            MoveByEffect(
+              Vector2(0, 88),
+              EffectController(
+                duration: 0.55,
+                curve: Curves.easeInCubic,
+              ),
+            ),
+            RemoveEffect(),
+          ],
+        ));
+        break;
       default:
         break;
     }
@@ -151,12 +190,29 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (bloc.state.status != GameStatus.running) {
+      return;
+    }
     if (_status == MarioStatus.smallToBig) {
       animationTicker?.onComplete = () {
         _loadSize(MarioSize.big);
-        _loadStatus(MarioStatus.normal);
+        _loadStatus(MarioStatus.stand);
       };
       return;
+    } else if (_status == MarioStatus.bigToSmall) {
+      animationTicker?.onComplete = () {
+        _loadSize(MarioSize.small);
+        _loadStatus(MarioStatus.stand);
+      };
+      return;
+    }
+    if (invisibility) {
+      twinkleTime += dt;
+      opacity = (opacity - 1).abs();
+      if (twinkleTime > 1.5) {
+        twinkleTime = 0;
+        opacity = 1;
+      }
     }
 
     // Change mario position.y
@@ -173,13 +229,13 @@ class MarioPlayer extends SpriteAnimationComponent
       y += jumpSpeed * dt;
     }
     if (isOnPlatform) {
-      y = platformHeight;
+      y = platformY;
       jumpSpeed = 0;
 
       if (horizontalDirection != 0 || moveSpeed != 0) {
         _loadStatus(MarioStatus.walk);
       } else {
-        _loadStatus(MarioStatus.normal);
+        _loadStatus(MarioStatus.stand);
       }
     }
     // Change mario position.x
@@ -228,14 +284,19 @@ class MarioPlayer extends SpriteAnimationComponent
 
     //Check mario is at the top of currentPlatform
     if (_currentPlatform != null) {
-      if (platformHeight == _currentPlatform!.y) {
+      if (platformY == _currentPlatform!.y) {
         if (x <= _currentPlatform!.x - width ||
             x >= _currentPlatform!.x + _currentPlatform!.width) {
-          platformHeight = groundHeight;
+          platformY = groundY;
           jumpSpeed = 1;
         }
+      } else if (_currentPlatform is EnemyGoomba &&
+          _currentPlatform!.height == 7) {
+        // Goomba's height shortened after being squished by Mario
+        platformY = groundY;
+        jumpSpeed = -ObjectValues.marioReboundSpeed;
       }
-      if (platformHeight == groundHeight) {
+      if (platformY == groundY) {
         _currentPlatform = null;
       }
     }
@@ -244,7 +305,10 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    // TODO: When mario hits multiple hitBoxes, handle component has more collision, ignore others.
+    if (bloc.state.status != GameStatus.running) {
+      return;
+    }
+    // TODO: When Mario hits multiple hitBoxes, handle component has more collision, ignore others.
     if (intersectionPoints.length < 2) {
       return;
     }
@@ -283,20 +347,24 @@ class MarioPlayer extends SpriteAnimationComponent
       _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
-        platformHeight = other.y;
+        platformY = other.y;
       }
     } else if (hitEdge == 1) {
-      x = other.x + other.width;
+      if (!invisibility) {
+        moveSpeed = 0;
+        x = other.x + other.width;
+      }
     } else if (hitEdge == 2) {
       if (jumpSpeed < 0) {
         jumpSpeed = -jumpSpeed;
       }
     } else if (hitEdge == 3) {
-      moveSpeed = 0;
-      x = other.x - width;
+      if (!invisibility) {
+        moveSpeed = 0;
+        x = other.x - width;
+      }
     }
-    if (other is ColliderBlock) {
-    } else if (other is BrickBlock) {
+    if (other is BrickBlock) {
       if (hitEdge == 2) {
         other.bump(_size);
       }
@@ -304,17 +372,28 @@ class MarioPlayer extends SpriteAnimationComponent
       if (hitEdge == 2) {
         other.bump();
       }
+    } else if (other is EnemyGoomba) {
+      if (hitEdge == 0) {
+        other.squishes();
+      } else {
+        if (!invisibility) {
+          _loadStatus(_size == MarioSize.small
+              ? MarioStatus.die
+              : MarioStatus.bigToSmall);
+        }
+      }
     }
   }
 }
 
 enum MarioStatus {
-  initial,
-  normal,
+  stand,
   walk,
   skid,
   jump,
   smallToBig,
+  bigToSmall,
+  die,
 }
 
 enum MarioSize {

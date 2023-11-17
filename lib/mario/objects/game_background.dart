@@ -8,6 +8,7 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
+import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
 class GameBackground extends SpriteComponent
@@ -19,24 +20,21 @@ class GameBackground extends SpriteComponent
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
     _buildCollider();
     _buildBlock();
+    _buildEnemies();
   }
 
   void _buildBlock() {
     final questionBlocks =
         game.mapComponent.tileMap.getLayer<ObjectGroup>('question blocks');
-    addAll(questionBlocks!.objects
-        .map((object) => QuestionBlock(
-              object.type == 'coin' ? QuestionType.coin : QuestionType.mushroom,
-              position: Vector2(object.x, object.y),
-            ))
-        .toList());
+    addAll(questionBlocks!.objects.map((object) => QuestionBlock(
+          object.type == 'coin' ? QuestionType.coin : QuestionType.mushroom,
+          position: Vector2(object.x, object.y),
+        )));
     final brickBlocks =
         game.mapComponent.tileMap.getLayer<ObjectGroup>('brick blocks');
-    addAll(brickBlocks!.objects
-        .map((object) => BrickBlock(
-              position: Vector2(object.x, object.y),
-            ))
-        .toList());
+    addAll(brickBlocks!.objects.map((object) => BrickBlock(
+          position: Vector2(object.x, object.y),
+        )));
   }
 
   void _buildCollider() {
@@ -50,6 +48,12 @@ class GameBackground extends SpriteComponent
         ),
       ),
     );
+  }
+
+  void _buildEnemies() {
+    final enemies = game.mapComponent.tileMap.getLayer<ObjectGroup>('enemies');
+    addAll(enemies!.objects.map((object) =>
+        EnemyGoomba(object.name, position: Vector2(object.x, object.y))));
   }
 
   @override
