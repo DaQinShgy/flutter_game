@@ -15,7 +15,9 @@ class ObjectValues {
 
   static const double mushroomMoveSpeed = 70;
 
-  static const double mushroomGravityAccel = 1000;
+  static const double mushroomGravityAccel = 700;
+
+  static const double enemyGravityAccel = 700;
 
   static const double enemyMoveSpeed = 50;
 }

@@ -10,6 +10,7 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
+import 'package:flutter_game/mario/objects/hole.dart';
 
 class EnemyGoomba extends SpriteAnimationComponent
     with
@@ -58,6 +59,14 @@ class EnemyGoomba extends SpriteAnimationComponent
 
   bool killed = false;
 
+  double jumpSpeed = 0;
+
+  double groundY = ObjectValues.groundY;
+
+  bool get isOnGround => y >= groundY - height;
+
+  double platformWidth = 0;
+
   @override
   void update(double dt) {
     super.update(dt);
@@ -83,16 +92,26 @@ class EnemyGoomba extends SpriteAnimationComponent
     if (x + width < game.cameraComponent.viewfinder.position.x) {
       removeFromParent();
     }
+    if (x >= platformWidth && !isOnGround) {
+      jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
+      y += jumpSpeed * dt;
+    }
+    if (isOnGround) {
+      y = groundY - height;
+    }
   }
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (other is MarioPlayer) {
-      if (other.isSmall && !other.invisibility) {
-        killed = true;
+    if (other is Hole) {
+      if (x >= other.x &&
+          x + width <= other.x + other.width &&
+          groundY == ObjectValues.groundY) {
+        jumpSpeed == 0;
+        groundY += 56;
       }
-    } else {
+    } else if (other is! MarioPlayer) {
       horizontalDirection = -horizontalDirection;
     }
   }

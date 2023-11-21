@@ -11,9 +11,12 @@ import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/question_mushroom.dart';
 
 class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
-  QuestionBlock(this.type, {super.position}) : super(size: Vector2.all(16));
+  QuestionBlock(this.type, this.id, {super.position})
+      : super(size: Vector2.all(16));
 
   late QuestionType type;
+
+  final int id;
 
   late Image image;
 
@@ -83,10 +86,10 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
         _handleCoin();
         break;
       case QuestionType.redMushroom:
-        _handleMushroom();
+        _handleMushroom(MushroomType.red);
         break;
       case QuestionType.greenMushroom:
-        _handleMushroom();
+        _handleMushroom(MushroomType.green);
         break;
     }
   }
@@ -130,8 +133,8 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     }));
   }
 
-  void _handleMushroom() {
-    add(QuestionMushroom());
+  void _handleMushroom(MushroomType type) {
+    add(QuestionMushroom(type, id));
   }
 }
 

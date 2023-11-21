@@ -9,6 +9,7 @@ import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
+import 'package:flutter_game/mario/objects/hole.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
 class GameBackground extends SpriteComponent
@@ -21,6 +22,7 @@ class GameBackground extends SpriteComponent
     _buildCollider();
     _buildBlock();
     _buildEnemies();
+    _buildHoles();
   }
 
   void _buildBlock() {
@@ -32,6 +34,7 @@ class GameBackground extends SpriteComponent
               : object.type == 'red mushroom'
                   ? QuestionType.redMushroom
                   : QuestionType.greenMushroom,
+          object.id,
           position: Vector2(object.x, object.y),
         )));
     final brickBlocks =
@@ -58,6 +61,13 @@ class GameBackground extends SpriteComponent
     final enemies = game.mapComponent.tileMap.getLayer<ObjectGroup>('enemies');
     addAll(enemies!.objects.map((object) =>
         EnemyGoomba(object.name, position: Vector2(object.x, object.y))));
+  }
+
+  void _buildHoles() {
+    final holes = game.mapComponent.tileMap.getLayer<ObjectGroup>('holes');
+    addAll(holes!.objects.map((object) => Hole(
+        position: Vector2(object.x, object.y),
+        size: Vector2(object.width, object.height))));
   }
 
   @override

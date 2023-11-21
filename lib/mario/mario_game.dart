@@ -1,5 +1,4 @@
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
@@ -9,16 +8,11 @@ import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
-import 'package:flutter_game/mario/objects/brick_block.dart';
-import 'package:flutter_game/mario/objects/collider_block.dart';
-import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/game_background.dart';
 
 class MarioGame extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection {
   late final CameraComponent cameraComponent;
-
-  late final double groundHeight;
 
   late final double scaleSize;
 
@@ -49,7 +43,6 @@ class MarioGame extends FlameGame
     );
 
     scaleSize = size.y / mapComponent.height;
-    groundHeight = size.y - 24 * scaleSize;
 
     cameraComponent.viewfinder
       ..zoom = scaleSize
@@ -61,9 +54,10 @@ class MarioGame extends FlameGame
       ),
     );
     _marioPlayer = MarioPlayer(
-      position: Vector2(32, ObjectValues.groundY),
+      position: Vector2(900, ObjectValues.groundY),
     );
     world.addAll([GameBackground(), mapComponent, _marioPlayer]);
+    cameraComponent.viewfinder.position = Vector2(890, 0);
   }
 
   @override

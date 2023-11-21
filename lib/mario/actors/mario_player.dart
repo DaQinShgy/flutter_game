@@ -17,6 +17,7 @@ import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
+import 'package:flutter_game/mario/objects/hole.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/objects/question_mushroom.dart';
 import 'package:flutter_game/mario/widgets/FlipSprite.dart';
@@ -47,8 +48,6 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  double groundY = 0;
-
   double platformY = 0;
 
   bool get isOnPlatform => y >= platformY;
@@ -64,7 +63,6 @@ class MarioPlayer extends SpriteAnimationComponent
     image = game.images.fromCache('mario/mario_bros.png');
     add(RectangleHitbox());
     _loadStatus(MarioStatus.stand);
-    groundY = y;
     platformY = y;
   }
 
@@ -287,16 +285,18 @@ class MarioPlayer extends SpriteAnimationComponent
       if (platformY == _currentPlatform!.y) {
         if (x <= _currentPlatform!.x - width ||
             x >= _currentPlatform!.x + _currentPlatform!.width) {
-          platformY = groundY;
-          jumpSpeed = 1;
+          platformY = ObjectValues.groundY;
+          if (jumpSpeed == 0) {
+            jumpSpeed = 1;
+          }
         }
       } else if (_currentPlatform is EnemyGoomba &&
           _currentPlatform!.height == 7) {
         // Goomba's height shortened after being squished by Mario
-        platformY = groundY;
+        platformY = ObjectValues.groundY;
         jumpSpeed = -ObjectValues.marioReboundSpeed;
       }
-      if (platformY == groundY) {
+      if (platformY == ObjectValues.groundY) {
         _currentPlatform = null;
       }
     }
@@ -343,6 +343,22 @@ class MarioPlayer extends SpriteAnimationComponent
       }
     }
     debugPrint('hitEdge=$hitEdge');
+    if (other is Hole) {
+      if (x >= other.x && x + width <= other.x + other.width) {
+        if (platformY != ObjectValues.groundY + 56) {
+          platformY = ObjectValues.groundY + 56;
+          jumpSpeed = 1;
+        }
+      }
+      if (hitEdge == 1) {
+        moveSpeed = 0;
+        x = other.x + other.width - width;
+      } else if (hitEdge == 3) {
+        moveSpeed == 0;
+        x = other.x;
+      }
+      return;
+    }
     if (hitEdge == 0) {
       _currentPlatform = other;
       if (jumpSpeed != 0) {
@@ -379,11 +395,15 @@ class MarioPlayer extends SpriteAnimationComponent
     } else if (other is EnemyGoomba) {
       if (hitEdge == 0) {
         other.squishes();
+        other.killed = true;
       } else {
         if (!invisibility) {
           _loadStatus(_size == MarioSize.small
               ? MarioStatus.die
               : MarioStatus.bigToSmall);
+          if (_size == MarioSize.small) {
+            other.killed = true;
+          }
         }
       }
     }
