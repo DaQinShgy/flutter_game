@@ -77,4 +77,31 @@ class MarioVectors {
   static const List<List<double>> dieVector = [
     [160, 32, 15, 16],
   ];
+
+  //Vector of big to fire
+  static const List<List<double>> bigToFireFlowerVector = [
+    [113, 48, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+    [113, 144, 15, 32],
+    [113, 48, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+    [113, 144, 15, 32],
+    [113, 48, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+    [113, 144, 15, 32],
+    [113, 48, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+  ];
+
+  //Vector of big to fire
+  static const List<List<double>> bigToFireVector = [
+    [113, 48, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+    [113, 144, 15, 32],
+  ];
 }

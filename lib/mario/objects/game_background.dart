@@ -33,7 +33,11 @@ class GameBackground extends SpriteComponent
               ? QuestionType.coin
               : object.type == 'red mushroom'
                   ? QuestionType.redMushroom
-                  : QuestionType.greenMushroom,
+                  : object.type == 'green mushroom'
+                      ? QuestionType.greenMushroom
+                      : object.type == 'flower'
+                          ? QuestionType.flower
+                          : QuestionType.star,
           object.id,
           position: Vector2(object.x, object.y),
         )));

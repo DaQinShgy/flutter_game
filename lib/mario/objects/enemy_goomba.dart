@@ -93,7 +93,7 @@ class EnemyGoomba extends SpriteAnimationComponent
       removeFromParent();
     }
     if (x >= platformWidth && !isOnGround) {
-      jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
+      jumpSpeed += ObjectValues.enemyGravityAccel * dt;
       y += jumpSpeed * dt;
     }
     if (isOnGround) {

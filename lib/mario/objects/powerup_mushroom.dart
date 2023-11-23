@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/hole.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
-class QuestionMushroom extends SpriteComponent
+class PowerupMushroom extends SpriteComponent
     with HasGameRef<MarioGame>, CollisionCallbacks {
-  QuestionMushroom(this.type, this.id, {super.position, super.priority = -1});
+  PowerupMushroom(this.type, this.id, {super.position, super.priority = -1});
 
   final MushroomType type;
 
@@ -27,8 +27,6 @@ class QuestionMushroom extends SpriteComponent
   List<double> greenMushroomVector = [16, 0, 16, 16];
 
   late RectangleHitbox _hitbox;
-
-  double platformWidth = 0;
 
   @override
   FutureOr<void> onLoad() {
@@ -49,12 +47,6 @@ class QuestionMushroom extends SpriteComponent
         horizontalDirection = 1;
       },
     ));
-
-    if (id == 3) {
-      platformWidth = 64;
-    } else if (id == 16) {
-      platformWidth = 16;
-    }
   }
 
   int horizontalDirection = 0;
@@ -72,13 +64,15 @@ class QuestionMushroom extends SpriteComponent
       return;
     }
     x += ObjectValues.mushroomMoveSpeed * horizontalDirection * dt;
-    if (x >= platformWidth && !isOnGround) {
-      jumpSpeed += ObjectValues.enemyGravityAccel * dt;
-      y += jumpSpeed * dt;
-    }
-    debugPrint('y=$y');
-    if (isOnGround) {
-      y = groundY - (parent as QuestionBlock).y - height;
+
+    if (horizontalDirection != 0) {
+      if (isOnGround) {
+        y = groundY - (parent as QuestionBlock).y - height;
+        jumpSpeed = 0;
+      } else {
+        jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
+        y += jumpSpeed * dt;
+      }
     }
     double screenWidth = game.size.x / game.scaleSize;
     if ((parent as PositionComponent).x + x + width <
@@ -120,6 +114,10 @@ class QuestionMushroom extends SpriteComponent
         jumpSpeed == 0;
         groundY += 56;
       }
+    } else if ((other is QuestionBlock || other is BrickBlock) &&
+        horizontalDirection != 0) {
+      y = other.y - (parent as QuestionBlock).y - height;
+      jumpSpeed = 0;
     }
   }
 }

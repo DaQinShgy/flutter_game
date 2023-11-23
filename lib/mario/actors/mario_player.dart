@@ -7,7 +7,6 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -18,8 +17,10 @@ import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/hole.dart';
+import 'package:flutter_game/mario/objects/powerup_fireball.dart';
+import 'package:flutter_game/mario/objects/powerup_flower.dart';
+import 'package:flutter_game/mario/objects/powerup_mushroom.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
-import 'package:flutter_game/mario/objects/question_mushroom.dart';
 import 'package:flutter_game/mario/widgets/FlipSprite.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
@@ -57,6 +58,14 @@ class MarioPlayer extends SpriteAnimationComponent
   double twinkleTime = 0;
 
   bool get invisibility => twinkleTime != 0;
+
+  bool authorizedFire = false;
+
+  bool get suspend =>
+      bloc.state.status != GameStatus.running ||
+      _status == MarioStatus.smallToBig ||
+      _status == MarioStatus.bigToSmall ||
+      _status == MarioStatus.bigToFireFlower;
 
   @override
   FutureOr<void> onLoad() {
@@ -101,6 +110,10 @@ class MarioPlayer extends SpriteAnimationComponent
             loop: false, stepTime: 0.07);
         twinkleTime = 0.01;
         break;
+      case MarioStatus.bigToFireFlower:
+        animation = _getAnimation(MarioVectors.bigToFireFlowerVector,
+            loop: false, stepTime: 0.07);
+        break;
       case MarioStatus.die:
         animation = _getAnimation(MarioVectors.dieVector);
         bloc.add(const GameOver());
@@ -127,6 +140,26 @@ class MarioPlayer extends SpriteAnimationComponent
         break;
       default:
         break;
+    }
+
+    if (_status == MarioStatus.smallToBig) {
+      animationTicker?.onComplete = () {
+        _loadSize(MarioSize.big);
+        _loadStatus(MarioStatus.stand);
+      };
+      return;
+    } else if (_status == MarioStatus.bigToSmall) {
+      animationTicker?.onComplete = () {
+        _loadSize(MarioSize.small);
+        _loadStatus(MarioStatus.stand);
+      };
+      return;
+    } else if (_status == MarioStatus.bigToFireFlower) {
+      animationTicker?.onComplete = () {
+        _loadStatus(MarioStatus.stand);
+        authorizedFire = true;
+      };
+      return;
     }
   }
 
@@ -158,9 +191,6 @@ class MarioPlayer extends SpriteAnimationComponent
 
   @override
   bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (bloc.state.status != GameStatus.running) {
-      return true;
-    }
     if (keysPressed.contains(LogicalKeyboardKey.keyA) ||
         keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
       isFlip = true;
@@ -182,26 +212,16 @@ class MarioPlayer extends SpriteAnimationComponent
     } else {
       verticalDirection = 0;
     }
+    if (keysPressed.contains(LogicalKeyboardKey.keyM)) {
+      _shootFireball();
+    }
     return true;
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    if (bloc.state.status != GameStatus.running) {
-      return;
-    }
-    if (_status == MarioStatus.smallToBig) {
-      animationTicker?.onComplete = () {
-        _loadSize(MarioSize.big);
-        _loadStatus(MarioStatus.stand);
-      };
-      return;
-    } else if (_status == MarioStatus.bigToSmall) {
-      animationTicker?.onComplete = () {
-        _loadSize(MarioSize.small);
-        _loadStatus(MarioStatus.stand);
-      };
+    if (suspend) {
       return;
     }
     if (invisibility) {
@@ -271,12 +291,16 @@ class MarioPlayer extends SpriteAnimationComponent
       x = game.cameraComponent.viewfinder.position.x;
       return;
     }
-    double halfScreenWidth = game.size.x / game.scaleSize / 2;
+    double screenWidth = game.size.x / game.scaleSize;
     if (x + width >=
-        game.cameraComponent.viewfinder.position.x + halfScreenWidth) {
+            game.cameraComponent.viewfinder.position.x + screenWidth / 2 &&
+        game.mapComponent.width >
+            game.cameraComponent.viewfinder.position.x + screenWidth) {
       // Viewfinder moves to the right
-      game.cameraComponent.viewfinder.position =
-          Vector2(x + width - halfScreenWidth, 0);
+      game.cameraComponent.viewfinder.position = Vector2(
+        min(x + width - screenWidth / 2, game.mapComponent.width - screenWidth),
+        0,
+      );
     }
     x += moveSpeed * dt;
 
@@ -312,11 +336,13 @@ class MarioPlayer extends SpriteAnimationComponent
     if (intersectionPoints.length < 2) {
       return;
     }
-    if (other is QuestionMushroom) {
+    if (other is PowerupMushroom) {
       _loadStatus(MarioStatus.smallToBig);
       return;
-    }
-    if (other is BrickBlock && other.opacity == 0) {
+    } else if (other is PowerupFlower) {
+      _loadStatus(MarioStatus.bigToFireFlower);
+      return;
+    } else if (other is BrickBlock && other.opacity == 0) {
       return;
     }
     // debugPrint('intersectionPoints=$intersectionPoints');
@@ -342,7 +368,7 @@ class MarioPlayer extends SpriteAnimationComponent
         hitEdge = 1;
       }
     }
-    debugPrint('hitEdge=$hitEdge');
+    // debugPrint('hitEdge=$hitEdge');
     if (other is Hole) {
       if (x >= other.x && x + width <= other.x + other.width) {
         if (platformY != ObjectValues.groundY + 56) {
@@ -390,7 +416,7 @@ class MarioPlayer extends SpriteAnimationComponent
       }
     } else if (other is QuestionBlock) {
       if (hitEdge == 2) {
-        other.bump();
+        other.bump(_size);
       }
     } else if (other is EnemyGoomba) {
       if (hitEdge == 0) {
@@ -408,6 +434,20 @@ class MarioPlayer extends SpriteAnimationComponent
       }
     }
   }
+
+  int _lastFireballTime = 0;
+
+  _shootFireball() {
+    int currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (currentTime - _lastFireballTime <= 200) {
+      return;
+    }
+    _lastFireballTime = currentTime;
+    game.world.add(PowerupFireball(
+      isFlip ? -1 : 1,
+      position: Vector2(isFlip ? x - 8 : x + width, y - 24),
+    ));
+  }
 }
 
 enum MarioStatus {
@@ -417,6 +457,8 @@ enum MarioStatus {
   jump,
   smallToBig,
   bigToSmall,
+  bigToFireFlower,
+  bigToFire,
   die,
 }
 

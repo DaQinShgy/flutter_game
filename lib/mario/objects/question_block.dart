@@ -5,10 +5,12 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
-import 'package:flutter_game/mario/objects/question_mushroom.dart';
+import 'package:flutter_game/mario/objects/powerup_flower.dart';
+import 'package:flutter_game/mario/objects/powerup_mushroom.dart';
 
 class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   QuestionBlock(this.type, this.id, {super.position})
@@ -56,7 +58,7 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   }
 
   /// Action after Mario has bumped the box from below
-  void bump() {
+  void bump(MarioSize size) {
     if (component is SpriteComponent) {
       return;
     }
@@ -90,6 +92,16 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
         break;
       case QuestionType.greenMushroom:
         _handleMushroom(MushroomType.green);
+        break;
+      case QuestionType.flower:
+        if (size == MarioSize.small) {
+          _handleMushroom(MushroomType.red);
+        } else {
+          _handleFlower();
+        }
+        break;
+      case QuestionType.star:
+        _handleStar();
         break;
     }
   }
@@ -134,12 +146,21 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   }
 
   void _handleMushroom(MushroomType type) {
-    add(QuestionMushroom(type, id));
+    add(PowerupMushroom(type, id));
   }
+
+  void _handleFlower() {
+    add(PowerupFlower());
+  }
+
+  void _handleStar() {}
+
 }
 
 enum QuestionType {
   coin,
   redMushroom,
   greenMushroom,
+  flower,
+  star,
 }

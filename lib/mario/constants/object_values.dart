@@ -20,4 +20,8 @@ class ObjectValues {
   static const double enemyGravityAccel = 700;
 
   static const double enemyMoveSpeed = 50;
+
+  static const double fireBallSpeed = 260;
+
+  static const double fireBallGravityAccel = 900;
 }
