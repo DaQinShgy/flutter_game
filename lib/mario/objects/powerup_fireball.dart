@@ -5,7 +5,8 @@ import 'package:flame/components.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
-import 'package:flutter_game/mario/objects/hole.dart';
+import 'package:flutter_game/mario/objects/ground_block.dart';
+import 'package:flutter_game/mario/util/collision_util.dart';
 
 class PowerupFireball extends SpriteAnimationComponent
     with HasGameRef<MarioGame>, CollisionCallbacks {
@@ -32,8 +33,6 @@ class PowerupFireball extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  bool collideHole = false;
-
   @override
   FutureOr<void> onLoad() {
     animation = _getAnimation(flyVector);
@@ -46,10 +45,6 @@ class PowerupFireball extends SpriteAnimationComponent
     x += ObjectValues.fireBallSpeed * horizontalDirection * dt;
     jumpSpeed += ObjectValues.fireBallGravityAccel * dt;
     y += jumpSpeed * dt;
-    if (y >= ObjectValues.groundY && !collideHole) {
-      debugPrint('jumpSpeed=$jumpSpeed');
-      jumpSpeed = -200;
-    }
   }
 
   SpriteAnimation _getAnimation(List<List<double>> list) {
@@ -68,8 +63,11 @@ class PowerupFireball extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (other is Hole && (x > other.x || x + width < other.x + other.width)) {
-      collideHole = true;
+    if (other is GroundBlock) {
+      int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+      if (hitEdge == 0) {
+        jumpSpeed = -200;
+      }
     }
   }
 }

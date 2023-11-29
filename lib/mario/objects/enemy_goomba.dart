@@ -10,7 +10,8 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
-import 'package:flutter_game/mario/objects/hole.dart';
+import 'package:flutter_game/mario/objects/ground_block.dart';
+import 'package:flutter_game/mario/util/collision_util.dart';
 
 class EnemyGoomba extends SpriteAnimationComponent
     with
@@ -61,11 +62,7 @@ class EnemyGoomba extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  double groundY = ObjectValues.groundY;
-
-  bool get isOnGround => y >= groundY - height;
-
-  double platformWidth = 0;
+  PositionComponent? _currentPlatform;
 
   @override
   void update(double dt) {
@@ -92,24 +89,33 @@ class EnemyGoomba extends SpriteAnimationComponent
     if (x + width < game.cameraComponent.viewfinder.position.x) {
       removeFromParent();
     }
-    if (x >= platformWidth && !isOnGround) {
+    if (jumpSpeed != 0) {
       jumpSpeed += ObjectValues.enemyGravityAccel * dt;
       y += jumpSpeed * dt;
     }
-    if (isOnGround) {
-      y = groundY - height;
+
+    if (_currentPlatform != null) {
+      if (x <= _currentPlatform!.x - width ||
+          x >= _currentPlatform!.x + _currentPlatform!.width) {
+        if (jumpSpeed == 0) {
+          jumpSpeed = 1;
+        }
+        _currentPlatform = null;
+      }
     }
   }
 
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (other is Hole) {
-      if (x >= other.x &&
-          x + width <= other.x + other.width &&
-          groundY == ObjectValues.groundY) {
-        jumpSpeed == 0;
-        groundY += 56;
+    if (other is GroundBlock) {
+      int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+      if (hitEdge == 0) {
+        y = other.y - height;
+      } else if (hitEdge == 1) {
+        x = other.x + other.width;
+      } else if (hitEdge == 3) {
+        x = other.x - width;
       }
     } else if (other is! MarioPlayer) {
       horizontalDirection = -horizontalDirection;

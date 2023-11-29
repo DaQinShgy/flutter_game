@@ -9,8 +9,9 @@ import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
-import 'package:flutter_game/mario/objects/hole.dart';
+import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
+import 'package:flutter_game/mario/util/collision_util.dart';
 
 class PowerupMushroom extends SpriteComponent
     with HasGameRef<MarioGame>, CollisionCallbacks {
@@ -53,9 +54,7 @@ class PowerupMushroom extends SpriteComponent
 
   double jumpSpeed = 0;
 
-  double groundY = ObjectValues.groundY;
-
-  bool get isOnGround => y >= groundY - (parent as QuestionBlock).y - height;
+  PositionComponent? _currentPlatform;
 
   @override
   void update(double dt) {
@@ -66,10 +65,7 @@ class PowerupMushroom extends SpriteComponent
     x += ObjectValues.mushroomMoveSpeed * horizontalDirection * dt;
 
     if (horizontalDirection != 0) {
-      if (isOnGround) {
-        y = groundY - (parent as QuestionBlock).y - height;
-        jumpSpeed = 0;
-      } else {
+      if (jumpSpeed != 0) {
         jumpSpeed += ObjectValues.mushroomGravityAccel * dt;
         y += jumpSpeed * dt;
       }
@@ -81,6 +77,16 @@ class PowerupMushroom extends SpriteComponent
             game.cameraComponent.viewfinder.position.x + screenWidth) {
       // Mushroom moves off screen edge
       removeFromParent();
+    }
+
+    if (_currentPlatform != null) {
+      if (x <= _currentPlatform!.x - width ||
+          x >= _currentPlatform!.x + _currentPlatform!.width) {
+        if (jumpSpeed == 0) {
+          jumpSpeed = 1;
+        }
+        _currentPlatform = null;
+      }
     }
   }
 
@@ -107,17 +113,26 @@ class PowerupMushroom extends SpriteComponent
           removeFromParent();
         },
       ));
-    } else if (other is Hole) {
-      if ((parent as QuestionBlock).x + x >= other.x &&
-          (parent as QuestionBlock).x + x + width <= other.x + other.width &&
-          groundY == ObjectValues.groundY) {
-        jumpSpeed == 0;
-        groundY += 56;
+    } else if (other is GroundBlock) {
+      int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+      if (hitEdge == 0) {
+        y = other.y - (parent as QuestionBlock).y - height;
+        _currentPlatform = other;
+        if (jumpSpeed != 0) {
+          jumpSpeed = 0;
+        }
+      } else if (hitEdge == 1) {
+        x = other.x + other.width;
+      } else if (hitEdge == 3) {
+        x = other.x - width;
       }
     } else if ((other is QuestionBlock || other is BrickBlock) &&
         horizontalDirection != 0) {
       y = other.y - (parent as QuestionBlock).y - height;
-      jumpSpeed = 0;
+      _currentPlatform = other;
+      if (jumpSpeed != 0) {
+        jumpSpeed = 0;
+      }
     }
   }
 }

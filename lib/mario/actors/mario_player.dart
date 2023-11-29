@@ -7,6 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -16,11 +17,12 @@ import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
-import 'package:flutter_game/mario/objects/hole.dart';
+import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/powerup_fireball.dart';
 import 'package:flutter_game/mario/objects/powerup_flower.dart';
 import 'package:flutter_game/mario/objects/powerup_mushroom.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
+import 'package:flutter_game/mario/util/collision_util.dart';
 import 'package:flutter_game/mario/widgets/FlipSprite.dart';
 
 class MarioPlayer extends SpriteAnimationComponent
@@ -49,10 +51,6 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  double platformY = 0;
-
-  bool get isOnPlatform => y >= platformY;
-
   PositionComponent? _currentPlatform;
 
   double twinkleTime = 0;
@@ -72,7 +70,6 @@ class MarioPlayer extends SpriteAnimationComponent
     image = game.images.fromCache('mario/mario_bros.png');
     add(RectangleHitbox());
     _loadStatus(MarioStatus.stand);
-    platformY = y;
   }
 
   void _loadStatus(MarioStatus status) {
@@ -205,7 +202,7 @@ class MarioPlayer extends SpriteAnimationComponent
     if (keysPressed.contains(LogicalKeyboardKey.space)) {
       if (verticalDirection != 1) {
         verticalDirection = 1;
-        if (isOnPlatform) {
+        if (jumpSpeed == 0) {
           jumpSpeed = -ObjectValues.marioJumpSpeedMax;
         }
       }
@@ -246,10 +243,7 @@ class MarioPlayer extends SpriteAnimationComponent
       }
       y += jumpSpeed * dt;
     }
-    if (isOnPlatform) {
-      y = platformY;
-      jumpSpeed = 0;
-
+    if (jumpSpeed == 0) {
       if (horizontalDirection != 0 || moveSpeed != 0) {
         _loadStatus(MarioStatus.walk);
       } else {
@@ -306,21 +300,16 @@ class MarioPlayer extends SpriteAnimationComponent
 
     //Check mario is at the top of currentPlatform
     if (_currentPlatform != null) {
-      if (platformY == _currentPlatform!.y) {
-        if (x <= _currentPlatform!.x - width ||
-            x >= _currentPlatform!.x + _currentPlatform!.width) {
-          platformY = ObjectValues.groundY;
-          if (jumpSpeed == 0) {
-            jumpSpeed = 1;
-          }
+      if (x <= _currentPlatform!.x - width ||
+          x >= _currentPlatform!.x + _currentPlatform!.width) {
+        if (jumpSpeed == 0) {
+          jumpSpeed = 1;
         }
-      } else if (_currentPlatform is EnemyGoomba &&
-          _currentPlatform!.height == 7) {
-        // Goomba's height shortened after being squished by Mario
-        platformY = ObjectValues.groundY;
-        jumpSpeed = -ObjectValues.marioReboundSpeed;
+        _currentPlatform = null;
       }
-      if (platformY == ObjectValues.groundY) {
+      if (_currentPlatform is EnemyGoomba && _currentPlatform!.height == 7) {
+        // Goomba's height shortened after being squished by Mario
+        jumpSpeed = -ObjectValues.marioReboundSpeed;
         _currentPlatform = null;
       }
     }
@@ -345,51 +334,13 @@ class MarioPlayer extends SpriteAnimationComponent
     } else if (other is BrickBlock && other.opacity == 0) {
       return;
     }
-    // debugPrint('intersectionPoints=$intersectionPoints');
-    // 0 top; 1 right; 2 bottom; 3 left;
-    int hitEdge = -1;
-    List<double> listX = intersectionPoints.map((e) => e.x).toList();
-    double diffX = listX.reduce(max) - listX.reduce(min);
-    List<double> listY = intersectionPoints.map((e) => e.y).toList();
-    double diffY = listY.reduce(max) - listY.reduce(min);
-    // debugPrint('diffX=$diffX,diffY=$diffY');
-    if (diffX > diffY) {
-      if ((intersectionPoints.elementAt(0).y - other.y).abs() <
-          (intersectionPoints.elementAt(0).y - other.y - other.height).abs()) {
-        hitEdge = 0;
-      } else {
-        hitEdge = 2;
-      }
-    } else {
-      if ((intersectionPoints.elementAt(0).x - other.x).abs() <
-          (intersectionPoints.elementAt(0).x - other.x - other.width).abs()) {
-        hitEdge = 3;
-      } else {
-        hitEdge = 1;
-      }
-    }
+    int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
     // debugPrint('hitEdge=$hitEdge');
-    if (other is Hole) {
-      if (x >= other.x && x + width <= other.x + other.width) {
-        if (platformY != ObjectValues.groundY + 56) {
-          platformY = ObjectValues.groundY + 56;
-          jumpSpeed = 1;
-        }
-      }
-      if (hitEdge == 1) {
-        moveSpeed = 0;
-        x = other.x + other.width - width;
-      } else if (hitEdge == 3) {
-        moveSpeed == 0;
-        x = other.x;
-      }
-      return;
-    }
     if (hitEdge == 0) {
+      y = other.y;
       _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
-        platformY = other.y;
       }
     } else if (hitEdge == 1) {
       if (invisibility && other is EnemyGoomba) {
@@ -408,6 +359,13 @@ class MarioPlayer extends SpriteAnimationComponent
       } else {
         moveSpeed = 0;
         x = other.x - width;
+      }
+    }
+    if (other is GroundBlock) {
+      if (hitEdge == 0) {
+        if (jumpSpeed != 0) {
+          jumpSpeed = 0;
+        }
       }
     }
     if (other is BrickBlock) {
