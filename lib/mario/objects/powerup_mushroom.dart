@@ -42,10 +42,11 @@ class PowerupMushroom extends SpriteComponent
     add(_hitbox);
 
     add(MoveByEffect(
-      Vector2(0, -16),
+      Vector2(0, -height),
       LinearEffectController(0.6),
       onComplete: () {
         horizontalDirection = 1;
+        jumpSpeed = 1;
       },
     ));
   }
@@ -74,14 +75,16 @@ class PowerupMushroom extends SpriteComponent
     if ((parent as PositionComponent).x + x + width <
             game.cameraComponent.viewfinder.position.x ||
         (parent as PositionComponent).x + x >
-            game.cameraComponent.viewfinder.position.x + screenWidth) {
+            game.cameraComponent.viewfinder.position.x + screenWidth ||
+        (parent as PositionComponent).y + y > game.mapComponent.height) {
       // Mushroom moves off screen edge
       removeFromParent();
     }
 
     if (_currentPlatform != null) {
-      if (x <= _currentPlatform!.x - width ||
-          x >= _currentPlatform!.x + _currentPlatform!.width) {
+      if (x + (parent as QuestionBlock).x <= _currentPlatform!.x - width ||
+          x + (parent as QuestionBlock).x >=
+              _currentPlatform!.x + _currentPlatform!.width) {
         if (jumpSpeed == 0) {
           jumpSpeed = 1;
         }
@@ -122,9 +125,9 @@ class PowerupMushroom extends SpriteComponent
           jumpSpeed = 0;
         }
       } else if (hitEdge == 1) {
-        x = other.x + other.width;
+        x = other.x + other.width - (parent as QuestionBlock).x;
       } else if (hitEdge == 3) {
-        x = other.x - width;
+        x = other.x - (parent as QuestionBlock).x - width;
       }
     } else if ((other is QuestionBlock || other is BrickBlock) &&
         horizontalDirection != 0) {

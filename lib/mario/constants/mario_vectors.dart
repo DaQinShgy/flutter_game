@@ -104,4 +104,9 @@ class MarioVectors {
     [113, 240, 15, 32],
     [113, 144, 15, 32],
   ];
+
+  //Vector of big throw fireball
+  static const List<List<double>> bigThrowVector = [
+    [336, 0, 16, 32],
+  ];
 }

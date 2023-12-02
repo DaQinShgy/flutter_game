@@ -7,7 +7,6 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -63,7 +62,8 @@ class MarioPlayer extends SpriteAnimationComponent
       bloc.state.status != GameStatus.running ||
       _status == MarioStatus.smallToBig ||
       _status == MarioStatus.bigToSmall ||
-      _status == MarioStatus.bigToFireFlower;
+      _status == MarioStatus.bigToFireFlower ||
+      _status == MarioStatus.bigThrow;
 
   @override
   FutureOr<void> onLoad() {
@@ -111,6 +111,10 @@ class MarioPlayer extends SpriteAnimationComponent
         animation = _getAnimation(MarioVectors.bigToFireFlowerVector,
             loop: false, stepTime: 0.07);
         break;
+      case MarioStatus.bigThrow:
+        animation = _getAnimation(MarioVectors.bigThrowVector,
+            loop: false, stepTime: 0.09);
+        break;
       case MarioStatus.die:
         animation = _getAnimation(MarioVectors.dieVector);
         bloc.add(const GameOver());
@@ -152,6 +156,12 @@ class MarioPlayer extends SpriteAnimationComponent
       };
       return;
     } else if (_status == MarioStatus.bigToFireFlower) {
+      animationTicker?.onComplete = () {
+        _loadStatus(MarioStatus.stand);
+        authorizedFire = true;
+      };
+      return;
+    } else if (_status == MarioStatus.bigThrow) {
       animationTicker?.onComplete = () {
         _loadStatus(MarioStatus.stand);
         authorizedFire = true;
@@ -400,6 +410,7 @@ class MarioPlayer extends SpriteAnimationComponent
     if (currentTime - _lastFireballTime <= 200) {
       return;
     }
+    _loadStatus(MarioStatus.bigThrow);
     _lastFireballTime = currentTime;
     game.world.add(PowerupFireball(
       isFlip ? -1 : 1,
@@ -417,6 +428,7 @@ enum MarioStatus {
   bigToSmall,
   bigToFireFlower,
   bigToFire,
+  bigThrow,
   die,
 }
 

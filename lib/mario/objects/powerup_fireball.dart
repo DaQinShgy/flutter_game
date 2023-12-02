@@ -29,7 +29,7 @@ class PowerupFireball extends SpriteAnimationComponent
     [112, 176, 16, 16],
   ];
 
-  final int horizontalDirection;
+  int horizontalDirection;
 
   double jumpSpeed = 0;
 
@@ -42,12 +42,15 @@ class PowerupFireball extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (horizontalDirection == 0) {
+      return;
+    }
     x += ObjectValues.fireBallSpeed * horizontalDirection * dt;
     jumpSpeed += ObjectValues.fireBallGravityAccel * dt;
     y += jumpSpeed * dt;
   }
 
-  SpriteAnimation _getAnimation(List<List<double>> list) {
+  SpriteAnimation _getAnimation(List<List<double>> list, {bool loop = true}) {
     return SpriteAnimation.spriteList(
       list
           .map((e) => Sprite(
@@ -57,6 +60,7 @@ class PowerupFireball extends SpriteAnimationComponent
               ))
           .toList(),
       stepTime: 0.1,
+      loop: loop,
     );
   }
 
@@ -67,6 +71,22 @@ class PowerupFireball extends SpriteAnimationComponent
       int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
       if (hitEdge == 0) {
         jumpSpeed = -200;
+      } else {
+        if (horizontalDirection != 0) {
+          horizontalDirection = 0;
+          animation = _getAnimation(explodeVector, loop: false);
+          animationTicker?.onComplete = () {
+            removeFromParent();
+          };
+        }
+      }
+    } else {
+      if (horizontalDirection != 0) {
+        horizontalDirection = 0;
+        animation = _getAnimation(explodeVector, loop: false);
+        animationTicker?.onComplete = () {
+          removeFromParent();
+        };
       }
     }
   }
