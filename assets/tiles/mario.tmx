@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="424" height="28" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="88">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="424" height="28" tilewidth="8" tileheight="8" infinite="0" nextlayerid="12" nextobjectid="90">
  <imagelayer id="2" name="background" visible="0">
   <image source="../images/mario/level_1.png" width="3392" height="224"/>
  </imagelayer>
@@ -8,6 +8,8 @@
   <object id="13" type="goomba" x="704" y="184" width="16" height="16"/>
   <object id="14" name="group0" type="goomba" x="832" y="184" width="16" height="16"/>
   <object id="15" name="group0" type="goomba" x="856" y="184" width="16" height="16"/>
+  <object id="88" name="group1" type="goomba" x="1312" y="56" width="16" height="16"/>
+  <object id="89" name="group1" type="goomba" x="1336" y="56" width="16" height="16"/>
  </objectgroup>
  <objectgroup id="3" name="question blocks">
   <object id="5" type="coin" x="368" y="136" width="16" height="16"/>

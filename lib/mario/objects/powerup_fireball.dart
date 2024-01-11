@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter_game/mario/constants/hit_edge.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
@@ -68,8 +68,8 @@ class PowerupFireball extends SpriteAnimationComponent
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (other is GroundBlock) {
-      int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
-      if (hitEdge == 0) {
+      HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+      if (hitEdge == HitEdge.top) {
         jumpSpeed = -200;
       } else {
         if (horizontalDirection != 0) {

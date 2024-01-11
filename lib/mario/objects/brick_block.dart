@@ -21,9 +21,14 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
     add(RectangleHitbox(collisionType: CollisionType.passive));
   }
 
+  bool _bumped = false;
+
+  bool get bumped => _bumped;
+
   /// Action after Mario has bumped the box from below
   void bump(MarioSize size) {
     if (size == MarioSize.small) {
+      _bumped = true;
       add(MoveByEffect(
         Vector2(0, -8),
         EffectController(
@@ -32,6 +37,9 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
           reverseDuration: 0.1,
           reverseCurve: Curves.fastOutSlowIn,
         ),
+        onComplete: () {
+          _bumped = false;
+        },
       ));
     } else {
       opacity = 0;

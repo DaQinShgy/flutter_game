@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
+import 'package:flutter_game/mario/constants/hit_edge.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
@@ -117,16 +118,16 @@ class PowerupMushroom extends SpriteComponent
         },
       ));
     } else if (other is GroundBlock) {
-      int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
-      if (hitEdge == 0) {
+      HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+      if (hitEdge == HitEdge.top) {
         y = other.y - (parent as QuestionBlock).y - height;
         _currentPlatform = other;
         if (jumpSpeed != 0) {
           jumpSpeed = 0;
         }
-      } else if (hitEdge == 1) {
+      } else if (hitEdge == HitEdge.right) {
         x = other.x + other.width - (parent as QuestionBlock).x;
-      } else if (hitEdge == 3) {
+      } else if (hitEdge == HitEdge.left) {
         x = other.x - (parent as QuestionBlock).x - width;
       }
     } else if ((other is QuestionBlock || other is BrickBlock) &&

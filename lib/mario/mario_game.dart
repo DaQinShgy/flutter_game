@@ -20,6 +20,8 @@ class MarioGame extends FlameGame
 
   late final MarioPlayer _marioPlayer;
 
+  MarioPlayer get marioPlayer => _marioPlayer;
+
   @override
   final world = World();
 

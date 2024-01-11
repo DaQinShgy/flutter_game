@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
+import 'package:flutter_game/mario/constants/hit_edge.dart';
 import 'package:flutter_game/mario/constants/mario_vectors.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
@@ -344,26 +345,26 @@ class MarioPlayer extends SpriteAnimationComponent
     } else if (other is BrickBlock && other.opacity == 0) {
       return;
     }
-    int hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
+    HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
     // debugPrint('hitEdge=$hitEdge');
-    if (hitEdge == 0) {
+    if (hitEdge == HitEdge.top) {
       y = other.y;
       _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
       }
-    } else if (hitEdge == 1) {
+    } else if (hitEdge == HitEdge.right) {
       if (invisibility && other is EnemyGoomba) {
         // invisibility, Goomba Mario doesn't affect each other
       } else {
         moveSpeed = 0;
         x = other.x + other.width;
       }
-    } else if (hitEdge == 2) {
+    } else if (hitEdge == HitEdge.bottom) {
       if (jumpSpeed < 0) {
         jumpSpeed = -jumpSpeed;
       }
-    } else if (hitEdge == 3) {
+    } else if (hitEdge == HitEdge.left) {
       if (invisibility && other is EnemyGoomba) {
         // invisibility, Goomba Mario doesn't affect each other
       } else {
@@ -372,26 +373,28 @@ class MarioPlayer extends SpriteAnimationComponent
       }
     }
     if (other is GroundBlock) {
-      if (hitEdge == 0) {
+      if (hitEdge == HitEdge.top) {
         if (jumpSpeed != 0) {
           jumpSpeed = 0;
         }
       }
     }
     if (other is BrickBlock) {
-      if (hitEdge == 2) {
+      if (hitEdge == HitEdge.bottom) {
         other.bump(_size);
       }
     } else if (other is QuestionBlock) {
-      if (hitEdge == 2) {
+      if (hitEdge == HitEdge.bottom) {
         other.bump(_size);
       }
     } else if (other is EnemyGoomba) {
-      if (hitEdge == 0) {
+      if (hitEdge == HitEdge.top) {
         other.squishes();
         other.killed = true;
       } else {
-        if (!invisibility) {
+        if (invisibility || other.death) {
+          // Mario ignores the enemy
+        } else {
           _loadStatus(_size == MarioSize.small
               ? MarioStatus.die
               : MarioStatus.bigToSmall);

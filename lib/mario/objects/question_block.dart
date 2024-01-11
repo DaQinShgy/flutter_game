@@ -57,6 +57,10 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     }
   }
 
+  bool _bumped = false;
+
+  bool get bumped => _bumped;
+
   /// Action after Mario has bumped the box from below
   void bump(MarioSize size) {
     if (component is SpriteComponent) {
@@ -73,6 +77,7 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     );
     add(component);
 
+    _bumped = true;
     add(MoveByEffect(
       Vector2(0, -8),
       EffectController(
@@ -81,6 +86,9 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
         reverseDuration: 0.1,
         reverseCurve: Curves.fastOutSlowIn,
       ),
+      onComplete: () {
+        _bumped = false;
+      },
     ));
 
     switch (type) {
@@ -154,7 +162,6 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   }
 
   void _handleStar() {}
-
 }
 
 enum QuestionType {
