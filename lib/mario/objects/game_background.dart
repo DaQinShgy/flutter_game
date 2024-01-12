@@ -9,6 +9,7 @@ import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
+import 'package:flutter_game/mario/objects/enemy_koopa.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
@@ -44,6 +45,7 @@ class GameBackground extends SpriteComponent
     final brickBlocks =
         game.mapComponent.tileMap.getLayer<ObjectGroup>('brick blocks');
     addAll(brickBlocks!.objects.map((object) => BrickBlock(
+          object.type,
           position: Vector2(object.x, object.y),
         )));
   }
@@ -63,8 +65,13 @@ class GameBackground extends SpriteComponent
 
   void _buildEnemies() {
     final enemies = game.mapComponent.tileMap.getLayer<ObjectGroup>('enemies');
-    addAll(enemies!.objects.map((object) =>
-        EnemyGoomba(object.name, position: Vector2(object.x, object.y))));
+    addAll(enemies!.objects.map((object) {
+      if (object.type == 'goomba') {
+        return EnemyGoomba(object.name, position: Vector2(object.x, object.y));
+      } else {
+        return EnemyKoopa(position: Vector2(object.x, object.y));
+      }
+    }));
   }
 
   void _buildGround() {

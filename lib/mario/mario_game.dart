@@ -59,7 +59,7 @@ class MarioGame extends FlameGame
       position: Vector2(900, ObjectValues.groundY),
     );
     world.addAll([GameBackground(), mapComponent, _marioPlayer]);
-    cameraComponent.viewfinder.position = Vector2(890, 0);
+    cameraComponent.viewfinder.position = Vector2(1264, 0);
   }
 
   @override

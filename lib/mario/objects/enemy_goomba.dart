@@ -12,7 +12,9 @@ import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
+import 'package:flutter_game/mario/objects/enemy_koopa.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
+import 'package:flutter_game/mario/objects/powerup_fireball.dart';
 import 'package:flutter_game/mario/objects/powerup_flower.dart';
 import 'package:flutter_game/mario/objects/powerup_mushroom.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
@@ -71,8 +73,6 @@ class EnemyGoomba extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
-  PositionComponent? _currentPlatform;
-
   @override
   void update(double dt) {
     super.update(dt);
@@ -86,6 +86,11 @@ class EnemyGoomba extends SpriteAnimationComponent
     double screenWidth = game.size.x / game.scaleSize;
     if (name == 'group1') {
       if (game.marioPlayer.x >= 1136 && horizontalDirection == 0) {
+        horizontalDirection = -1;
+        moveSpeed = ObjectValues.enemyMoveSpeed;
+      }
+    } else if (name == 'group2') {
+      if (game.marioPlayer.x >= 1424 && horizontalDirection == 0) {
         horizontalDirection = -1;
         moveSpeed = ObjectValues.enemyMoveSpeed;
       }
@@ -108,16 +113,6 @@ class EnemyGoomba extends SpriteAnimationComponent
       jumpSpeed += ObjectValues.enemyGravityAccel * dt;
       y += jumpSpeed * dt;
     }
-
-    if (_currentPlatform != null) {
-      if (x <= _currentPlatform!.x - width ||
-          x >= _currentPlatform!.x + _currentPlatform!.width) {
-        if (jumpSpeed == 0) {
-          jumpSpeed = 1;
-        }
-        _currentPlatform = null;
-      }
-    }
   }
 
   bool _death = false;
@@ -128,6 +123,11 @@ class EnemyGoomba extends SpriteAnimationComponent
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
     if (_death) {
+      return;
+    }
+    if ((other is EnemyKoopa && other.horizontalDirection.abs() > 1) ||
+        other is PowerupFireball) {
+      _handleDeath(other);
       return;
     }
     HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);

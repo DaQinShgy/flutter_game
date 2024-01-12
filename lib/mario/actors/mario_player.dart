@@ -7,6 +7,7 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -17,6 +18,7 @@ import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
+import 'package:flutter_game/mario/objects/enemy_koopa.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/powerup_fireball.dart';
 import 'package:flutter_game/mario/objects/powerup_flower.dart';
@@ -322,6 +324,9 @@ class MarioPlayer extends SpriteAnimationComponent
         // Goomba's height shortened after being squished by Mario
         jumpSpeed = -ObjectValues.marioReboundSpeed;
         _currentPlatform = null;
+      } else if (_currentPlatform is EnemyKoopa) {
+        jumpSpeed = -ObjectValues.marioReboundSpeed;
+        _currentPlatform = null;
       }
     }
   }
@@ -344,11 +349,17 @@ class MarioPlayer extends SpriteAnimationComponent
       return;
     } else if (other is BrickBlock && other.opacity == 0) {
       return;
+    } else if (other is EnemyKoopa && other.shelled) {
+      other.sliding(x >= other.center.x ? -4 : 4);
+      return;
     }
     HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
-    // debugPrint('hitEdge=$hitEdge');
     if (hitEdge == HitEdge.top) {
-      y = other.y;
+      if (other is EnemyKoopa) {
+        y = other.y - other.height;
+      } else {
+        y = other.y;
+      }
       _currentPlatform = other;
       if (jumpSpeed != 0) {
         jumpSpeed = 0;
@@ -401,6 +412,18 @@ class MarioPlayer extends SpriteAnimationComponent
           if (_size == MarioSize.small) {
             other.killed = true;
           }
+        }
+      }
+    } else if (other is EnemyKoopa) {
+      if (hitEdge == HitEdge.top && !other.shelled) {
+        other.squishes();
+      } else {
+        if (invisibility || other.shelled) {
+          // Mario ignores the enemy
+        } else {
+          _loadStatus(_size == MarioSize.small
+              ? MarioStatus.die
+              : MarioStatus.bigToSmall);
         }
       }
     }

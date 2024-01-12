@@ -7,12 +7,21 @@ import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/coin_icon.dart';
+import 'package:flutter_game/mario/objects/coin_score.dart';
 
 class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
-  BrickBlock({super.position}) : super(size: Vector2.all(16));
+  BrickBlock(this.type, {super.position}) : super(size: Vector2.all(16));
+
+  String type;
+
+  int coinCount = 0;
 
   @override
   FutureOr<void> onLoad() {
+    if (type == 'coin') {
+      coinCount = 6;
+    }
     sprite = Sprite(
       game.images.fromCache('mario/tile_set.png'),
       srcSize: Vector2.all(16),
@@ -27,7 +36,21 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
 
   /// Action after Mario has bumped the box from below
   void bump(MarioSize size) {
-    if (size == MarioSize.small) {
+    if (type == 'coin') {
+      if (coinCount == 1) {
+        sprite = Sprite(
+          game.images.fromCache('mario/tile_set.png'),
+          srcSize: Vector2.all(16),
+          srcPosition: Vector2(432, 0),
+        );
+      }
+      if (coinCount <= 0) {
+        return;
+      }
+    } else if(type == 'star'){
+
+    }
+    if (size == MarioSize.small || coinCount > 0) {
       _bumped = true;
       add(MoveByEffect(
         Vector2(0, -8),
@@ -41,6 +64,9 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
           _bumped = false;
         },
       ));
+      if (coinCount-- > 0) {
+        _handleCoin();
+      }
     } else {
       opacity = 0;
       _buildBrickPiece(0, 0, 0);
@@ -86,5 +112,44 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
         removeFromParent();
       },
     ));
+  }
+
+  void _handleCoin() {
+    CoinIcon coinIcon =
+        CoinIcon(CoinType.spinning, position: Vector2(width / 2, 0));
+    add(coinIcon);
+    coinIcon.add(SequenceEffect([
+      MoveByEffect(
+        Vector2(0, -56),
+        EffectController(
+          duration: 0.42,
+          curve: Curves.fastEaseInToSlowEaseOut,
+        ),
+      ),
+      MoveByEffect(
+        Vector2(0, 32),
+        EffectController(
+          duration: 0.24,
+          curve: Curves.fastOutSlowIn,
+        ),
+      ),
+      RemoveEffect(),
+    ], onComplete: () {
+      CoinScore coinScore = CoinScore(
+        '200',
+        position: Vector2(width / 2, -16),
+      );
+      add(coinScore);
+      coinScore.add(MoveByEffect(
+        Vector2(0, -32),
+        EffectController(
+          duration: 0.3,
+          curve: Curves.fastEaseInToSlowEaseOut,
+        ),
+        onComplete: () {
+          remove(coinScore);
+        },
+      ));
+    }));
   }
 }
