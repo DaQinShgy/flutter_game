@@ -109,4 +109,84 @@ class MarioVectors {
   static const List<List<double>> bigThrowVector = [
     [336, 0, 16, 32],
   ];
+
+  //Vector of invincible small
+  static const List<List<double>> invincibleSmallVector = [
+    ...normalSmallVector,
+    [178, 224, 12, 16],
+    [178, 272, 12, 16],
+    [178, 176, 12, 16],
+  ];
+
+  //Vector of invincible big
+  static const List<List<double>> invincibleBigVector = [
+    ...normalBigVector,
+    [176, 192, 16, 32],
+    [176, 240, 16, 32],
+    [176, 144, 16, 32],
+  ];
+
+  //Vector of invincible small walk
+  static const List<List<double>> invincibleSmallWalkVector = [
+    [80, 32, 15, 16],
+    [80, 224, 15, 16],
+    [80, 272, 15, 16],
+    [80, 176, 15, 16],
+    [96, 32, 16, 16],
+    [96, 224, 16, 16],
+    [96, 272, 16, 16],
+    [96, 176, 16, 16],
+    [112, 32, 16, 16],
+    [112, 224, 15, 16],
+    [112, 272, 15, 16],
+    [112, 176, 15, 16],
+  ];
+
+  //Vector of invincible big walk
+  static const List<List<double>> invincibleBigWalkVector = [
+    [81, 0, 16, 32],
+    [81, 192, 16, 32],
+    [81, 240, 16, 32],
+    [81, 144, 16, 32],
+    [97, 0, 15, 32],
+    [97, 192, 15, 32],
+    [97, 240, 15, 32],
+    [97, 144, 15, 32],
+    [113, 0, 15, 32],
+    [113, 192, 15, 32],
+    [113, 240, 15, 32],
+    [113, 144, 15, 32],
+  ];
+
+  //Vector of invincible small skid
+  static const List<List<double>> invincibleSmallSkidVector = [
+    ...normalSmallSkidVector,
+    [130, 224, 14, 16],
+    [130, 272, 14, 16],
+    [130, 176, 14, 16],
+  ];
+
+  //Vector of invincible big skid
+  static const List<List<double>> invincibleBigSkidVector = [
+    ...normalBigSkidVector,
+    [128, 192, 16, 32],
+    [128, 240, 16, 32],
+    [128, 144, 16, 32],
+  ];
+
+  //Vector of invincible small jump
+  static const List<List<double>> invincibleSmallJumpVector = [
+    ...normalSmallJumpVector,
+    [144, 224, 16, 16],
+    [144, 272, 16, 16],
+    [144, 176, 16, 16],
+  ];
+
+  //Vector of invincible big jump
+  static const List<List<double>> invincibleBigJumpVector = [
+    ...normalBigJumpVector,
+    [144, 192, 16, 32],
+    [144, 240, 16, 32],
+    [144, 144, 16, 32],
+  ];
 }

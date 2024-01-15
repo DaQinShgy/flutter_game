@@ -127,18 +127,18 @@ class EnemyGoomba extends SpriteAnimationComponent
     }
     if ((other is EnemyKoopa && other.horizontalDirection.abs() > 1) ||
         other is PowerupFireball) {
-      _handleDeath(other);
+      handleDeath(other);
       return;
     }
     HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
     if (other is GroundBlock || other is BrickBlock || other is QuestionBlock) {
       if (hitEdge == HitEdge.top) {
-        if (other is BrickBlock && other.opacity == 0) {
+        if (other is BrickBlock && other.componentBrick.opacity == 0) {
           return;
         }
         if ((other is BrickBlock && other.bumped) ||
             (other is QuestionBlock && other.bumped)) {
-          _handleDeath(other);
+          handleDeath(other);
         } else {
           y = other.y - height;
           jumpSpeed = 0;
@@ -150,14 +150,14 @@ class EnemyGoomba extends SpriteAnimationComponent
       }
     } else if (other is SpriteComponent && other.size == Vector2(8, 8)) {
       // BrickPiece
-      _handleDeath(other);
+      handleDeath(other);
     } else if (other is PowerupMushroom || other is PowerupFlower) {
     } else if (other is! MarioPlayer) {
       horizontalDirection = -horizontalDirection;
     }
   }
 
-  _handleDeath(PositionComponent other) {
+  handleDeath(PositionComponent other) {
     _death = true;
     animation = _getAnimation(deathJumpVector);
     flipVerticallyAroundCenter();

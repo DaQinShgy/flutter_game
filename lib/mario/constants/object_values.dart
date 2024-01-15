@@ -26,4 +26,8 @@ class ObjectValues {
   static const double fireBallSpeed = 260;
 
   static const double fireBallGravityAccel = 900;
+
+  static const double starMoveSpeed = 130;
+
+  static const double starGravityAccel = 900;
 }

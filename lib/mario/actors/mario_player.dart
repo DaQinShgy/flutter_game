@@ -7,7 +7,6 @@ import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -17,6 +16,7 @@ import 'package:flutter_game/mario/constants/mario_vectors.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
+import 'package:flutter_game/mario/objects/brick_star.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/enemy_koopa.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
@@ -68,6 +68,14 @@ class MarioPlayer extends SpriteAnimationComponent
       _status == MarioStatus.bigToFireFlower ||
       _status == MarioStatus.bigThrow;
 
+  bool _invincible = false;
+
+  bool get invincible => _invincible;
+
+  int _invincibleTime = 0;
+
+  double _invincibleStepTime = 0.03;
+
   @override
   FutureOr<void> onLoad() {
     image = game.images.fromCache('mario/mario_bros.png');
@@ -82,24 +90,52 @@ class MarioPlayer extends SpriteAnimationComponent
     _status = status;
     switch (_status) {
       case MarioStatus.stand:
-        animation = _getAnimation(_size == MarioSize.small
-            ? MarioVectors.normalSmallVector
-            : MarioVectors.normalBigVector);
+        animation = _getAnimation(
+          !_invincible
+              ? (_size == MarioSize.small
+                  ? MarioVectors.normalSmallVector
+                  : MarioVectors.normalBigVector)
+              : (_size == MarioSize.small
+                  ? MarioVectors.invincibleSmallVector
+                  : MarioVectors.invincibleBigVector),
+          stepTime: !_invincible ? 0.1 : _invincibleStepTime,
+        );
         break;
       case MarioStatus.walk:
-        animation = _getAnimation(_size == MarioSize.small
-            ? MarioVectors.normalSmallWalkVector
-            : MarioVectors.normalBigWalkVector);
+        animation = _getAnimation(
+          !_invincible
+              ? (_size == MarioSize.small
+                  ? MarioVectors.normalSmallWalkVector
+                  : MarioVectors.normalBigWalkVector)
+              : (_size == MarioSize.small
+                  ? MarioVectors.invincibleSmallWalkVector
+                  : MarioVectors.invincibleBigWalkVector),
+          stepTime: !_invincible ? 0.1 : _invincibleStepTime,
+        );
         break;
       case MarioStatus.skid:
-        animation = _getAnimation(_size == MarioSize.small
-            ? MarioVectors.normalSmallSkidVector
-            : MarioVectors.normalBigSkidVector);
+        animation = _getAnimation(
+          !_invincible
+              ? (_size == MarioSize.small
+                  ? MarioVectors.normalSmallSkidVector
+                  : MarioVectors.normalBigSkidVector)
+              : (_size == MarioSize.small
+                  ? MarioVectors.invincibleSmallSkidVector
+                  : MarioVectors.invincibleBigSkidVector),
+          stepTime: !_invincible ? 0.1 : _invincibleStepTime,
+        );
         break;
       case MarioStatus.jump:
-        animation = _getAnimation(_size == MarioSize.small
-            ? MarioVectors.normalSmallJumpVector
-            : MarioVectors.normalBigJumpVector);
+        animation = _getAnimation(
+          !_invincible
+              ? (_size == MarioSize.small
+                  ? MarioVectors.normalSmallJumpVector
+                  : MarioVectors.normalBigJumpVector)
+              : (_size == MarioSize.small
+                  ? MarioVectors.invincibleSmallJumpVector
+                  : MarioVectors.invincibleBigJumpVector),
+          stepTime: !_invincible ? 0.1 : _invincibleStepTime,
+        );
         break;
       case MarioStatus.smallToBig:
         animation = _getAnimation(MarioVectors.smallToBigVector,
@@ -231,6 +267,27 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
+    final currentTime = DateTime.now().millisecondsSinceEpoch;
+    if (currentTime - _invincibleTime < 10000) {
+      if (_invincibleStepTime != 0.03) {
+        _invincibleStepTime = 0.03;
+        animation = null;
+        _loadStatus(_status);
+      }
+    } else if (currentTime - _invincibleTime < 12000) {
+      if (_invincibleStepTime != 0.1) {
+        _invincibleStepTime = 0.1;
+        animation = null;
+        _loadStatus(_status);
+      }
+    } else {
+      if (_invincible) {
+        _invincible = false;
+        _invincibleStepTime = 0.03;
+        animation = null;
+        _loadStatus(_status);
+      }
+    }
     if (suspend) {
       return;
     }
@@ -342,15 +399,33 @@ class MarioPlayer extends SpriteAnimationComponent
       return;
     }
     if (other is PowerupMushroom) {
-      _loadStatus(MarioStatus.smallToBig);
+      if (isSmall) {
+        _loadStatus(MarioStatus.smallToBig);
+      }
       return;
     } else if (other is PowerupFlower) {
       _loadStatus(MarioStatus.bigToFireFlower);
       return;
-    } else if (other is BrickBlock && other.opacity == 0) {
+    } else if (other is BrickBlock && other.componentBrick.opacity == 0) {
       return;
     } else if (other is EnemyKoopa && other.shelled) {
       other.sliding(x >= other.center.x ? -4 : 4);
+      return;
+    } else if (other is BrickStar) {
+      _invincible = true;
+      animation = null;
+      _loadStatus(_status);
+      _invincibleTime = DateTime.now().millisecondsSinceEpoch;
+      return;
+    } else if (other is EnemyGoomba && _invincible) {
+      if (!other.death) {
+        other.handleDeath(other);
+      }
+      return;
+    } else if (other is EnemyKoopa && _invincible) {
+      if (!other.death) {
+        other.handleDeath(other);
+      }
       return;
     }
     HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
@@ -409,9 +484,6 @@ class MarioPlayer extends SpriteAnimationComponent
           _loadStatus(_size == MarioSize.small
               ? MarioStatus.die
               : MarioStatus.bigToSmall);
-          if (_size == MarioSize.small) {
-            other.killed = true;
-          }
         }
       }
     } else if (other is EnemyKoopa) {

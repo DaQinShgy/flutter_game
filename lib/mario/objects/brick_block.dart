@@ -7,26 +7,31 @@ import 'package:flame/effects.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/mario_game.dart';
+import 'package:flutter_game/mario/objects/brick_star.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 
-class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
+class BrickBlock extends PositionComponent with HasGameRef<MarioGame> {
   BrickBlock(this.type, {super.position}) : super(size: Vector2.all(16));
 
   String type;
 
   int coinCount = 0;
 
+  late SpriteComponent componentBrick;
+
   @override
   FutureOr<void> onLoad() {
     if (type == 'coin') {
       coinCount = 6;
     }
-    sprite = Sprite(
+    componentBrick = SpriteComponent(
+        sprite: Sprite(
       game.images.fromCache('mario/tile_set.png'),
       srcSize: Vector2.all(16),
       srcPosition: Vector2(16, 0),
-    );
+    ));
+    add(componentBrick);
     add(RectangleHitbox(collisionType: CollisionType.passive));
   }
 
@@ -38,17 +43,38 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
   void bump(MarioSize size) {
     if (type == 'coin') {
       if (coinCount == 1) {
-        sprite = Sprite(
+        remove(componentBrick);
+        componentBrick = SpriteComponent(
+            sprite: Sprite(
           game.images.fromCache('mario/tile_set.png'),
           srcSize: Vector2.all(16),
           srcPosition: Vector2(432, 0),
-        );
+        ));
+        add(componentBrick);
       }
       if (coinCount <= 0) {
         return;
       }
-    } else if(type == 'star'){
-
+    } else if (type == 'star') {
+      remove(componentBrick);
+      componentBrick = SpriteComponent(
+          sprite: Sprite(
+        game.images.fromCache('mario/tile_set.png'),
+        srcSize: Vector2.all(16),
+        srcPosition: Vector2(432, 0),
+      ));
+      add(componentBrick);
+      add(MoveByEffect(
+        Vector2(0, -8),
+        EffectController(
+          duration: 0.1,
+          curve: Curves.fastEaseInToSlowEaseOut,
+          reverseDuration: 0.1,
+          reverseCurve: Curves.fastOutSlowIn,
+        ),
+      ));
+      add(BrickStar());
+      return;
     }
     if (size == MarioSize.small || coinCount > 0) {
       _bumped = true;
@@ -68,7 +94,7 @@ class BrickBlock extends SpriteComponent with HasGameRef<MarioGame> {
         _handleCoin();
       }
     } else {
-      opacity = 0;
+      componentBrick.opacity = 0;
       _buildBrickPiece(0, 0, 0);
       _buildBrickPiece(width, 0, 1);
       _buildBrickPiece(0, height, 2);

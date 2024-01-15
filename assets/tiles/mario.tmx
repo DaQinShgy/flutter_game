@@ -31,7 +31,7 @@
   <object id="38" type="coin" x="1696" y="136" width="16" height="16"/>
   <object id="39" type="coin" x="1744" y="136" width="16" height="16"/>
   <object id="40" type="coin" x="1792" y="136" width="16" height="16"/>
-  <object id="41" type="coin" x="1744" y="72" width="16" height="16"/>
+  <object id="41" type="mushroom flower" x="1744" y="72" width="16" height="16"/>
   <object id="50" type="coin" x="2064" y="72" width="16" height="16"/>
   <object id="51" type="coin" x="2080" y="72" width="16" height="16"/>
   <object id="82" type="coin" x="2720" y="136" width="16" height="16"/>

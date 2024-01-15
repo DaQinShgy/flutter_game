@@ -18,9 +18,6 @@ class EnemyKoopa extends SpriteAnimationComponent
         FlameBlocReader<StatsBloc, StatsState> {
   EnemyKoopa({super.position, super.anchor = Anchor.bottomLeft});
 
-  @override
-  bool get debugMode => true;
-
   List<List<double>> walkVector = [
     [150, 0, 16, 24],
     [180, 0, 16, 24],
@@ -71,7 +68,7 @@ class EnemyKoopa extends SpriteAnimationComponent
     }
     x += moveSpeed * horizontalDirection * dt;
     if (x + width < game.cameraComponent.viewfinder.position.x ||
-        y > game.mapComponent.height) {
+        y - height > game.mapComponent.height) {
       removeFromParent();
     }
     if (jumpSpeed != 0) {
@@ -131,5 +128,17 @@ class EnemyKoopa extends SpriteAnimationComponent
     if (other is GroundBlock) {
       jumpSpeed = 1;
     }
+  }
+
+  bool _death = false;
+
+  bool get death => _death;
+
+  handleDeath(PositionComponent other) {
+    _death = true;
+    animation = _getAnimation(shellVector);
+    flipVerticallyAroundCenter();
+    jumpSpeed = ObjectValues.enemyDeathJumpSpeed;
+    horizontalDirection = x >= other.center.x ? 1 : -1;
   }
 }

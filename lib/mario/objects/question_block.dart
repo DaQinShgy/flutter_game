@@ -99,7 +99,8 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
         _handleMushroom(MushroomType.red);
         break;
       case QuestionType.greenMushroom:
-        _handleMushroom(MushroomType.green);
+        _handleMushroom(
+            game.marioPlayer.isSmall ? MushroomType.red : MushroomType.green);
         break;
       case QuestionType.flower:
         if (size == MarioSize.small) {
@@ -110,6 +111,13 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
         break;
       case QuestionType.star:
         _handleStar();
+        break;
+      case QuestionType.mushroomFlower:
+        if (game.marioPlayer.isSmall) {
+          _handleMushroom(MushroomType.red);
+        } else {
+          _handleFlower();
+        }
         break;
     }
   }
@@ -170,4 +178,5 @@ enum QuestionType {
   greenMushroom,
   flower,
   star,
+  mushroomFlower,
 }
