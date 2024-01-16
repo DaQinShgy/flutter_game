@@ -7,6 +7,7 @@ import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_block.dart';
+import 'package:flutter_game/mario/objects/castle_flag.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/enemy_koopa.dart';
@@ -26,6 +27,7 @@ class GameBackground extends SpriteComponent
     _buildEnemies();
     _buildGround();
     _buildFlagPole();
+    _buildCastle();
   }
 
   void _buildBlock() {
@@ -94,6 +96,18 @@ class GameBackground extends SpriteComponent
         return Flag(position: Vector2(object.x, object.y));
       } else if (object.type == 'finial') {
         return Finial(position: Vector2(object.x, object.y));
+      }
+      return Component();
+    }));
+  }
+
+  void _buildCastle() {
+    final castle = game.mapComponent.tileMap.getLayer<ObjectGroup>('castle');
+    addAll(castle!.objects.map((object) {
+      if (object.type == 'flag') {
+        return CastleFlag(
+          position: Vector2(object.x, object.y),
+        );
       }
       return Component();
     }));

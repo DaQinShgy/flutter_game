@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="424" height="28" tilewidth="8" tileheight="8" infinite="0" nextlayerid="13" nextobjectid="113">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="424" height="28" tilewidth="8" tileheight="8" infinite="0" nextlayerid="14" nextobjectid="114">
  <imagelayer id="2" name="background" visible="0">
   <image source="../images/mario/level_1.png" width="3392" height="224"/>
  </imagelayer>
+ <objectgroup id="13" name="castle">
+  <object id="113" type="flag" x="3265" y="120" width="14" height="14"/>
+ </objectgroup>
  <objectgroup id="12" name="flagpole">
   <object id="101" type="pole" x="3175" y="168" width="2" height="16"/>
   <object id="102" type="pole" x="3175" y="152" width="2" height="16"/>

@@ -412,7 +412,10 @@ class MarioPlayer extends SpriteAnimationComponent
       // castle gate position
       x += moveSpeed * dt;
     } else {
-      opacity = 0;
+      if (opacity != 0) {
+        opacity = 0;
+        bloc.add(const RaiseFlag());
+      }
     }
 
     //Check mario is at the top of currentPlatform

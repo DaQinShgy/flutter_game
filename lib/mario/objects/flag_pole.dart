@@ -62,7 +62,6 @@ class Finial extends SpriteComponent
       srcPosition: Vector2(228, 120),
       srcSize: Vector2(8, 8),
     );
-    add(RectangleHitbox());
     return super.onLoad();
   }
 }

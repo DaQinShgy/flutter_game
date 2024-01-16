@@ -40,3 +40,10 @@ class GameVictory extends StatsEvent {
   @override
   List<Object?> get props => [];
 }
+
+class RaiseFlag extends StatsEvent {
+  const RaiseFlag();
+
+  @override
+  List<Object?> get props => [];
+}
