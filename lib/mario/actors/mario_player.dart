@@ -19,6 +19,7 @@ import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/brick_star.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/enemy_koopa.dart';
+import 'package:flutter_game/mario/objects/flag_pole.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/powerup_fireball.dart';
 import 'package:flutter_game/mario/objects/powerup_flower.dart';
@@ -62,7 +63,8 @@ class MarioPlayer extends SpriteAnimationComponent
   bool authorizedFire = false;
 
   bool get suspend =>
-      bloc.state.status != GameStatus.running ||
+      (bloc.state.status != GameStatus.running &&
+          bloc.state.status != GameStatus.victory) ||
       _status == MarioStatus.smallToBig ||
       _status == MarioStatus.bigToSmall ||
       _status == MarioStatus.bigToFireFlower ||
@@ -76,6 +78,8 @@ class MarioPlayer extends SpriteAnimationComponent
 
   double _invincibleStepTime = 0.03;
 
+  bool _fire = false;
+
   @override
   FutureOr<void> onLoad() {
     image = game.images.fromCache('mario/mario_bros.png');
@@ -87,14 +91,21 @@ class MarioPlayer extends SpriteAnimationComponent
     if (status == _status && animation != null) {
       return;
     }
+    if (status == MarioStatus.bigToFireFlower) {
+      _fire = true;
+    } else if (status == MarioStatus.bigToSmall) {
+      _fire = false;
+    }
     _status = status;
     switch (_status) {
       case MarioStatus.stand:
         animation = _getAnimation(
           !_invincible
-              ? (_size == MarioSize.small
-                  ? MarioVectors.normalSmallVector
-                  : MarioVectors.normalBigVector)
+              ? (_fire
+                  ? MarioVectors.fireBigVector
+                  : _size == MarioSize.small
+                      ? MarioVectors.normalSmallVector
+                      : MarioVectors.normalBigVector)
               : (_size == MarioSize.small
                   ? MarioVectors.invincibleSmallVector
                   : MarioVectors.invincibleBigVector),
@@ -104,9 +115,11 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.walk:
         animation = _getAnimation(
           !_invincible
-              ? (_size == MarioSize.small
-                  ? MarioVectors.normalSmallWalkVector
-                  : MarioVectors.normalBigWalkVector)
+              ? (_fire
+                  ? MarioVectors.fireBigWalkVector
+                  : _size == MarioSize.small
+                      ? MarioVectors.normalSmallWalkVector
+                      : MarioVectors.normalBigWalkVector)
               : (_size == MarioSize.small
                   ? MarioVectors.invincibleSmallWalkVector
                   : MarioVectors.invincibleBigWalkVector),
@@ -116,9 +129,11 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.skid:
         animation = _getAnimation(
           !_invincible
-              ? (_size == MarioSize.small
-                  ? MarioVectors.normalSmallSkidVector
-                  : MarioVectors.normalBigSkidVector)
+              ? (_fire
+                  ? MarioVectors.fireBigSkidVector
+                  : _size == MarioSize.small
+                      ? MarioVectors.normalSmallSkidVector
+                      : MarioVectors.normalBigSkidVector)
               : (_size == MarioSize.small
                   ? MarioVectors.invincibleSmallSkidVector
                   : MarioVectors.invincibleBigSkidVector),
@@ -128,9 +143,11 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.jump:
         animation = _getAnimation(
           !_invincible
-              ? (_size == MarioSize.small
-                  ? MarioVectors.normalSmallJumpVector
-                  : MarioVectors.normalBigJumpVector)
+              ? (_fire
+                  ? MarioVectors.fireBigJumpVector
+                  : _size == MarioSize.small
+                      ? MarioVectors.normalSmallJumpVector
+                      : MarioVectors.normalBigJumpVector)
               : (_size == MarioSize.small
                   ? MarioVectors.invincibleSmallJumpVector
                   : MarioVectors.invincibleBigJumpVector),
@@ -177,6 +194,20 @@ class MarioPlayer extends SpriteAnimationComponent
             RemoveEffect(),
           ],
         ));
+        break;
+      case MarioStatus.poleSlide:
+        animation = _getAnimation(isSmall
+            ? MarioVectors.normalSmallPoleSlideVector
+            : _fire
+                ? MarioVectors.normalBigPoleSlideVector
+                : MarioVectors.fireBigPoleSlideVector);
+        break;
+      case MarioStatus.poleSlideEnd:
+        animation = _getAnimation(isSmall
+            ? MarioVectors.normalSmallPoleSlideEndVector
+            : _fire
+                ? MarioVectors.normalBigPoleSlideEndVector
+                : MarioVectors.fireBigPoleSlideEndVector);
         break;
       default:
         break;
@@ -237,6 +268,9 @@ class MarioPlayer extends SpriteAnimationComponent
 
   @override
   bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (bloc.state.status != GameStatus.running) {
+      return true;
+    }
     if (keysPressed.contains(LogicalKeyboardKey.keyA) ||
         keysPressed.contains(LogicalKeyboardKey.arrowLeft)) {
       isFlip = true;
@@ -259,7 +293,9 @@ class MarioPlayer extends SpriteAnimationComponent
       verticalDirection = 0;
     }
     if (keysPressed.contains(LogicalKeyboardKey.keyM)) {
-      _shootFireball();
+      if (_fire) {
+        _shootFireball();
+      }
     }
     return true;
   }
@@ -267,6 +303,9 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (suspend) {
+      return;
+    }
     final currentTime = DateTime.now().millisecondsSinceEpoch;
     if (currentTime - _invincibleTime < 10000) {
       if (_invincibleStepTime != 0.03) {
@@ -288,9 +327,6 @@ class MarioPlayer extends SpriteAnimationComponent
         _loadStatus(_status);
       }
     }
-    if (suspend) {
-      return;
-    }
     if (invisibility) {
       twinkleTime += dt;
       opacity = (opacity - 1).abs();
@@ -301,7 +337,9 @@ class MarioPlayer extends SpriteAnimationComponent
     }
 
     // Change mario position.y
-    if (jumpSpeed != 0) {
+    if (jumpSpeed != 0 &&
+        _status != MarioStatus.poleSlide &&
+        _status != MarioStatus.poleSlideEnd) {
       _loadStatus(MarioStatus.jump);
       if (verticalDirection == 1 && jumpSpeed > -170 && jumpSpeed < 0) {
         // Long space key event, mario jump higher
@@ -313,7 +351,9 @@ class MarioPlayer extends SpriteAnimationComponent
       }
       y += jumpSpeed * dt;
     }
-    if (jumpSpeed == 0) {
+    if (jumpSpeed == 0 &&
+        _status != MarioStatus.poleSlide &&
+        _status != MarioStatus.poleSlideEnd) {
       if (horizontalDirection != 0 || moveSpeed != 0) {
         _loadStatus(MarioStatus.walk);
       } else {
@@ -344,7 +384,9 @@ class MarioPlayer extends SpriteAnimationComponent
           moveSpeed.abs() < ObjectValues.marioMoveAccel) {
         moveSpeed = 0;
       }
-      if (moveSpeed > 0) {
+      if (bloc.state.status == GameStatus.victory) {
+        moveSpeed = 0;
+      } else if (moveSpeed > 0) {
         moveSpeed -= ObjectValues.marioMoveAccel;
       } else if (moveSpeed < 0) {
         moveSpeed += ObjectValues.marioMoveAccel;
@@ -366,7 +408,12 @@ class MarioPlayer extends SpriteAnimationComponent
         0,
       );
     }
-    x += moveSpeed * dt;
+    if (x <= 3264) {
+      // castle gate position
+      x += moveSpeed * dt;
+    } else {
+      opacity = 0;
+    }
 
     //Check mario is at the top of currentPlatform
     if (_currentPlatform != null) {
@@ -391,7 +438,8 @@ class MarioPlayer extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    if (bloc.state.status != GameStatus.running) {
+    if (bloc.state.status != GameStatus.running &&
+        bloc.state.status != GameStatus.victory) {
       return;
     }
     // TODO: When Mario hits multiple hitBoxes, handle component has more collision, ignore others.
@@ -426,6 +474,8 @@ class MarioPlayer extends SpriteAnimationComponent
       if (!other.death) {
         other.handleDeath(other);
       }
+      return;
+    } else if (other is Flag) {
       return;
     }
     HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
@@ -464,8 +514,7 @@ class MarioPlayer extends SpriteAnimationComponent
           jumpSpeed = 0;
         }
       }
-    }
-    if (other is BrickBlock) {
+    } else if (other is BrickBlock) {
       if (hitEdge == HitEdge.bottom) {
         other.bump(_size);
       }
@@ -498,6 +547,30 @@ class MarioPlayer extends SpriteAnimationComponent
               : MarioStatus.bigToSmall);
         }
       }
+    } else if (other is Pole) {
+      if (_status == MarioStatus.poleSlide ||
+          _status == MarioStatus.poleSlideEnd) {
+        return;
+      }
+      horizontalDirection = 0;
+      bloc.add(const GameVictory());
+      _loadStatus(MarioStatus.poleSlide);
+      add(MoveToEffect(
+        Vector2(other.x - width, 184),
+        EffectController(duration: 0.5),
+        onComplete: () async {
+          _loadStatus(MarioStatus.poleSlideEnd);
+          await Future.delayed(const Duration(milliseconds: 200));
+          isFlip = true;
+          x += (width + 2);
+          animation = null;
+          _loadStatus(_status);
+          isFlip = false;
+          await Future.delayed(const Duration(milliseconds: 200));
+          _loadStatus(MarioStatus.walk);
+          horizontalDirection = 1;
+        },
+      ));
     }
   }
 
@@ -528,6 +601,8 @@ enum MarioStatus {
   bigToFire,
   bigThrow,
   die,
+  poleSlide,
+  poleSlideEnd,
 }
 
 enum MarioSize {

@@ -10,6 +10,7 @@ import 'package:flutter_game/mario/objects/brick_block.dart';
 import 'package:flutter_game/mario/objects/collider_block.dart';
 import 'package:flutter_game/mario/objects/enemy_goomba.dart';
 import 'package:flutter_game/mario/objects/enemy_koopa.dart';
+import 'package:flutter_game/mario/objects/flag_pole.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
@@ -24,6 +25,7 @@ class GameBackground extends SpriteComponent
     _buildBlock();
     _buildEnemies();
     _buildGround();
+    _buildFlagPole();
   }
 
   void _buildBlock() {
@@ -38,7 +40,9 @@ class GameBackground extends SpriteComponent
                       ? QuestionType.greenMushroom
                       : object.type == 'flower'
                           ? QuestionType.flower
-                          : QuestionType.star,
+                          : object.type == 'mushroom flower'
+                              ? QuestionType.mushroomFlower
+                              : QuestionType.star,
           object.id,
           position: Vector2(object.x, object.y),
         )));
@@ -79,6 +83,20 @@ class GameBackground extends SpriteComponent
     addAll(grounds!.objects.map((object) => GroundBlock(
         position: Vector2(object.x, object.y),
         size: Vector2(object.width, object.height))));
+  }
+
+  void _buildFlagPole() {
+    final group = game.mapComponent.tileMap.getLayer<ObjectGroup>('flagpole');
+    addAll(group!.objects.map((object) {
+      if (object.type == 'pole') {
+        return Pole(position: Vector2(object.x, object.y));
+      } else if (object.type == 'flag') {
+        return Flag(position: Vector2(object.x, object.y));
+      } else if (object.type == 'finial') {
+        return Finial(position: Vector2(object.x, object.y));
+      }
+      return Component();
+    }));
   }
 
   @override

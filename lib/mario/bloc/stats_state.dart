@@ -4,6 +4,7 @@ enum GameStatus {
   initial,
   running,
   over,
+  victory,
 }
 
 class StatsState extends Equatable {

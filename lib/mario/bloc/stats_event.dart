@@ -33,3 +33,10 @@ class GameScore extends StatsEvent {
   @override
   List<Object?> get props => [score];
 }
+
+class GameVictory extends StatsEvent {
+  const GameVictory();
+
+  @override
+  List<Object?> get props => [];
+}

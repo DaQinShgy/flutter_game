@@ -126,7 +126,9 @@ class EnemyGoomba extends SpriteAnimationComponent
       return;
     }
     if ((other is EnemyKoopa && other.horizontalDirection.abs() > 1) ||
-        other is PowerupFireball) {
+        (other is PowerupFireball &&
+            horizontalDirection != 0 &&
+            !other.fired)) {
       handleDeath(other);
       return;
     }
@@ -152,6 +154,9 @@ class EnemyGoomba extends SpriteAnimationComponent
       // BrickPiece
       handleDeath(other);
     } else if (other is PowerupMushroom || other is PowerupFlower) {
+    } else if (other is EnemyGoomba && other.death) {
+    } else if (other is EnemyKoopa && other.death) {
+    } else if (other is PowerupFireball && other.fired) {
     } else if (other is! MarioPlayer) {
       horizontalDirection = -horizontalDirection;
     }

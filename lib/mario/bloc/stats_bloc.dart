@@ -21,5 +21,11 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         state.copyWith(status: GameStatus.over),
       ),
     );
+
+    on<GameVictory>(
+      (event, emit) => emit(
+        state.copyWith(status: GameStatus.victory),
+      ),
+    );
   }
 }

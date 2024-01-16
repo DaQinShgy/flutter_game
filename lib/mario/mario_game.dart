@@ -56,9 +56,10 @@ class MarioGame extends FlameGame
       ),
     );
     _marioPlayer = MarioPlayer(
-      position: Vector2(32, ObjectValues.groundY),
+      position: Vector2(2800, ObjectValues.groundY),
     );
     world.addAll([GameBackground(), mapComponent, _marioPlayer]);
+    cameraComponent.viewfinder.position = Vector2(2600, 0);
   }
 
   @override

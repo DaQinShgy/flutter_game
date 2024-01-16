@@ -9,6 +9,7 @@ import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
+import 'package:flutter_game/mario/objects/powerup_fireball.dart';
 import 'package:flutter_game/mario/util/collision_util.dart';
 
 class EnemyKoopa extends SpriteAnimationComponent
@@ -109,8 +110,13 @@ class EnemyKoopa extends SpriteAnimationComponent
   @override
   void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
     super.onCollision(intersectionPoints, other);
-    HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
-    if (other is GroundBlock) {
+    if (_death) {
+      return;
+    }
+    if (other is PowerupFireball && horizontalDirection != 0 && !other.fired) {
+      handleDeath(other);
+    } else if (other is GroundBlock) {
+      HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
       if (hitEdge == HitEdge.top) {
         y = other.y + 1;
         jumpSpeed = 0;
@@ -125,6 +131,9 @@ class EnemyKoopa extends SpriteAnimationComponent
   @override
   void onCollisionEnd(PositionComponent other) {
     super.onCollisionEnd(other);
+    if (_death) {
+      return;
+    }
     if (other is GroundBlock) {
       jumpSpeed = 1;
     }

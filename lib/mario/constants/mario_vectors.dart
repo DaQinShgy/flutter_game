@@ -21,6 +21,16 @@ class MarioVectors {
     [144, 32, 16, 16],
   ];
 
+  //Vector of normal small Mario pole slide
+  static const List<List<double>> normalSmallPoleSlideVector = [
+    [194, 32, 12, 16],
+  ];
+
+  //Vector of normal small Mario pole slide
+  static const List<List<double>> normalSmallPoleSlideEndVector = [
+    [210, 33, 12, 16],
+  ];
+
   //Vector of small to big
   static const List<List<double>> smallToBigVector = [
     [320, 8, 16, 24],
@@ -73,6 +83,16 @@ class MarioVectors {
     [144, 0, 16, 32],
   ];
 
+  //Vector of normal big Mario pole slide
+  static const List<List<double>> normalBigPoleSlideVector = [
+    [193, 2, 16, 30],
+  ];
+
+  //Vector of normal big Mario pole slide
+  static const List<List<double>> normalBigPoleSlideEndVector = [
+    [209, 2, 16, 29],
+  ];
+
   //Vector of Mario die
   static const List<List<double>> dieVector = [
     [160, 32, 15, 16],
@@ -107,7 +127,7 @@ class MarioVectors {
 
   //Vector of big throw fireball
   static const List<List<double>> bigThrowVector = [
-    [336, 0, 16, 32],
+    [336, 48, 16, 32],
   ];
 
   //Vector of invincible small
@@ -188,5 +208,37 @@ class MarioVectors {
     [144, 192, 16, 32],
     [144, 240, 16, 32],
     [144, 144, 16, 32],
+  ];
+
+  //Vector of fire big Mario
+  static const List<List<double>> fireBigVector = [
+    [176, 48, 16, 32],
+  ];
+
+  //Vector of fire big Mario walk
+  static const List<List<double>> fireBigWalkVector = [
+    [81, 48, 16, 32],
+    [97, 48, 15, 32],
+    [113, 48, 15, 32],
+  ];
+
+  //Vector of fire big Mario skid
+  static const List<List<double>> fireBigSkidVector = [
+    [128, 48, 16, 32],
+  ];
+
+  //Vector of fire big Mario jump
+  static const List<List<double>> fireBigJumpVector = [
+    [144, 48, 16, 32],
+  ];
+
+  //Vector of fire big Mario pole slide
+  static const List<List<double>> fireBigPoleSlideVector = [
+    [193, 50, 16, 29],
+  ];
+
+  //Vector of fire big Mario pole slide
+  static const List<List<double>> fireBigPoleSlideEndVector = [
+    [209, 50, 16, 29],
   ];
 }

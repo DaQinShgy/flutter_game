@@ -33,6 +33,10 @@ class PowerupFireball extends SpriteAnimationComponent
 
   double jumpSpeed = 0;
 
+  bool _fired = false;
+
+  bool get fired => _fired;
+
   @override
   FutureOr<void> onLoad() {
     animation = _getAnimation(flyVector);
@@ -75,15 +79,18 @@ class PowerupFireball extends SpriteAnimationComponent
         if (horizontalDirection != 0) {
           horizontalDirection = 0;
           animation = _getAnimation(explodeVector, loop: false);
+          _fired = true;
           animationTicker?.onComplete = () {
             removeFromParent();
           };
         }
       }
+    } else if (other is PowerupFireball) {
     } else {
       if (horizontalDirection != 0) {
         horizontalDirection = 0;
         animation = _getAnimation(explodeVector, loop: false);
+        _fired = true;
         animationTicker?.onComplete = () {
           removeFromParent();
         };
