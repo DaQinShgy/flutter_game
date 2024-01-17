@@ -68,7 +68,8 @@ class MarioPlayer extends SpriteAnimationComponent
       _status == MarioStatus.smallToBig ||
       _status == MarioStatus.bigToSmall ||
       _status == MarioStatus.bigToFireFlower ||
-      _status == MarioStatus.bigThrow;
+      _status == MarioStatus.bigThrow ||
+      _status == MarioStatus.die;
 
   bool _invincible = false;
 
@@ -173,7 +174,7 @@ class MarioPlayer extends SpriteAnimationComponent
         break;
       case MarioStatus.die:
         animation = _getAnimation(MarioVectors.dieVector);
-        bloc.add(const GameOver());
+        bloc.add(const GamePause());
         add(SequenceEffect(
           [
             MoveByEffect(
@@ -193,6 +194,9 @@ class MarioPlayer extends SpriteAnimationComponent
             ),
             RemoveEffect(),
           ],
+          onComplete: () {
+            bloc.add(const GameOver());
+          },
         ));
         break;
       case MarioStatus.poleSlide:
@@ -590,6 +594,10 @@ class MarioPlayer extends SpriteAnimationComponent
       isFlip ? -1 : 1,
       position: Vector2(isFlip ? x - 8 : x + width, y - 24),
     ));
+  }
+
+  void death() {
+    _loadStatus(MarioStatus.die);
   }
 }
 

@@ -6,6 +6,7 @@ import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/hit_edge.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
@@ -168,6 +169,7 @@ class EnemyGoomba extends SpriteAnimationComponent
     flipVerticallyAroundCenter();
     jumpSpeed = ObjectValues.enemyDeathJumpSpeed;
     horizontalDirection = x >= other.center.x ? 1 : -1;
+    bloc.add(const ScoreEnemy());
   }
 
   @override
@@ -184,6 +186,7 @@ class EnemyGoomba extends SpriteAnimationComponent
     animation = _getAnimation(killVector);
     remove(_hitbox);
 
+    bloc.add(const ScoreEnemy());
     CoinScore coinScore = CoinScore(
       '100',
       position: Vector2(width / 2, -10),

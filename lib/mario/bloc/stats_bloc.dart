@@ -16,6 +16,12 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       ),
     );
 
+    on<GamePause>(
+      (event, emit) => emit(
+        state.copyWith(status: GameStatus.pause),
+      ),
+    );
+
     on<GameOver>(
       (event, emit) => emit(
         state.copyWith(status: GameStatus.over),
@@ -25,6 +31,39 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     on<GameVictory>(
       (event, emit) => emit(
         state.copyWith(status: GameStatus.victory),
+      ),
+    );
+
+    on<CountDown>(
+      (event, emit) => emit(
+        state.copyWith(
+          time: state.time > 0 ? state.time - 1 : 0,
+        ),
+      ),
+    );
+
+    on<ScoreCoin>(
+      (event, emit) => emit(
+        state.copyWith(
+          score: state.score + 200,
+          coin: state.coin + 1,
+        ),
+      ),
+    );
+
+    on<ScoreEnemy>(
+      (event, emit) => emit(
+        state.copyWith(
+          score: state.score + 100,
+        ),
+      ),
+    );
+
+    on<ScoreMushroom>(
+      (event, emit) => emit(
+        state.copyWith(
+          score: state.score + 1000,
+        ),
       ),
     );
   }

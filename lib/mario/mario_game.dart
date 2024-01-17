@@ -9,6 +9,7 @@ import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/objects/game_background.dart';
+import 'package:flutter_game/mario/overlays/hud.dart';
 
 class MarioGame extends FlameGame
     with HasKeyboardHandlerComponents, HasCollisionDetection {
@@ -56,14 +57,13 @@ class MarioGame extends FlameGame
       ),
     );
     _marioPlayer = MarioPlayer(
-      position: Vector2(2800, ObjectValues.groundY),
+      position: Vector2(32, ObjectValues.groundY),
     );
     world.addAll([GameBackground(), mapComponent, _marioPlayer]);
-    cameraComponent.viewfinder.position = Vector2(2600, 0);
+
+    cameraComponent.viewport.add(Hub(size: size));
   }
 
   @override
   Color backgroundColor() => Colors.black;
-
-  void _buildBlocks(TiledComponent mapComponent) {}
 }

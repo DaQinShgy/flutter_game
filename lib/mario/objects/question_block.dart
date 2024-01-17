@@ -4,15 +4,20 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
+import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_event.dart';
+import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 import 'package:flutter_game/mario/objects/powerup_flower.dart';
 import 'package:flutter_game/mario/objects/powerup_mushroom.dart';
 
-class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
+class QuestionBlock extends PositionComponent
+    with HasGameRef<MarioGame>, FlameBlocReader<StatsBloc, StatsState> {
   QuestionBlock(this.type, this.id, {super.position})
       : super(size: Vector2.all(16));
 
@@ -35,7 +40,7 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
   List<double> bumpedVector = [432, 0, 16, 16];
 
   @override
-  FutureOr<void> onLoad() {
+  Future<void> onLoad() {
     image = game.images.fromCache('mario/tile_set.png');
     component = SpriteAnimationComponent(
       animation: SpriteAnimation.variableSpriteList(
@@ -55,6 +60,7 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
     if (type == QuestionType.greenMushroom) {
       (component as SpriteAnimationComponent).opacity = 0;
     }
+    return super.onLoad();
   }
 
   bool _bumped = false;
@@ -143,6 +149,7 @@ class QuestionBlock extends PositionComponent with HasGameRef<MarioGame> {
       ),
       RemoveEffect(),
     ], onComplete: () {
+      bloc.add(const ScoreCoin());
       CoinScore coinScore = CoinScore(
         '200',
         position: Vector2(width / 2, -16),

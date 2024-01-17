@@ -3,7 +3,11 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
+import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_event.dart';
+import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/constants/hit_edge.dart';
 import 'package:flutter_game/mario/constants/object_values.dart';
 import 'package:flutter_game/mario/mario_game.dart';
@@ -15,7 +19,10 @@ import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/util/collision_util.dart';
 
 class PowerupMushroom extends SpriteComponent
-    with HasGameRef<MarioGame>, CollisionCallbacks {
+    with
+        HasGameRef<MarioGame>,
+        CollisionCallbacks,
+        FlameBlocReader<StatsBloc, StatsState> {
   PowerupMushroom(this.type, this.id, {super.position, super.priority = -1});
 
   final MushroomType type;
@@ -31,7 +38,7 @@ class PowerupMushroom extends SpriteComponent
   late RectangleHitbox _hitbox;
 
   @override
-  FutureOr<void> onLoad() {
+  Future<void> onLoad() {
     List<double> mushroomVector =
         type == MushroomType.red ? redMushroomVector : greenMushroomVector;
     sprite = Sprite(
@@ -50,6 +57,7 @@ class PowerupMushroom extends SpriteComponent
         jumpSpeed = 1;
       },
     ));
+    return super.onLoad();
   }
 
   int horizontalDirection = 0;
@@ -102,6 +110,7 @@ class PowerupMushroom extends SpriteComponent
     } else if (other is MarioPlayer) {
       remove(_hitbox);
       opacity = 0;
+      bloc.add(const ScoreMushroom());
       CoinScore coinScore = CoinScore(
         '1000',
         position: Vector2(width / 2, -10),

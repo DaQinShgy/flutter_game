@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flame/components.dart';
-import 'package:flame/sprite.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
@@ -18,11 +18,13 @@ class Hub extends PositionComponent
         KeyboardHandler {
   Hub({super.position, super.size});
 
-  late Component scoreLabel;
+  Component? scoreLabel;
 
   late Component coinIcon;
 
-  late Component coinCount;
+  Component? coinCount;
+
+  Component? time;
 
   late SpriteComponent spriteComponentBoard;
 
@@ -41,8 +43,6 @@ class Hub extends PositionComponent
   late Component level;
 
   late Component mario;
-
-  late Component health;
 
   /// Character vector
   Map<String, Vector2> characterMap = {
@@ -99,22 +99,15 @@ class Hub extends PositionComponent
         'TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
     add(_buildLabel(
         '1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
-    scoreLabel = _buildLabel(
-      '000000',
-      Vector2(centerX - 16 * 8 * game.scaleSize, 21 * game.scaleSize),
-    );
-    add(scoreLabel);
+
     coinIcon = CoinIcon(
       CoinType.twinkle,
       position:
-          Vector2(centerX - 16 * 4 * game.scaleSize, 21.5 * game.scaleSize),
+          Vector2(centerX - 16 * 3 * game.scaleSize, 21.5 * game.scaleSize),
     );
     add(coinIcon);
     add(_buildLabel('*',
-        Vector2(centerX - (16 * 4 - 6) * game.scaleSize, 21 * game.scaleSize)));
-    coinCount = _buildLabel('00',
-        Vector2(centerX - (16 * 4 - 14) * game.scaleSize, 21 * game.scaleSize));
-    add(coinCount);
+        Vector2(centerX - (16 * 3 - 6) * game.scaleSize, 21 * game.scaleSize)));
 
     spriteComponentBoard = SpriteComponent(
       sprite: Sprite(
@@ -160,25 +153,27 @@ class Hub extends PositionComponent
       scale: scale * game.scaleSize,
       position: Vector2(centerX - 35 * game.scaleSize, 110 * game.scaleSize),
     );
-    health = _buildLabel(
-        'X   3', Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
   }
 
-  PositionComponent _buildLabel(String string, Vector2 position,
-      {Anchor anchor = Anchor.topLeft}) {
-    SpriteBatch spriteBatch =
-        SpriteBatch(game.images.fromCache('mario/text_images.png'));
+  PositionComponent _buildLabel(String string, Vector2 position) {
+    List<Component> list = [];
+    Image image = game.images.fromCache('mario/text_images.png');
     for (int i = 0; i < string.length; i++) {
       Vector2 vector2 = characterMap[string[i]] ?? Vector2(0, 0);
-      spriteBatch.add(
-        source: Rect.fromLTWH(vector2.x, vector2.y, 7, 7),
-        offset: Vector2(i * 7, 0),
-      );
+      list.add(SpriteComponent(
+        sprite: Sprite(
+          image,
+          srcPosition: vector2,
+          srcSize: Vector2(7, 7),
+        ),
+        position: Vector2(i * 8, 0),
+        // scale: scale * game.scaleSize,
+      ));
     }
     return PositionComponent(
       position: position,
       scale: scale * game.scaleSize,
-      children: [SpriteBatchComponent(spriteBatch: spriteBatch)],
+      children: list,
     );
   }
 
@@ -186,8 +181,10 @@ class Hub extends PositionComponent
 
   @override
   void update(double dt) {
+    timer?.update(dt);
     if (firstUpdate) {
       firstUpdate = false;
+      _buildData();
     }
   }
 
@@ -206,18 +203,71 @@ class Hub extends PositionComponent
           return true;
         }
         if (playerCount == 1) {
-          _buildData();
+          _buildPreview();
         }
       }
     }
     return true;
   }
 
-  Future<void> _buildData() async {
-    removeAll([spriteComponentBoard, mushrooms, player1, player2, top]);
+  void _buildPreview() {
+    if (spriteComponentBoard.parent != null) {
+      removeAll([spriteComponentBoard, mushrooms, player1, player2, top]);
+    }
+    double centerX = size.x / 2;
+    final health = _buildLabel('X   ${bloc.state.lives}',
+        Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
     addAll([blackBg, level, mario, health]);
-    await Future.delayed(const Duration(seconds: 1));
-    removeAll([blackBg, level, mario, health]);
-    bloc.add(const GameRunning());
+    Future.delayed(const Duration(seconds: 1), () {
+      removeAll([blackBg, level, mario, health]);
+      bloc.add(const GameRunning());
+      _startTimer();
+    });
+  }
+
+  Timer? timer;
+
+  void _startTimer() {
+    timer = Timer(0.5, repeat: true, onTick: () {
+      if (bloc.state.status == GameStatus.running) {
+        bloc.add(const CountDown());
+      }
+    }, autoStart: true);
+  }
+
+  @override
+  void onNewState(StatsState state) {
+    super.onNewState(state);
+    if (state.status == GameStatus.over) {
+      _buildPreview();
+    } else {
+      _buildData();
+      if (bloc.state.time <= 0) {
+        game.marioPlayer.death();
+      }
+    }
+  }
+
+  void _buildData() {
+    double centerX = size.x / 2;
+
+    scoreLabel?.removeFromParent();
+    scoreLabel = _buildLabel(
+      bloc.state.score.toString().padLeft(6, '0'),
+      Vector2(centerX - 16 * 8 * game.scaleSize, 21 * game.scaleSize),
+    );
+    add(scoreLabel!);
+
+    coinCount?.removeFromParent();
+    coinCount = _buildLabel(bloc.state.coin.toString().padLeft(2, '0'),
+        Vector2(centerX - (16 * 3 - 14) * game.scaleSize, 21 * game.scaleSize));
+    add(coinCount!);
+
+    time?.removeFromParent();
+    time = _buildLabel(
+      bloc.state.time.toString().padLeft(3, '0'),
+      Vector2(centerX + 14 + 16 * 6 * game.scaleSize, 21 * game.scaleSize),
+    );
+    add(time!);
   }
 }

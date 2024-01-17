@@ -22,12 +22,6 @@ class GameBackground extends SpriteComponent
   @override
   FutureOr<void> onLoad() {
     sprite = Sprite(game.images.fromCache('mario/level_1.png'));
-    _buildCollider();
-    _buildBlock();
-    _buildEnemies();
-    _buildGround();
-    _buildFlagPole();
-    _buildCastle();
   }
 
   void _buildBlock() {
@@ -114,16 +108,15 @@ class GameBackground extends SpriteComponent
   }
 
   @override
-  void onInitialState(StatsState state) {
-    super.onInitialState(state);
-    if (state.status == GameStatus.initial) {}
-  }
-
-  @override
   bool listenWhen(StatsState previousState, StatsState newState) {
     if (previousState.status == GameStatus.initial &&
         newState.status == GameStatus.running) {
-      // _buildBlock();
+      _buildCollider();
+      _buildBlock();
+      _buildEnemies();
+      _buildGround();
+      _buildFlagPole();
+      _buildCastle();
     }
     return super.listenWhen(previousState, newState);
   }

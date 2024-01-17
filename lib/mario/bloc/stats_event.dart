@@ -18,6 +18,13 @@ class GameRunning extends StatsEvent {
   List<Object?> get props => [];
 }
 
+class GamePause extends StatsEvent {
+  const GamePause();
+
+  @override
+  List<Object?> get props => [];
+}
+
 class GameOver extends StatsEvent {
   const GameOver();
 
@@ -43,6 +50,34 @@ class GameVictory extends StatsEvent {
 
 class RaiseFlag extends StatsEvent {
   const RaiseFlag();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class CountDown extends StatsEvent {
+  const CountDown();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class ScoreCoin extends StatsEvent {
+  const ScoreCoin();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class ScoreEnemy extends StatsEvent {
+  const ScoreEnemy();
+
+  @override
+  List<Object?> get props => [];
+}
+
+class ScoreMushroom extends StatsEvent {
+  const ScoreMushroom();
 
   @override
   List<Object?> get props => [];

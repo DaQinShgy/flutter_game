@@ -4,14 +4,19 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
+import 'package:flutter_game/mario/bloc/stats_bloc.dart';
+import 'package:flutter_game/mario/bloc/stats_event.dart';
+import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/brick_star.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/objects/coin_score.dart';
 
-class BrickBlock extends PositionComponent with HasGameRef<MarioGame> {
+class BrickBlock extends PositionComponent
+    with HasGameRef<MarioGame>, FlameBlocReader<StatsBloc, StatsState> {
   BrickBlock(this.type, {super.position}) : super(size: Vector2.all(16));
 
   String type;
@@ -21,7 +26,7 @@ class BrickBlock extends PositionComponent with HasGameRef<MarioGame> {
   late SpriteComponent componentBrick;
 
   @override
-  FutureOr<void> onLoad() {
+  Future<void> onLoad() {
     if (type == 'coin') {
       coinCount = 6;
     }
@@ -33,6 +38,7 @@ class BrickBlock extends PositionComponent with HasGameRef<MarioGame> {
     ));
     add(componentBrick);
     add(RectangleHitbox(collisionType: CollisionType.passive));
+    return super.onLoad();
   }
 
   bool _bumped = false;
@@ -161,6 +167,7 @@ class BrickBlock extends PositionComponent with HasGameRef<MarioGame> {
       ),
       RemoveEffect(),
     ], onComplete: () {
+      bloc.add(const ScoreCoin());
       CoinScore coinScore = CoinScore(
         '200',
         position: Vector2(width / 2, -16),
