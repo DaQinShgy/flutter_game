@@ -9,6 +9,7 @@ class CoinIcon extends SpriteAnimationComponent with HasGameRef<MarioGame> {
     super.position,
     super.anchor = Anchor.topCenter,
     super.priority = -1,
+    super.scale,
   });
 
   final CoinType type;
@@ -31,7 +32,6 @@ class CoinIcon extends SpriteAnimationComponent with HasGameRef<MarioGame> {
   @override
   FutureOr<void> onLoad() {
     if (type == CoinType.twinkle) {
-      scale = scale * 1.2;
       animation = SpriteAnimation.variableSpriteList(
         twinkleVector
             .map((e) => Sprite(

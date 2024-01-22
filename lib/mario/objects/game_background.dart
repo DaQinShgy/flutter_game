@@ -15,8 +15,7 @@ import 'package:flutter_game/mario/objects/flag_pole.dart';
 import 'package:flutter_game/mario/objects/ground_block.dart';
 import 'package:flutter_game/mario/objects/question_block.dart';
 
-class GameBackground extends SpriteComponent
-    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
+class GameBackground extends SpriteComponent with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState> {
   GameBackground({super.size}) : super(position: Vector2(0, 0));
 
   @override
@@ -25,8 +24,7 @@ class GameBackground extends SpriteComponent
   }
 
   void _buildBlock() {
-    final questionBlocks =
-        game.mapComponent.tileMap.getLayer<ObjectGroup>('question blocks');
+    final questionBlocks = game.mapComponent.tileMap.getLayer<ObjectGroup>('question blocks');
     addAll(questionBlocks!.objects.map((object) => QuestionBlock(
           object.type == 'coin'
               ? QuestionType.coin
@@ -42,8 +40,7 @@ class GameBackground extends SpriteComponent
           object.id,
           position: Vector2(object.x, object.y),
         )));
-    final brickBlocks =
-        game.mapComponent.tileMap.getLayer<ObjectGroup>('brick blocks');
+    final brickBlocks = game.mapComponent.tileMap.getLayer<ObjectGroup>('brick blocks');
     addAll(brickBlocks!.objects.map((object) => BrickBlock(
           object.type,
           position: Vector2(object.x, object.y),
@@ -51,8 +48,7 @@ class GameBackground extends SpriteComponent
   }
 
   void _buildCollider() {
-    final collider =
-        game.mapComponent.tileMap.getLayer<ObjectGroup>('collider');
+    final collider = game.mapComponent.tileMap.getLayer<ObjectGroup>('collider');
     addAll(
       collider!.objects.map(
         (object) => ColliderBlock(
@@ -76,9 +72,8 @@ class GameBackground extends SpriteComponent
 
   void _buildGround() {
     final grounds = game.mapComponent.tileMap.getLayer<ObjectGroup>('grounds');
-    addAll(grounds!.objects.map((object) => GroundBlock(
-        position: Vector2(object.x, object.y),
-        size: Vector2(object.width, object.height))));
+    addAll(grounds!.objects.map(
+        (object) => GroundBlock(position: Vector2(object.x, object.y), size: Vector2(object.width, object.height))));
   }
 
   void _buildFlagPole() {
@@ -109,8 +104,7 @@ class GameBackground extends SpriteComponent
 
   @override
   bool listenWhen(StatsState previousState, StatsState newState) {
-    if (previousState.status == GameStatus.initial &&
-        newState.status == GameStatus.running) {
+    if (previousState.status == GameStatus.initial && newState.status == GameStatus.running) {
       _buildCollider();
       _buildBlock();
       _buildEnemies();

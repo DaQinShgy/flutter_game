@@ -82,3 +82,10 @@ class ScoreMushroom extends StatsEvent {
   @override
   List<Object?> get props => [];
 }
+
+class LiveMushroom extends StatsEvent {
+  const LiveMushroom();
+
+  @override
+  List<Object?> get props => [];
+}

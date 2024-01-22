@@ -19,10 +19,7 @@ import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/util/collision_util.dart';
 
 class PowerupMushroom extends SpriteComponent
-    with
-        HasGameRef<MarioGame>,
-        CollisionCallbacks,
-        FlameBlocReader<StatsBloc, StatsState> {
+    with HasGameRef<MarioGame>, CollisionCallbacks, FlameBlocReader<StatsBloc, StatsState> {
   PowerupMushroom(this.type, this.id, {super.position, super.priority = -1});
 
   final MushroomType type;
@@ -39,8 +36,7 @@ class PowerupMushroom extends SpriteComponent
 
   @override
   Future<void> onLoad() {
-    List<double> mushroomVector =
-        type == MushroomType.red ? redMushroomVector : greenMushroomVector;
+    List<double> mushroomVector = type == MushroomType.red ? redMushroomVector : greenMushroomVector;
     sprite = Sprite(
       game.images.fromCache('mario/item_objects.png'),
       srcPosition: Vector2(mushroomVector[0], mushroomVector[1]),
@@ -81,10 +77,8 @@ class PowerupMushroom extends SpriteComponent
       }
     }
     double screenWidth = game.size.x / game.scaleSize;
-    if ((parent as PositionComponent).x + x + width <
-            game.cameraComponent.viewfinder.position.x ||
-        (parent as PositionComponent).x + x >
-            game.cameraComponent.viewfinder.position.x + screenWidth ||
+    if ((parent as PositionComponent).x + x + width < game.cameraComponent.viewfinder.position.x ||
+        (parent as PositionComponent).x + x > game.cameraComponent.viewfinder.position.x + screenWidth ||
         (parent as PositionComponent).y + y > game.mapComponent.height) {
       // Mushroom moves off screen edge
       removeFromParent();
@@ -92,8 +86,7 @@ class PowerupMushroom extends SpriteComponent
 
     if (_currentPlatform != null) {
       if (x + (parent as QuestionBlock).x <= _currentPlatform!.x - width ||
-          x + (parent as QuestionBlock).x >=
-              _currentPlatform!.x + _currentPlatform!.width) {
+          x + (parent as QuestionBlock).x >= _currentPlatform!.x + _currentPlatform!.width) {
         if (jumpSpeed == 0) {
           jumpSpeed = 1;
         }
@@ -110,22 +103,41 @@ class PowerupMushroom extends SpriteComponent
     } else if (other is MarioPlayer) {
       remove(_hitbox);
       opacity = 0;
-      bloc.add(const ScoreMushroom());
-      CoinScore coinScore = CoinScore(
-        '1000',
-        position: Vector2(width / 2, -10),
-      );
-      add(coinScore);
-      coinScore.add(MoveByEffect(
-        Vector2(0, -40),
-        EffectController(
-          duration: 0.5,
-        ),
-        onComplete: () {
-          remove(coinScore);
-          removeFromParent();
-        },
-      ));
+      if (type == MushroomType.red) {
+        bloc.add(const ScoreMushroom());
+        CoinScore coinScore = CoinScore(
+          '1000',
+          position: Vector2(width / 2, -10),
+        );
+        add(coinScore);
+        coinScore.add(MoveByEffect(
+          Vector2(0, -40),
+          EffectController(
+            duration: 0.5,
+          ),
+          onComplete: () {
+            remove(coinScore);
+            removeFromParent();
+          },
+        ));
+      } else {
+        bloc.add(const ScoreMushroom());
+        CoinScore coinScore = CoinScore(
+          '1UP',
+          position: Vector2(width / 2, -10),
+        );
+        add(coinScore);
+        coinScore.add(MoveByEffect(
+          Vector2(0, -40),
+          EffectController(
+            duration: 0.5,
+          ),
+          onComplete: () {
+            remove(coinScore);
+            removeFromParent();
+          },
+        ));
+      }
     } else if (other is GroundBlock) {
       HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
       if (hitEdge == HitEdge.top) {
@@ -139,8 +151,7 @@ class PowerupMushroom extends SpriteComponent
       } else if (hitEdge == HitEdge.left) {
         x = other.x - (parent as QuestionBlock).x - width;
       }
-    } else if ((other is QuestionBlock || other is BrickBlock) &&
-        horizontalDirection != 0) {
+    } else if ((other is QuestionBlock || other is BrickBlock) && horizontalDirection != 0) {
       y = other.y - (parent as QuestionBlock).y - height;
       _currentPlatform = other;
       if (jumpSpeed != 0) {

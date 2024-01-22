@@ -66,5 +66,13 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
         ),
       ),
     );
+
+    on<LiveMushroom>(
+      (event, emit) => emit(
+        state.copyWith(
+          lives: state.lives + 1,
+        ),
+      ),
+    );
   }
 }

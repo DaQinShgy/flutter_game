@@ -12,10 +12,7 @@ import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/overlays/hud_background.dart';
 
 class Hub extends PositionComponent
-    with
-        HasGameRef<MarioGame>,
-        FlameBlocListenable<StatsBloc, StatsState>,
-        KeyboardHandler {
+    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState>, KeyboardHandler {
   Hub({super.position, super.size});
 
   Component? scoreLabel;
@@ -91,23 +88,18 @@ class Hub extends PositionComponent
   FutureOr<void> onLoad() async {
     double centerX = size.x / 2;
     double topMargin = 11 * game.scaleSize;
-    add(_buildLabel(
-        'MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
-    add(_buildLabel(
-        'WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
-    add(_buildLabel(
-        'TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
-    add(_buildLabel(
-        '1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
+    add(_buildLabel('MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
+    add(_buildLabel('WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
+    add(_buildLabel('TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
+    add(_buildLabel('1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
 
     coinIcon = CoinIcon(
       CoinType.twinkle,
-      position:
-          Vector2(centerX - 16 * 3 * game.scaleSize, 21.5 * game.scaleSize),
+      position: Vector2(centerX - 16 * 3 * game.scaleSize, 21.5 * game.scaleSize),
+      scale: scale * game.scaleSize / 2,
     );
     add(coinIcon);
-    add(_buildLabel('*',
-        Vector2(centerX - (16 * 3 - 6) * game.scaleSize, 21 * game.scaleSize)));
+    add(_buildLabel('*', Vector2(centerX - (16 * 3 - 6) * game.scaleSize, 21 * game.scaleSize)));
 
     spriteComponentBoard = SpriteComponent(
       sprite: Sprite(
@@ -127,23 +119,19 @@ class Hub extends PositionComponent
         srcPosition: Vector2(3, 155),
       ),
       scale: scale * game.scaleSize,
-      position:
-          Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
+      position: Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
     );
     add(mushrooms);
-    player1 = _buildLabel('1 PLAYER GAME',
-        Vector2(centerX - 16 * 2.5 * game.scaleSize, 140.5 * game.scaleSize));
+    player1 = _buildLabel('1 PLAYER GAME', Vector2(centerX - 16 * 2.5 * game.scaleSize, 140.5 * game.scaleSize));
     add(player1);
-    player2 = _buildLabel('2 PLAYER GAME - COMING SOON',
-        Vector2(centerX - 16 * 2.5 * game.scaleSize, 160.5 * game.scaleSize));
+    player2 = _buildLabel(
+        '2 PLAYER GAME - COMING SOON', Vector2(centerX - 16 * 2.5 * game.scaleSize, 160.5 * game.scaleSize));
     add(player2);
-    top = _buildLabel('TOP - 000000',
-        Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
+    top = _buildLabel('TOP - 000000', Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
     add(top);
 
     blackBg = HudBackground(size: size);
-    level = _buildLabel('WORLD   1-1  ',
-        Vector2(centerX - 6 * 7 * game.scaleSize, 80 * game.scaleSize));
+    level = _buildLabel('WORLD   1-1  ', Vector2(centerX - 6 * 7 * game.scaleSize, 80 * game.scaleSize));
     mario = SpriteComponent(
       sprite: Sprite(
         game.images.fromCache('mario/mario_bros.png'),
@@ -196,8 +184,8 @@ class Hub extends PositionComponent
           keysPressed.contains(LogicalKeyboardKey.keyS) ||
           keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
         playerCount = playerCount == 1 ? 2 : 1;
-        mushrooms.position = Vector2(size.x / 2 - 16 * 4 * game.scaleSize,
-            (playerCount == 1 ? 140 : 160) * game.scaleSize);
+        mushrooms.position =
+            Vector2(size.x / 2 - 16 * 4 * game.scaleSize, (playerCount == 1 ? 140 : 160) * game.scaleSize);
       } else if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         if (blackBg.parent != null) {
           return true;
@@ -215,8 +203,7 @@ class Hub extends PositionComponent
       removeAll([spriteComponentBoard, mushrooms, player1, player2, top]);
     }
     double centerX = size.x / 2;
-    final health = _buildLabel('X   ${bloc.state.lives}',
-        Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
+    final health = _buildLabel('X   ${bloc.state.lives}', Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
     addAll([blackBg, level, mario, health]);
     Future.delayed(const Duration(seconds: 1), () {
       removeAll([blackBg, level, mario, health]);
