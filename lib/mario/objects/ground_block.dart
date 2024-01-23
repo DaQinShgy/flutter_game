@@ -7,9 +7,6 @@ class GroundBlock extends PositionComponent {
   GroundBlock({super.position, super.size});
 
   @override
-  bool get debugMode => true;
-
-  @override
   FutureOr<void> onLoad() {
     add(RectangleHitbox(collisionType: CollisionType.passive));
   }

@@ -14,10 +14,11 @@ Open [https://daqinshgy.github.io/flutter_game/](https://daqinshgy.github.io/flu
 
 ----
 
-### Interface preview
-| web | mac | iOS |
-|--|--|--|
-| ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_web.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_mac.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_iOS.png) |
+### 效果预览
+| GAME |  |  |  |
+|--|--|--|--|
+| Tetris | ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_web.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_mac.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_iOS.png) |
+| SuperMario | ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_init.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_big.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_fire.png) |
 
 ## Getting Started
 

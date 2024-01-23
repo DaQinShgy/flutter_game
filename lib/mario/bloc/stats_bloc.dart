@@ -1,3 +1,4 @@
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
@@ -18,9 +19,10 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     );
 
     on<GameRunning>(
-      (event, emit) => emit(
-        state.copyWith(status: GameStatus.running),
-      ),
+      (event, emit) {
+        emit(state.copyWith(status: GameStatus.running));
+        // FlameAudio.play('mario/main_theme.ogg');
+      },
     );
 
     on<GamePause>(

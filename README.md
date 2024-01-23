@@ -15,9 +15,10 @@ Please view [README_EN](https://github.com/DaQinShgy/flutter_game/blob/main/READ
 ----
 
 ### 效果预览
-| web | mac | iOS |
-|--|--|--|
-| ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_web.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_mac.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_iOS.png) |
+| 游戏 |  |  |  |
+|--|--|--|--|
+| 俄罗斯方块 | ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_web.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_mac.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/tetris_iOS.png) |
+| 超级马里奥 | ![web_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_init.png) | ![mac_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_big.png) | ![iOS_preview](https://github.com/DaQinShgy/flutter_game/blob/main/images/mario_fire.png) |
 
 ## 如何开始
 

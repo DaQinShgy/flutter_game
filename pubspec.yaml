@@ -30,6 +30,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/audio/tetris/
+    - assets/audio/mario/
     - assets/images/
     - assets/images/tetris/
     - assets/images/mario/
