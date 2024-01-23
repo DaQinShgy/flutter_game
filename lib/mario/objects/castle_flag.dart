@@ -4,6 +4,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame_bloc/flame_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
@@ -27,16 +28,18 @@ class CastleFlag extends SpriteComponent
     return super.onLoad();
   }
 
-  bool _firstUpdate = true;
-
   @override
-  void update(double dt) {
-    if (_firstUpdate) {
-      _firstUpdate = false;
-      bloc.on<RaiseFlag>((event, emit) {
-        opacity = 1;
-        add(MoveByEffect(Vector2(0, -14), EffectController(duration: 0.5)));
-      });
+  void onNewState(StatsState state) {
+    super.onNewState(state);
+    if (state.finish) {
+      opacity = 1;
+      add(MoveByEffect(
+        Vector2(0, -14),
+        EffectController(duration: 0.5),
+        onComplete: () {
+          bloc.add(const GameOver());
+        },
+      ));
     }
   }
 }

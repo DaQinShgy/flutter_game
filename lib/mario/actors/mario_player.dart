@@ -202,14 +202,14 @@ class MarioPlayer extends SpriteAnimationComponent
       case MarioStatus.poleSlide:
         animation = _getAnimation(isSmall
             ? MarioVectors.normalSmallPoleSlideVector
-            : _fire
+            : !_fire
                 ? MarioVectors.normalBigPoleSlideVector
                 : MarioVectors.fireBigPoleSlideVector);
         break;
       case MarioStatus.poleSlideEnd:
         animation = _getAnimation(isSmall
             ? MarioVectors.normalSmallPoleSlideEndVector
-            : _fire
+            : !_fire
                 ? MarioVectors.normalBigPoleSlideEndVector
                 : MarioVectors.fireBigPoleSlideEndVector);
         break;
@@ -308,6 +308,10 @@ class MarioPlayer extends SpriteAnimationComponent
   void update(double dt) {
     super.update(dt);
     if (suspend) {
+      return;
+    }
+    if (y > game.mapComponent.height) {
+      _loadStatus(MarioStatus.die);
       return;
     }
     final currentTime = DateTime.now().millisecondsSinceEpoch;
@@ -499,6 +503,8 @@ class MarioPlayer extends SpriteAnimationComponent
     } else if (hitEdge == HitEdge.right) {
       if (invisibility && other is EnemyGoomba) {
         // invisibility, Goomba Mario doesn't affect each other
+      } else if (invisibility && other is EnemyKoopa) {
+        // invisibility, Koopa Mario doesn't affect each other
       } else {
         moveSpeed = 0;
         x = other.x + other.width;
@@ -510,6 +516,8 @@ class MarioPlayer extends SpriteAnimationComponent
     } else if (hitEdge == HitEdge.left) {
       if (invisibility && other is EnemyGoomba) {
         // invisibility, Goomba Mario doesn't affect each other
+      } else if (invisibility && other is EnemyKoopa) {
+        // invisibility, Koopa Mario doesn't affect each other
       } else {
         moveSpeed = 0;
         x = other.x - width;

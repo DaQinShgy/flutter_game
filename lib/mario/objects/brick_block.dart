@@ -45,6 +45,8 @@ class BrickBlock extends PositionComponent
 
   bool get bumped => _bumped;
 
+  bool _generateStar = false;
+
   /// Action after Mario has bumped the box from below
   void bump(MarioSize size) {
     if (type == 'coin') {
@@ -62,6 +64,9 @@ class BrickBlock extends PositionComponent
         return;
       }
     } else if (type == 'star') {
+      if (_generateStar) {
+        return;
+      }
       remove(componentBrick);
       componentBrick = SpriteComponent(
           sprite: Sprite(
@@ -80,6 +85,7 @@ class BrickBlock extends PositionComponent
         ),
       ));
       add(BrickStar());
+      _generateStar = true;
       return;
     }
     if (size == MarioSize.small || coinCount > 0) {

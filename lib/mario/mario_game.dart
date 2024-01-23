@@ -19,7 +19,9 @@ class MarioGame extends FlameGame
 
   late final TiledComponent mapComponent;
 
-  late final MarioPlayer _marioPlayer;
+  late MarioPlayer _marioPlayer;
+
+  late Component _gameBackground;
 
   MarioPlayer get marioPlayer => _marioPlayer;
 
@@ -59,11 +61,23 @@ class MarioGame extends FlameGame
     _marioPlayer = MarioPlayer(
       position: Vector2(32, ObjectValues.groundY),
     );
-    world.addAll([GameBackground(), mapComponent, _marioPlayer]);
+    _gameBackground = GameBackground();
+    world.addAll([_gameBackground, mapComponent, _marioPlayer]);
 
     cameraComponent.viewport.add(Hub(size: size));
   }
 
   @override
   Color backgroundColor() => Colors.black;
+
+  void resetView() {
+    world.removeAll([_gameBackground, _marioPlayer]);
+    _marioPlayer = MarioPlayer(
+      position: Vector2(32, ObjectValues.groundY),
+    );
+    _gameBackground.removeAll(_gameBackground.children);
+    _gameBackground = GameBackground();
+    world.addAll([_gameBackground, _marioPlayer]);
+    cameraComponent.viewfinder.position = Vector2(0, 0);
+  }
 }

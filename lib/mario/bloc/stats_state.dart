@@ -15,6 +15,7 @@ class StatsState extends Equatable {
   final int time;
   final int lives;
   final int top;
+  final bool finish;
 
   const StatsState({
     required this.status,
@@ -23,6 +24,7 @@ class StatsState extends Equatable {
     required this.time,
     required this.lives,
     required this.top,
+    required this.finish,
   });
 
   const StatsState.empty()
@@ -33,6 +35,7 @@ class StatsState extends Equatable {
           lives: 3,
           time: 400,
           top: 0,
+          finish: false,
         );
 
   StatsState copyWith({
@@ -42,6 +45,7 @@ class StatsState extends Equatable {
     int? time,
     int? lives,
     int? top,
+    bool? finish,
   }) {
     return StatsState(
       status: status ?? this.status,
@@ -50,6 +54,7 @@ class StatsState extends Equatable {
       time: time ?? this.time,
       lives: lives ?? this.lives,
       top: top ?? this.top,
+      finish: finish ?? this.finish,
     );
   }
 
@@ -61,5 +66,6 @@ class StatsState extends Equatable {
         time,
         lives,
         top,
+        finish,
       ];
 }

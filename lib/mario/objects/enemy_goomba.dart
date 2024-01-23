@@ -170,6 +170,21 @@ class EnemyGoomba extends SpriteAnimationComponent
     jumpSpeed = ObjectValues.enemyDeathJumpSpeed;
     horizontalDirection = x >= other.center.x ? 1 : -1;
     bloc.add(const ScoreEnemy());
+    CoinScore coinScore = CoinScore(
+      '100',
+      position: Vector2(width / 2, -10),
+    );
+    add(coinScore);
+    coinScore.add(MoveByEffect(
+      Vector2(0, -24),
+      EffectController(
+        duration: 0.4,
+      ),
+      onComplete: () {
+        remove(coinScore);
+      },
+    ));
+    add(RemoveEffect(delay: 0.5));
   }
 
   @override

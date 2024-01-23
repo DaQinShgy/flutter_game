@@ -6,7 +6,14 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
   StatsBloc() : super(const StatsState.empty()) {
     on<GameInitial>(
       (event, emit) => emit(
-        state.copyWith(status: GameStatus.initial),
+        state.copyWith(
+          status: GameStatus.initial,
+          time: 400,
+          score: state.lives > 0 ? null : 0,
+          coin: state.lives > 0 ? null : 0,
+          lives: state.lives > 0 ? null : 3,
+          finish: false,
+        ),
       ),
     );
 
@@ -24,7 +31,11 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
 
     on<GameOver>(
       (event, emit) => emit(
-        state.copyWith(status: GameStatus.over),
+        state.copyWith(
+          status: GameStatus.over,
+          lives: state.lives - 1,
+          top: state.score,
+        ),
       ),
     );
 
@@ -71,6 +82,14 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       (event, emit) => emit(
         state.copyWith(
           lives: state.lives + 1,
+        ),
+      ),
+    );
+
+    on<RaiseFlag>(
+      (event, emit) => emit(
+        state.copyWith(
+          finish: true,
         ),
       ),
     );

@@ -10,9 +10,13 @@ import 'package:flutter_game/mario/bloc/stats_state.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/overlays/hud_background.dart';
+import 'package:flutter_game/mario/constants/character_vector.dart';
 
 class Hub extends PositionComponent
-    with HasGameRef<MarioGame>, FlameBlocListenable<StatsBloc, StatsState>, KeyboardHandler {
+    with
+        HasGameRef<MarioGame>,
+        FlameBlocListenable<StatsBloc, StatsState>,
+        KeyboardHandler {
   Hub({super.position, super.size});
 
   Component? scoreLabel;
@@ -41,65 +45,28 @@ class Hub extends PositionComponent
 
   late Component mario;
 
-  /// Character vector
-  Map<String, Vector2> characterMap = {
-    '0': Vector2(3, 230),
-    '1': Vector2(11.5, 230),
-    '2': Vector2(19, 230),
-    '3': Vector2(27, 230),
-    '4': Vector2(35, 230),
-    '5': Vector2(43, 230),
-    '6': Vector2(51, 230),
-    '7': Vector2(59, 230),
-    '8': Vector2(67, 230),
-    '9': Vector2(75, 230),
-    'A': Vector2(83, 230),
-    'B': Vector2(91, 230),
-    'C': Vector2(99, 230),
-    'D': Vector2(107, 230),
-    'E': Vector2(115, 230),
-    'F': Vector2(123, 230),
-    'G': Vector2(3, 238),
-    'H': Vector2(11, 238),
-    'I': Vector2(20, 238),
-    'J': Vector2(27, 238),
-    'K': Vector2(35, 238),
-    'L': Vector2(43.5, 238),
-    'M': Vector2(51, 238),
-    'N': Vector2(59, 238),
-    'O': Vector2(67, 238),
-    'P': Vector2(75, 238),
-    'Q': Vector2(83, 238),
-    'R': Vector2(91, 238),
-    'S': Vector2(99, 238),
-    'T': Vector2(107.7, 238),
-    'U': Vector2(115, 238),
-    'V': Vector2(123, 238),
-    'W': Vector2(3, 246),
-    'X': Vector2(11, 246),
-    'Y': Vector2(20, 246),
-    'Z': Vector2(27, 246),
-    ' ': Vector2(48, 248),
-    '-': Vector2(67.5, 246.5),
-    '*': Vector2(75, 247),
-  };
-
   @override
   FutureOr<void> onLoad() async {
     double centerX = size.x / 2;
     double topMargin = 11 * game.scaleSize;
-    add(_buildLabel('MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
-    add(_buildLabel('WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
-    add(_buildLabel('TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
-    add(_buildLabel('1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
+    add(_buildLabel(
+        'MARIO', Vector2(centerX - 16 * 8 * game.scaleSize, topMargin)));
+    add(_buildLabel(
+        'WORLD', Vector2(centerX + 16 * game.scaleSize, topMargin)));
+    add(_buildLabel(
+        'TIME', Vector2(centerX + 16 * 6 * game.scaleSize, topMargin)));
+    add(_buildLabel(
+        '1-1', Vector2(centerX + 22 * game.scaleSize, topMargin * 2)));
 
     coinIcon = CoinIcon(
       CoinType.twinkle,
-      position: Vector2(centerX - 16 * 3 * game.scaleSize, 21.5 * game.scaleSize),
+      position:
+          Vector2(centerX - 16 * 3 * game.scaleSize, 21.5 * game.scaleSize),
       scale: scale * game.scaleSize / 2,
     );
     add(coinIcon);
-    add(_buildLabel('*', Vector2(centerX - (16 * 3 - 6) * game.scaleSize, 21 * game.scaleSize)));
+    add(_buildLabel('*',
+        Vector2(centerX - (16 * 3 - 6) * game.scaleSize, 21 * game.scaleSize)));
 
     spriteComponentBoard = SpriteComponent(
       sprite: Sprite(
@@ -119,19 +86,23 @@ class Hub extends PositionComponent
         srcPosition: Vector2(3, 155),
       ),
       scale: scale * game.scaleSize,
-      position: Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
+      position:
+          Vector2(centerX - 16 * 4 * game.scaleSize, 140 * game.scaleSize),
     );
     add(mushrooms);
-    player1 = _buildLabel('1 PLAYER GAME', Vector2(centerX - 16 * 2.5 * game.scaleSize, 140.5 * game.scaleSize));
+    player1 = _buildLabel('1 PLAYER GAME',
+        Vector2(centerX - 16 * 2.5 * game.scaleSize, 140.5 * game.scaleSize));
     add(player1);
-    player2 = _buildLabel(
-        '2 PLAYER GAME - COMING SOON', Vector2(centerX - 16 * 2.5 * game.scaleSize, 160.5 * game.scaleSize));
+    player2 = _buildLabel('2 PLAYER GAME - COMING SOON',
+        Vector2(centerX - 16 * 2.5 * game.scaleSize, 160.5 * game.scaleSize));
     add(player2);
-    top = _buildLabel('TOP - 000000', Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
+    top = _buildLabel('TOP - 000000',
+        Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
     add(top);
 
     blackBg = HudBackground(size: size);
-    level = _buildLabel('WORLD   1-1  ', Vector2(centerX - 6 * 7 * game.scaleSize, 80 * game.scaleSize));
+    level = _buildLabel('WORLD   1-1  ',
+        Vector2(centerX - 6 * 7 * game.scaleSize, 80 * game.scaleSize));
     mario = SpriteComponent(
       sprite: Sprite(
         game.images.fromCache('mario/mario_bros.png'),
@@ -147,7 +118,8 @@ class Hub extends PositionComponent
     List<Component> list = [];
     Image image = game.images.fromCache('mario/text_images.png');
     for (int i = 0; i < string.length; i++) {
-      Vector2 vector2 = characterMap[string[i]] ?? Vector2(0, 0);
+      Vector2 vector2 =
+          CharacterVector.characterMap[string[i]] ?? Vector2(0, 0);
       list.add(SpriteComponent(
         sprite: Sprite(
           image,
@@ -155,7 +127,6 @@ class Hub extends PositionComponent
           srcSize: Vector2(7, 7),
         ),
         position: Vector2(i * 8, 0),
-        // scale: scale * game.scaleSize,
       ));
     }
     return PositionComponent(
@@ -178,38 +149,52 @@ class Hub extends PositionComponent
 
   @override
   bool onKeyEvent(RawKeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (bloc.state.status == GameStatus.initial) {
+    if (bloc.state.status == GameStatus.initial &&
+        spriteComponentBoard.parent != null) {
       if (keysPressed.contains(LogicalKeyboardKey.keyW) ||
           keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
           keysPressed.contains(LogicalKeyboardKey.keyS) ||
           keysPressed.contains(LogicalKeyboardKey.arrowDown)) {
         playerCount = playerCount == 1 ? 2 : 1;
-        mushrooms.position =
-            Vector2(size.x / 2 - 16 * 4 * game.scaleSize, (playerCount == 1 ? 140 : 160) * game.scaleSize);
+        mushrooms.position = Vector2(size.x / 2 - 16 * 4 * game.scaleSize,
+            (playerCount == 1 ? 140 : 160) * game.scaleSize);
       } else if (keysPressed.contains(LogicalKeyboardKey.enter)) {
         if (blackBg.parent != null) {
           return true;
         }
         if (playerCount == 1) {
-          _buildPreview();
+          _buildPreview(operate: true);
         }
       }
     }
     return true;
   }
 
-  void _buildPreview() {
+  void _buildPreview({bool operate = false}) {
     if (spriteComponentBoard.parent != null) {
       removeAll([spriteComponentBoard, mushrooms, player1, player2, top]);
     }
     double centerX = size.x / 2;
-    final health = _buildLabel('X   ${bloc.state.lives}', Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
-    addAll([blackBg, level, mario, health]);
-    Future.delayed(const Duration(seconds: 1), () {
-      removeAll([blackBg, level, mario, health]);
-      bloc.add(const GameRunning());
-      _startTimer();
-    });
+    if (bloc.state.lives > 0 || operate) {
+      final health = _buildLabel('X   ${bloc.state.lives}',
+          Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
+      addAll([blackBg, level, mario, health]);
+      Future.delayed(const Duration(seconds: 2), () {
+        removeAll([blackBg, level, mario, health]);
+        bloc.add(const GameRunning());
+        _startTimer();
+      });
+    } else {
+      final gameOver = _buildLabel('GAME OVER',
+          Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
+      addAll([blackBg, level, mario, gameOver]);
+      Future.delayed(const Duration(seconds: 2), () {
+        removeAll([blackBg, level, mario, gameOver]);
+        top = _buildLabel('TOP - ${bloc.state.top.toString().padLeft(6, '0')}',
+            Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
+        addAll([spriteComponentBoard, mushrooms, player1, player2, top]);
+      });
+    }
   }
 
   Timer? timer;
@@ -217,7 +202,9 @@ class Hub extends PositionComponent
   void _startTimer() {
     timer = Timer(0.5, repeat: true, onTick: () {
       if (bloc.state.status == GameStatus.running) {
-        bloc.add(const CountDown());
+        if (bloc.state.time > 0) {
+          bloc.add(const CountDown());
+        }
       }
     }, autoStart: true);
   }
@@ -226,6 +213,8 @@ class Hub extends PositionComponent
   void onNewState(StatsState state) {
     super.onNewState(state);
     if (state.status == GameStatus.over) {
+      bloc.add(const GameInitial());
+      game.resetView();
       _buildPreview();
     } else {
       _buildData();
