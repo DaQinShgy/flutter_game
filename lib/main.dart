@@ -1,3 +1,5 @@
+// ignore: depend_on_referenced_packages
+import 'package:collection/collection.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -72,7 +74,15 @@ class _GameMenuState extends State<GameMenu> {
               },
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: _buildMenu(),
+                children: _buildMenu((index) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GameWidget(
+                          game: index == 0 ? TetrisGame() : MarioGame()),
+                    ),
+                  );
+                }),
               ),
             ),
           ],
@@ -82,13 +92,16 @@ class _GameMenuState extends State<GameMenu> {
     );
   }
 
-  List<MenuButton> _buildMenu() {
+  List<MenuButton> _buildMenu(void Function(int) onTap) {
     return games
         .asMap()
         .entries
-        .map((e) => MenuButton(
+        .mapIndexed((index, e) => MenuButton(
               text: e.value,
               isSelected: selectIndex == e.key,
+              onTap: () {
+                onTap(index);
+              },
             ))
         .toList();
   }

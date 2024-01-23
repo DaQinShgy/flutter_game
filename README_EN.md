@@ -2,11 +2,13 @@
 
 请前往 [README](https://github.com/DaQinShgy/flutter_game/blob/main/README.md)
 
-## Tetris game based on the Flutter flame game engine.
+## Tetris, SuperMario game based on the Flutter flame game engine.
 
 [Flame Engine](https://github.com/flame-engine/flame)The goal of the Flame Engine is to provide a complete set of out-of-the-way solutions for common problems that games developed with Flutter might share. Support any platform of **Android**, **iOS**, **Windows**, **mac**, **Linux** and **web**.
 
-UI inspired by [react-tetris](https://github.com/chvin/react-tetris)，Code logic inspired by [flutter-tetris](https://github.com/boyan01/flutter-tetris)。
+Tetris game UI inspired by [react-tetris](https://github.com/chvin/react-tetris)，Code logic inspired by [flutter-tetris](https://github.com/boyan01/flutter-tetris)。
+
+SuperMario game UI, code logic inspired by [Mario-Level-1](https://github.com/justinmeister/Mario-Level-1)。
 
 Open [https://daqinshgy.github.io/flutter_game/](https://daqinshgy.github.io/flutter_game/) to play.
 
