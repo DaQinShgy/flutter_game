@@ -3,6 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_game/chinese_chess/chess_game.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/menu_button.dart';
 import 'package:flutter_game/tetris/constants/strings.dart';
@@ -94,7 +95,11 @@ class _GameMenuState extends State<GameMenu> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => GameWidget(
-                          game: selectIndex == 0 ? TetrisGame() : MarioGame()),
+                          game: selectIndex == 0
+                              ? TetrisGame()
+                              : selectIndex == 1
+                                  ? MarioGame()
+                                  : ChessGame()),
                     ),
                   );
                 }

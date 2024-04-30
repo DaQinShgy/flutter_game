@@ -38,4 +38,5 @@ flutter:
     - assets/images/
     - assets/images/tetris/
     - assets/images/mario/
+    - assets/images/chinese_chess/
     - assets/tiles/
