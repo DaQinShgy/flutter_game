@@ -1,0 +1,19 @@
+{
+  "flutter_game": "Flutter Game",
+  "tetris": "Tetris",
+  "mario": "Mario",
+  "highestScore": "Highest Score",
+  "score": "Score",
+  "startLine": "Start Line",
+  "cleanLine": "Clean Line",
+  "level": "Level",
+  "next": "Next",
+  "pause": "PAUSE",
+  "sounds": "SOUNDS",
+  "reset": "RESET",
+  "drop": "DROP",
+  "left": "LEFT",
+  "right": "RIGHT",
+  "down": "DOWN",
+  "rotation": "ROTATION"
+}

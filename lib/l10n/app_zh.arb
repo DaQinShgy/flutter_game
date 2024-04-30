@@ -1,0 +1,19 @@
+{
+  "flutter_game": "Flutter 游戏",
+  "tetris": "俄罗斯方块",
+  "mario": "超级马里奥",
+  "highestScore": "最高分",
+  "score": "得分",
+  "startLine": "起始行",
+  "cleanLine": "消除行",
+  "level": "等级",
+  "next": "下一个",
+  "pause": "暂停",
+  "sounds": "音效",
+  "reset": "重玩",
+  "drop": "掉落",
+  "left": "左移",
+  "right": "右移",
+  "down": "下移",
+  "rotation": "旋转"
+}

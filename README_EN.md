@@ -26,6 +26,6 @@ Open [https://daqinshgy.github.io/flutter_game/](https://daqinshgy.github.io/flu
 
  Install [Flutter](https://flutter.io/docs/get-started/install)
 
- run in Command Line: `flutter pub get`
+ run in Command Line: `flutter pub get``flutter gen-l10n`
 
  select target device， click run

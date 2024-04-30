@@ -1,31 +1,31 @@
 class Strings {
-  static const String appName = 'TETRIS';
+  static String appName = 'TETRIS';
 
-  static const String highestScore = 'Highest Score';
+  static String highestScore = 'Highest Score';
 
-  static const String score = 'Score';
+  static String score = 'Score';
 
-  static const String startLine = 'Start Line';
+  static String startLine = 'Start Line';
 
-  static const String cleanLine = 'Clean Line';
+  static String cleanLine = 'Clean Line';
 
-  static const String level = 'Level';
+  static String level = 'Level';
 
-  static const String next = 'Next';
+  static String next = 'Next';
 
-  static const String pause = 'PAUSE';
+  static String pause = 'PAUSE';
 
-  static const String sounds = 'SOUNDS';
+  static String sounds = 'SOUNDS';
 
-  static const String reset = 'RESET';
+  static String reset = 'RESET';
 
-  static const String drop = 'DROP';
+  static String drop = 'DROP';
 
-  static const String left = 'LEFT';
+  static String left = 'LEFT';
 
-  static const String right = 'RIGHT';
+  static String right = 'RIGHT';
 
-  static const String down = 'DOWN';
+  static String down = 'DOWN';
 
-  static const String rotation = 'ROTATION';
+  static String rotation = 'ROTATION';
 }
