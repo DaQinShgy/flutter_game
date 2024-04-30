@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
@@ -87,6 +88,7 @@ class EnemyKoopa extends SpriteAnimationComponent
     animation = _getAnimation(shellVector);
     _shelled = true;
     moveSpeed = 0;
+    FlameAudio.play('mario/kick.ogg');
     bloc.add(const ScoreEnemy());
     CoinScore coinScore = CoinScore(
       '100',
@@ -148,6 +150,7 @@ class EnemyKoopa extends SpriteAnimationComponent
   handleDeath(PositionComponent other) {
     _death = true;
     animation = _getAnimation(shellVector);
+    FlameAudio.play('mario/kick.ogg');
     flipVerticallyAroundCenter();
     jumpSpeed = ObjectValues.enemyDeathJumpSpeed;
     horizontalDirection = x >= other.center.x ? 1 : -1;

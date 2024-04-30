@@ -2,15 +2,16 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:flame/components.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
+import 'package:flutter_game/mario/constants/character_vector.dart';
 import 'package:flutter_game/mario/mario_game.dart';
 import 'package:flutter_game/mario/objects/coin_icon.dart';
 import 'package:flutter_game/mario/overlays/hud_background.dart';
-import 'package:flutter_game/mario/constants/character_vector.dart';
 
 class Hub extends PositionComponent
     with
@@ -44,6 +45,10 @@ class Hub extends PositionComponent
   late Component level;
 
   late Component mario;
+
+  AudioPlayer? _playerMain;
+
+  AudioPlayer? _playerInvincible;
 
   @override
   FutureOr<void> onLoad() async {
@@ -145,6 +150,45 @@ class Hub extends PositionComponent
       firstUpdate = false;
       _buildData();
     }
+    _setInvincibleMusic();
+    if (bloc.state.fastCountDown && !_startFast) {
+      _startFast = true;
+      _startFastCountDown();
+      FlameAudio.play('mario/count_down.ogg').then((value) {
+        _playerFastCountDown = value;
+      });
+    }
+  }
+
+  _setInvincibleMusic() async {
+    if (_playerMain != null) {
+      if (game.marioPlayer.invincible &&
+          _playerMain?.state == PlayerState.playing) {
+        _playerMain?.pause();
+        _playerInvincible = await FlameAudio.play('mario/invincible.ogg');
+      } else if (!game.marioPlayer.invincible &&
+          _playerMain?.state == PlayerState.paused) {
+        _playerInvincible?.dispose();
+        _playerMain?.resume();
+      }
+    }
+  }
+
+  bool _startFast = false;
+  AudioPlayer? _playerFastCountDown;
+
+  _startFastCountDown() async {
+    if (bloc.state.time > 0) {
+      bloc.add(const CountDown());
+      bloc.add(const ScoreTime());
+      Future.delayed(const Duration(milliseconds: 1), () {
+        _startFastCountDown();
+      });
+    } else if (_playerFastCountDown?.state != PlayerState.disposed) {
+      _playerFastCountDown?.dispose();
+      bloc.add(const ResetLives());
+      bloc.add(const RaiseFlag());
+    }
   }
 
   @override
@@ -179,17 +223,19 @@ class Hub extends PositionComponent
       final health = _buildLabel('X   ${bloc.state.lives}',
           Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
       addAll([blackBg, level, mario, health]);
-      Future.delayed(const Duration(seconds: 2), () {
+      Future.delayed(const Duration(seconds: 3), () async {
         removeAll([blackBg, level, mario, health]);
         bloc.add(const GameRunning());
         _startTimer();
+        _playerMain = await FlameAudio.play('mario/main_theme.ogg');
       });
     } else {
       final gameOver = _buildLabel('GAME OVER',
-          Vector2(centerX - 8 * game.scaleSize, 115 * game.scaleSize));
-      addAll([blackBg, level, mario, gameOver]);
-      Future.delayed(const Duration(seconds: 2), () {
-        removeAll([blackBg, level, mario, gameOver]);
+          Vector2(centerX - 8 * 4 * game.scaleSize - 4, 115 * game.scaleSize));
+      addAll([blackBg, level, gameOver]);
+      FlameAudio.play('mario/game_over.ogg');
+      Future.delayed(const Duration(seconds: 7), () {
+        removeAll([blackBg, level, gameOver]);
         top = _buildLabel('TOP - ${bloc.state.top.toString().padLeft(6, '0')}',
             Vector2(centerX - 16 * 2 * game.scaleSize, 180 * game.scaleSize));
         addAll([spriteComponentBoard, mushrooms, player1, player2, top]);
@@ -200,10 +246,23 @@ class Hub extends PositionComponent
   Timer? timer;
 
   void _startTimer() {
-    timer = Timer(0.5, repeat: true, onTick: () {
+    timer = Timer(0.5, repeat: true, onTick: () async {
       if (bloc.state.status == GameStatus.running) {
         if (bloc.state.time > 0) {
           bloc.add(const CountDown());
+        }
+        if (bloc.state.time == 100) {
+          if (_playerMain?.state != PlayerState.disposed) {
+            _playerMain?.dispose();
+          }
+          FlameAudio.play('mario/out_of_time.wav').then((value) {
+            value.onPlayerComplete.listen((event) async {
+              if (bloc.state.status == GameStatus.running) {
+                _playerMain =
+                    await FlameAudio.play('mario/main_theme_sped_up.ogg');
+              }
+            });
+          });
         }
       }
     }, autoStart: true);
@@ -218,8 +277,14 @@ class Hub extends PositionComponent
       _buildPreview();
     } else {
       _buildData();
-      if (bloc.state.time <= 0) {
+      if (bloc.state.time <= 0 && !bloc.state.fastCountDown) {
         game.marioPlayer.death();
+      }
+    }
+    if (state.status == GameStatus.dying ||
+        state.status == GameStatus.victory) {
+      if (_playerMain?.state != PlayerState.disposed) {
+        _playerMain?.dispose();
       }
     }
   }

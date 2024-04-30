@@ -1,4 +1,3 @@
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_game/mario/bloc/stats_event.dart';
 import 'package:flutter_game/mario/bloc/stats_state.dart';
@@ -21,13 +20,12 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
     on<GameRunning>(
       (event, emit) {
         emit(state.copyWith(status: GameStatus.running));
-        // FlameAudio.play('mario/main_theme.ogg');
       },
     );
 
-    on<GamePause>(
+    on<GameDying>(
       (event, emit) => emit(
-        state.copyWith(status: GameStatus.pause),
+        state.copyWith(status: GameStatus.dying),
       ),
     );
 
@@ -80,6 +78,14 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       ),
     );
 
+    on<ScoreTime>(
+      (event, emit) => emit(
+        state.copyWith(
+          score: state.score + 50,
+        ),
+      ),
+    );
+
     on<LiveMushroom>(
       (event, emit) => emit(
         state.copyWith(
@@ -92,6 +98,22 @@ class StatsBloc extends Bloc<StatsEvent, StatsState> {
       (event, emit) => emit(
         state.copyWith(
           finish: true,
+        ),
+      ),
+    );
+
+    on<FastCountDown>(
+      (event, emit) => emit(
+        state.copyWith(
+          fastCountDown: true,
+        ),
+      ),
+    );
+
+    on<ResetLives>(
+      (event, emit) => emit(
+        state.copyWith(
+          lives: 0,
         ),
       ),
     );

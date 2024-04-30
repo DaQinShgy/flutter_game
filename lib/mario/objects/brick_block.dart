@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
@@ -104,6 +105,9 @@ class BrickBlock extends PositionComponent
       ));
       if (coinCount-- > 0) {
         _handleCoin();
+        FlameAudio.play('mario/coin.ogg');
+      } else {
+        FlameAudio.play('mario/brick_smash.ogg');
       }
     } else {
       componentBrick.opacity = 0;
@@ -111,6 +115,7 @@ class BrickBlock extends PositionComponent
       _buildBrickPiece(width, 0, 1);
       _buildBrickPiece(0, height, 2);
       _buildBrickPiece(width, height, 3);
+      FlameAudio.play('mario/bump.ogg');
     }
   }
 

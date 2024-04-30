@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/services.dart';
@@ -163,6 +164,7 @@ class MarioPlayer extends SpriteAnimationComponent
         animation = _getAnimation(MarioVectors.bigToSmallVector,
             loop: false, stepTime: 0.07);
         twinkleTime = 0.01;
+        FlameAudio.play('mario/pipe.ogg');
         break;
       case MarioStatus.bigToFireFlower:
         animation = _getAnimation(MarioVectors.bigToFireFlowerVector,
@@ -174,7 +176,8 @@ class MarioPlayer extends SpriteAnimationComponent
         break;
       case MarioStatus.die:
         animation = _getAnimation(MarioVectors.dieVector);
-        bloc.add(const GamePause());
+        bloc.add(const GameDying());
+        FlameAudio.play('mario/death.wav');
         add(SequenceEffect(
           [
             MoveByEffect(
@@ -291,6 +294,11 @@ class MarioPlayer extends SpriteAnimationComponent
         verticalDirection = 1;
         if (jumpSpeed == 0) {
           jumpSpeed = -ObjectValues.marioJumpSpeedMax;
+          if (isSmall) {
+            FlameAudio.play('mario/small_jump.ogg');
+          } else {
+            FlameAudio.play('mario/big_jump.ogg');
+          }
         }
       }
     } else {
@@ -422,7 +430,7 @@ class MarioPlayer extends SpriteAnimationComponent
     } else {
       if (opacity != 0) {
         opacity = 0;
-        bloc.add(const RaiseFlag());
+        bloc.add(const FastCountDown());
       }
     }
 
@@ -570,6 +578,7 @@ class MarioPlayer extends SpriteAnimationComponent
       horizontalDirection = 0;
       bloc.add(const GameVictory());
       _loadStatus(MarioStatus.poleSlide);
+      FlameAudio.play('mario/flagpole.wav');
       add(MoveToEffect(
         Vector2(other.x - width, 184),
         EffectController(duration: 0.5),
@@ -584,6 +593,11 @@ class MarioPlayer extends SpriteAnimationComponent
           await Future.delayed(const Duration(milliseconds: 200));
           _loadStatus(MarioStatus.walk);
           horizontalDirection = 1;
+          FlameAudio.play('mario/stage_clear.wav').then((value) {
+            value.onPlayerComplete.listen((event) {
+              bloc.add(const GameOver());
+            });
+          });
         },
       ));
     }
@@ -596,6 +610,7 @@ class MarioPlayer extends SpriteAnimationComponent
     if (currentTime - _lastFireballTime <= 200) {
       return;
     }
+    FlameAudio.play('mario/fireball.ogg');
     _loadStatus(MarioStatus.bigThrow);
     _lastFireballTime = currentTime;
     game.world.add(PowerupFireball(

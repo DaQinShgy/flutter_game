@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
@@ -166,6 +167,7 @@ class EnemyGoomba extends SpriteAnimationComponent
   handleDeath(PositionComponent other) {
     _death = true;
     animation = _getAnimation(deathJumpVector);
+    FlameAudio.play('mario/kick.ogg');
     flipVerticallyAroundCenter();
     jumpSpeed = ObjectValues.enemyDeathJumpSpeed;
     horizontalDirection = x >= other.center.x ? 1 : -1;
@@ -200,7 +202,7 @@ class EnemyGoomba extends SpriteAnimationComponent
     y += 9;
     animation = _getAnimation(killVector);
     remove(_hitbox);
-
+    FlameAudio.play('mario/kick.ogg');
     bloc.add(const ScoreEnemy());
     CoinScore coinScore = CoinScore(
       '100',

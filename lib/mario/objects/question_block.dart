@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
@@ -100,6 +101,7 @@ class QuestionBlock extends PositionComponent
     switch (type) {
       case QuestionType.coin:
         _handleCoin();
+        FlameAudio.play('mario/coin.ogg');
         break;
       case QuestionType.redMushroom:
         _handleMushroom(MushroomType.red);
@@ -170,10 +172,12 @@ class QuestionBlock extends PositionComponent
 
   void _handleMushroom(MushroomType type) {
     add(PowerupMushroom(type, id));
+    FlameAudio.play('mario/powerup_appears.ogg');
   }
 
   void _handleFlower() {
     add(PowerupFlower());
+    FlameAudio.play('mario/powerup_appears.ogg');
   }
 
   void _handleStar() {}

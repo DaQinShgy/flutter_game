@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 enum GameStatus {
   initial,
   running,
-  pause,
+  dying,
   over,
   victory,
 }
@@ -15,6 +15,7 @@ class StatsState extends Equatable {
   final int time;
   final int lives;
   final int top;
+  final bool fastCountDown;
   final bool finish;
 
   const StatsState({
@@ -24,6 +25,7 @@ class StatsState extends Equatable {
     required this.time,
     required this.lives,
     required this.top,
+    required this.fastCountDown,
     required this.finish,
   });
 
@@ -35,6 +37,7 @@ class StatsState extends Equatable {
           lives: 3,
           time: 400,
           top: 0,
+          fastCountDown: false,
           finish: false,
         );
 
@@ -45,6 +48,7 @@ class StatsState extends Equatable {
     int? time,
     int? lives,
     int? top,
+    bool? fastCountDown,
     bool? finish,
   }) {
     return StatsState(
@@ -54,6 +58,7 @@ class StatsState extends Equatable {
       time: time ?? this.time,
       lives: lives ?? this.lives,
       top: top ?? this.top,
+      fastCountDown: fastCountDown ?? this.fastCountDown,
       finish: finish ?? this.finish,
     );
   }
@@ -66,6 +71,7 @@ class StatsState extends Equatable {
         time,
         lives,
         top,
+        fastCountDown,
         finish,
       ];
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
@@ -19,7 +20,10 @@ import 'package:flutter_game/mario/objects/question_block.dart';
 import 'package:flutter_game/mario/util/collision_util.dart';
 
 class PowerupMushroom extends SpriteComponent
-    with HasGameRef<MarioGame>, CollisionCallbacks, FlameBlocReader<StatsBloc, StatsState> {
+    with
+        HasGameRef<MarioGame>,
+        CollisionCallbacks,
+        FlameBlocReader<StatsBloc, StatsState> {
   PowerupMushroom(this.type, this.id, {super.position, super.priority = -1});
 
   final MushroomType type;
@@ -36,7 +40,8 @@ class PowerupMushroom extends SpriteComponent
 
   @override
   Future<void> onLoad() {
-    List<double> mushroomVector = type == MushroomType.red ? redMushroomVector : greenMushroomVector;
+    List<double> mushroomVector =
+        type == MushroomType.red ? redMushroomVector : greenMushroomVector;
     sprite = Sprite(
       game.images.fromCache('mario/item_objects.png'),
       srcPosition: Vector2(mushroomVector[0], mushroomVector[1]),
@@ -77,8 +82,10 @@ class PowerupMushroom extends SpriteComponent
       }
     }
     double screenWidth = game.size.x / game.scaleSize;
-    if ((parent as PositionComponent).x + x + width < game.cameraComponent.viewfinder.position.x ||
-        (parent as PositionComponent).x + x > game.cameraComponent.viewfinder.position.x + screenWidth ||
+    if ((parent as PositionComponent).x + x + width <
+            game.cameraComponent.viewfinder.position.x ||
+        (parent as PositionComponent).x + x >
+            game.cameraComponent.viewfinder.position.x + screenWidth ||
         (parent as PositionComponent).y + y > game.mapComponent.height) {
       // Mushroom moves off screen edge
       removeFromParent();
@@ -86,7 +93,8 @@ class PowerupMushroom extends SpriteComponent
 
     if (_currentPlatform != null) {
       if (x + (parent as QuestionBlock).x <= _currentPlatform!.x - width ||
-          x + (parent as QuestionBlock).x >= _currentPlatform!.x + _currentPlatform!.width) {
+          x + (parent as QuestionBlock).x >=
+              _currentPlatform!.x + _currentPlatform!.width) {
         if (jumpSpeed == 0) {
           jumpSpeed = 1;
         }
@@ -120,6 +128,7 @@ class PowerupMushroom extends SpriteComponent
             removeFromParent();
           },
         ));
+        FlameAudio.play('mario/powerup.ogg');
       } else {
         bloc.add(const ScoreMushroom());
         CoinScore coinScore = CoinScore(
@@ -137,6 +146,7 @@ class PowerupMushroom extends SpriteComponent
             removeFromParent();
           },
         ));
+        FlameAudio.play('mario/one_up.ogg');
       }
     } else if (other is GroundBlock) {
       HitEdge hitEdge = CollisionUtil.getHitEdge(intersectionPoints, other);
@@ -151,7 +161,8 @@ class PowerupMushroom extends SpriteComponent
       } else if (hitEdge == HitEdge.left) {
         x = other.x - (parent as QuestionBlock).x - width;
       }
-    } else if ((other is QuestionBlock || other is BrickBlock) && horizontalDirection != 0) {
+    } else if ((other is QuestionBlock || other is BrickBlock) &&
+        horizontalDirection != 0) {
       y = other.y - (parent as QuestionBlock).y - height;
       _currentPlatform = other;
       if (jumpSpeed != 0) {

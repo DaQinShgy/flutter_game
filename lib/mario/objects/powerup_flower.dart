@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_bloc/flame_bloc.dart';
 import 'package:flutter_game/mario/actors/mario_player.dart';
 import 'package:flutter_game/mario/bloc/stats_bloc.dart';
@@ -72,6 +73,7 @@ class PowerupFlower extends SpriteAnimationComponent
           removeFromParent();
         },
       ));
+      FlameAudio.play('mario/powerup.ogg');
     }
   }
 }
