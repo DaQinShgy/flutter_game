@@ -26,6 +26,6 @@ Please view [README_EN](https://github.com/DaQinShgy/flutter_game/blob/main/READ
 
  安装 [Flutter](https://flutter.io/docs/get-started/install)
 
- 在命令行输入：`flutter pub get``flutter gen-l10n`
+ 在命令行输入：`flutter pub get` `flutter gen-l10n`
 
  选择设备，点击运行按钮
