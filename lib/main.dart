@@ -40,7 +40,8 @@ class _GameMenuState extends State<GameMenu> {
   Widget build(BuildContext context) {
     games = [
       AppLocalizations.of(context)!.tetris,
-      AppLocalizations.of(context)!.mario
+      AppLocalizations.of(context)!.mario,
+      AppLocalizations.of(context)!.chineseChess
     ];
     return Scaffold(
       body: Center(
@@ -112,7 +113,11 @@ class _GameMenuState extends State<GameMenu> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => GameWidget(
-                          game: index == 0 ? TetrisGame() : MarioGame()),
+                          game: index == 0
+                              ? TetrisGame()
+                              : index == 1
+                                  ? MarioGame()
+                                  : ChessGame()),
                     ),
                   );
                 }),

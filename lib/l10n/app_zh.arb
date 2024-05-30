@@ -2,6 +2,7 @@
   "flutter_game": "Flutter 游戏",
   "tetris": "俄罗斯方块",
   "mario": "超级马里奥",
+  "chineseChess": "中国象棋",
   "highestScore": "最高分",
   "score": "得分",
   "startLine": "起始行",
