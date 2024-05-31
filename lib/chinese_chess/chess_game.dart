@@ -1,8 +1,8 @@
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
 import 'package:flame_bloc/flame_bloc.dart';
-import 'package:flutter_game/tetris/bloc/stats_bloc.dart';
-import 'package:flutter_game/tetris/bloc/stats_state.dart';
+import 'package:flutter_game/chinese_chess/bloc/stats_bloc.dart';
+import 'package:flutter_game/chinese_chess/bloc/stats_state.dart';
 
 import 'objects/app_container.dart';
 
