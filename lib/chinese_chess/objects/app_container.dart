@@ -7,6 +7,7 @@ import 'package:flutter_game/chinese_chess/actors/player.dart';
 import 'package:flutter_game/chinese_chess/bloc/stats_bloc.dart';
 import 'package:flutter_game/chinese_chess/bloc/stats_state.dart';
 import 'package:flutter_game/chinese_chess/chess_game.dart';
+import 'package:flutter_game/chinese_chess/objects/chess_borad.dart';
 
 import 'bottom_control.dart';
 
@@ -29,10 +30,7 @@ class AppContainer extends RectangleComponent
     );
     double chessboardHeight = size.y - size.y / 15 - size.y / 40;
     double chessboardWidth = chessboardHeight * 628 / 730;
-    SpriteComponent spriteChessboard = SpriteComponent(
-      sprite: Sprite(
-        game.images.fromCache('chinese_chess/chessboard.png'),
-      ),
+    ChessBoard chessBoard = ChessBoard(
       size: Vector2(chessboardWidth, chessboardHeight),
       position: Vector2(size.x / 2, size.y / 40),
       anchor: Anchor.topCenter,
@@ -64,7 +62,7 @@ class AppContainer extends RectangleComponent
     );
     addAll([
       spriteBg,
-      spriteChessboard,
+      chessBoard,
       playerLeft,
       playerRight,
       bottomControl,
